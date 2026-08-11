@@ -10,17 +10,24 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ArticlesIndexRouteImport } from './routes/articles.index'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
+import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as SurahIdRouteImport } from './routes/surah.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -53,6 +60,11 @@ const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
   path: '/articles/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PSlugRoute = PSlugRouteImport.update({
+  id: '/p/$slug',
+  path: '/p/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SurahIdRoute = SurahIdRouteImport.update({
   id: '/surah/$id',
   path: '/surah/$id',
@@ -61,32 +73,38 @@ const SurahIdRoute = SurahIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/bookmarks': typeof BookmarksRoute
   '/reset-password': typeof ResetPasswordRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/p/$slug': typeof PSlugRoute
   '/surah/$id': typeof SurahIdRoute
   '/articles/': typeof ArticlesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/bookmarks': typeof BookmarksRoute
   '/reset-password': typeof ResetPasswordRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/p/$slug': typeof PSlugRoute
   '/surah/$id': typeof SurahIdRoute
   '/articles': typeof ArticlesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/bookmarks': typeof BookmarksRoute
   '/reset-password': typeof ResetPasswordRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/p/$slug': typeof PSlugRoute
   '/surah/$id': typeof SurahIdRoute
   '/articles/': typeof ArticlesIndexRoute
 }
@@ -94,42 +112,50 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/admin'
     | '/auth'
     | '/bookmarks'
     | '/reset-password'
     | '/articles/$slug'
+    | '/p/$slug'
     | '/surah/$id'
     | '/articles/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/admin'
     | '/auth'
     | '/bookmarks'
     | '/reset-password'
     | '/articles/$slug'
+    | '/p/$slug'
     | '/surah/$id'
     | '/articles'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/admin'
     | '/auth'
     | '/bookmarks'
     | '/reset-password'
     | '/articles/$slug'
+    | '/p/$slug'
     | '/surah/$id'
     | '/articles/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   BookmarksRoute: typeof BookmarksRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
+  PSlugRoute: typeof PSlugRoute
   SurahIdRoute: typeof SurahIdRoute
   ArticlesIndexRoute: typeof ArticlesIndexRoute
 }
@@ -141,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -185,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArticlesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/p/$slug': {
+      id: '/p/$slug'
+      path: '/p/$slug'
+      fullPath: '/p/$slug'
+      preLoaderRoute: typeof PSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/surah/$id': {
       id: '/surah/$id'
       path: '/surah/$id'
@@ -197,11 +237,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   BookmarksRoute: BookmarksRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
+  PSlugRoute: PSlugRoute,
   SurahIdRoute: SurahIdRoute,
   ArticlesIndexRoute: ArticlesIndexRoute,
 }
