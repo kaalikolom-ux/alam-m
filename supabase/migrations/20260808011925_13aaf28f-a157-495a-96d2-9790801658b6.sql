@@ -1,0 +1,2 @@
+ALTER TABLE public.verse_translations DROP CONSTRAINT verse_translations_lang_check;
+ALTER TABLE public.verse_translations ADD CONSTRAINT verse_translations_lang_check CHECK (lang = ANY (ARRAY['bn'::text, 'en'::text, 'bn_std'::text, 'en_std'::text]));
