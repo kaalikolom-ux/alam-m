@@ -73,6 +73,23 @@ function ArticlesPage() {
               )}
             </div>
             <div className="flex min-w-0 flex-1 flex-col p-5">
+              {a.article_categories.length > 0 && (
+                <div className="mb-2 flex flex-wrap gap-1.5">
+                  {a.article_categories.map(
+                    (ac) =>
+                      ac.categories && (
+                        <span
+                          key={ac.categories.id}
+                          className="rounded-full border border-primary/40 px-2 py-0.5 text-[11px] text-primary"
+                        >
+                          {lang === "en" && ac.categories.name_en
+                            ? ac.categories.name_en
+                            : ac.categories.name_bn}
+                        </span>
+                      ),
+                  )}
+                </div>
+              )}
               <h2 className="text-lg font-semibold transition-colors group-hover:text-primary">
                 {lang === "en" && a.title_en ? a.title_en : a.title_bn}
               </h2>
