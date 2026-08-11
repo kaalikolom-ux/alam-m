@@ -29,7 +29,9 @@ function ArticlesPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select("id, slug, title_bn, title_en, excerpt_bn, excerpt_en, published_at, cover_image_url")
+        .select(
+          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en))",
+        )
         .eq("published", true)
         .order("published_at", { ascending: false });
       if (error) throw error;
