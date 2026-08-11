@@ -139,6 +139,7 @@ function ArticlesAdmin() {
   const [published, setPublished] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [authorId, setAuthorId] = useState<string>("");
+  const [catIds, setCatIds] = useState<string[]>([]);
 
   const authors = useQuery({
     queryKey: ["authors"],
@@ -149,12 +150,21 @@ function ArticlesAdmin() {
     },
   });
 
+  const categories = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("categories").select("*").order("name_bn");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const list = useQuery({
     queryKey: ["admin-articles"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select("*")
+        .select("*, article_categories(category_id)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -178,12 +188,27 @@ function ArticlesAdmin() {
         published_at: published ? new Date().toISOString() : null,
         created_by: user!.id,
       };
+      let articleId = editingId;
       if (editingId) {
         const { error } = await supabase.from("articles").update(payload).eq("id", editingId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("articles").insert(payload);
+        const { data, error } = await supabase.from("articles").insert(payload).select("id").single();
         if (error) throw error;
+        articleId = data.id;
+      }
+      if (articleId) {
+        const { error: delError } = await supabase
+          .from("article_categories")
+          .delete()
+          .eq("article_id", articleId);
+        if (delError) throw delError;
+        if (catIds.length > 0) {
+          const { error: insError } = await supabase
+            .from("article_categories")
+            .insert(catIds.map((category_id) => ({ article_id: articleId!, category_id })));
+          if (insError) throw insError;
+        }
       }
     },
     onSuccess: () => {
@@ -192,10 +217,12 @@ function ArticlesAdmin() {
       setForm({ ...EMPTY });
       setEditingId(null);
       setAuthorId("");
+      setCatIds([]);
       toast.success(t("saved"));
     },
     onError: (error: Error) => toast.error(error.message),
   });
+
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
