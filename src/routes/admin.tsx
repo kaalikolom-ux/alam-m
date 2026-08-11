@@ -301,6 +301,33 @@ function ArticlesAdmin() {
             ))}
           </select>
         </div>
+        <div className="space-y-2">
+          <Label>{t("categories")}</Label>
+          {categories.data?.length === 0 && (
+            <p className="text-xs text-muted-foreground">{t("noCategories")}</p>
+          )}
+          <div className="flex flex-wrap gap-2">
+            {categories.data?.map((c) => {
+              const active = catIds.includes(c.id);
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() =>
+                    setCatIds(active ? catIds.filter((id) => id !== c.id) : [...catIds, c.id])
+                  }
+                  className={
+                    active
+                      ? "rounded-full border border-primary bg-primary px-3 py-1 text-xs font-medium text-primary-foreground"
+                      : "rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:border-primary"
+                  }
+                >
+                  {c.name_bn}
+                </button>
+              );
+            })}
+          </div>
+        </div>
         <div className="flex gap-2">
           <Button type="submit" disabled={save.isPending}>
             <Plus className="size-4" /> {t("save")}
