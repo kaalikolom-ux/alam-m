@@ -22,15 +22,6 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
         {t("home")}
       </Link>
       <Link
-        to="/surah/$id"
-        params={{ id: "1" }}
-        onClick={onNavigate}
-        activeProps={{ className: "text-primary" }}
-        className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
-      >
-        {t("readQuran")}
-      </Link>
-      <Link
         to="/articles"
         onClick={onNavigate}
         activeProps={{ className: "text-primary" }}

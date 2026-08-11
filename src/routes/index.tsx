@@ -1,15 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { ArrowRight, BookOpen, Search, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 
-import { chaptersQuery, localNumber } from "@/lib/quran";
 import { usePrefs } from "@/lib/prefs";
 import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { NewsletterForm } from "@/components/NewsletterForm";
-import { DisplayToggles } from "@/components/DisplayToggles";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,16 +23,11 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
-  loader: ({ context }) => {
-    context.queryClient.ensureQueryData(chaptersQuery("bn"));
-  },
   component: HomePage,
 });
 
 function HomePage() {
   const { t, lang } = usePrefs();
-  const [term, setTerm] = useState("");
-  const chapters = useQuery(chaptersQuery(lang));
 
   const articles = useQuery({
     queryKey: ["articles", "published", "home"],
@@ -51,18 +42,6 @@ function HomePage() {
       return data;
     },
   });
-
-  const filtered = useMemo(() => {
-    const list = chapters.data ?? [];
-    const q = term.trim().toLowerCase();
-    if (!q) return list;
-    return list.filter(
-      (c) =>
-        c.name_simple.toLowerCase().includes(q) ||
-        c.translated_name.name.toLowerCase().includes(q) ||
-        String(c.id) === q,
-    );
-  }, [chapters.data, term]);
 
   return (
     <div>
@@ -84,11 +63,6 @@ function HomePage() {
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/80">{t("heroSub")}</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg" variant="secondary">
-              <Link to="/surah/$id" params={{ id: "1" }}>
-                <BookOpen className="size-4" /> {t("readQuran")}
-              </Link>
-            </Button>
             <Button
               asChild
               size="lg"
@@ -97,58 +71,6 @@ function HomePage() {
             >
               <Link to="/articles">{t("articles")}</Link>
             </Button>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto w-full max-w-6xl px-4 py-14">
-        <div className="grid gap-8 lg:grid-cols-[1fr_280px]">
-          {/* Mobile: settings first for instant access. Desktop: right sidebar. */}
-          <aside className="order-first space-y-4 lg:order-last lg:sticky lg:top-24 lg:self-start">
-            <DisplayToggles />
-          </aside>
-
-          <div className="min-w-0">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2 className="text-2xl font-semibold">
-            {t("surahs")} <span className="text-muted-foreground">({localNumber(114, lang)})</span>
-          </h2>
-          <div className="relative w-full max-w-xs">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={term}
-              onChange={(e) => setTerm(e.target.value)}
-              placeholder={t("searchSurah")}
-              className="pl-9"
-            />
-          </div>
-        </div>
-
-        {chapters.isLoading ? (
-          <p className="mt-8 text-sm text-muted-foreground">{t("loading")}</p>
-        ) : (
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((c) => (
-              <Link
-                key={c.id}
-                to="/surah/$id"
-                params={{ id: String(c.id) }}
-                className="card-soft group flex items-center gap-4 p-4 transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
-              >
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent text-sm font-semibold text-accent-foreground">
-                  {localNumber(c.id, lang)}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-medium">{c.name_simple}</span>
-                  <span className="block truncate text-xs text-muted-foreground">
-                    {c.translated_name.name} · {localNumber(c.verses_count, lang)} {t("verses")}
-                  </span>
-                </span>
-                <span className="arabic text-lg text-primary">{c.name_arabic}</span>
-              </Link>
-            ))}
-          </div>
-        )}
           </div>
         </div>
       </section>
