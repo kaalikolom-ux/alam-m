@@ -61,13 +61,26 @@ function AdminPage() {
     <div className="mx-auto w-full max-w-4xl px-4 py-12">
       <h1 className="text-3xl font-semibold">{t("dashboard")}</h1>
       <Tabs defaultValue="articles" className="mt-8">
-        <TabsList>
+        <TabsList className="flex flex-wrap">
           <TabsTrigger value="articles">{t("articles")}</TabsTrigger>
+          <TabsTrigger value="categories">{t("categoriesTab")}</TabsTrigger>
+          <TabsTrigger value="pages">{t("pagesTab")}</TabsTrigger>
+          <TabsTrigger value="menus">{t("menusTab")}</TabsTrigger>
           <TabsTrigger value="posts">{t("postSettings")}</TabsTrigger>
+          <TabsTrigger value="messages">{t("messagesTab")}</TabsTrigger>
           <TabsTrigger value="subs">{t("subscribersTab")}</TabsTrigger>
         </TabsList>
         <TabsContent value="articles" className="mt-6">
           <ArticlesAdmin />
+        </TabsContent>
+        <TabsContent value="categories" className="mt-6">
+          <CategoriesAdmin />
+        </TabsContent>
+        <TabsContent value="pages" className="mt-6">
+          <PagesAdmin />
+        </TabsContent>
+        <TabsContent value="menus" className="mt-6">
+          <MenuAdmin />
         </TabsContent>
         <TabsContent value="posts" className="mt-6">
           <div className="space-y-4">
@@ -75,10 +88,14 @@ function AdminPage() {
             <AuthorsAdmin />
           </div>
         </TabsContent>
+        <TabsContent value="messages" className="mt-6">
+          <MessagesAdmin />
+        </TabsContent>
         <TabsContent value="subs" className="mt-6">
           <SubscribersAdmin />
         </TabsContent>
       </Tabs>
+
     </div>
   );
 }
