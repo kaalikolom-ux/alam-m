@@ -46,23 +46,19 @@ function HomePage() {
   return (
     <div>
       <section className="hero-surface relative overflow-hidden">
-        <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:py-28">
-          <p className="inline-flex items-center gap-2 rounded-full border border-white/25 px-3 py-1 text-xs font-medium tracking-wide">
+        <div className="mx-auto w-full max-w-3xl px-4 py-16 text-center sm:py-24">
+          <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/25 px-3 py-1 text-xs font-medium tracking-wide">
             <Sparkles className="size-3.5" /> {t("tagline")}
           </p>
-          <h1 className="mt-6 max-w-3xl text-4xl font-bold leading-tight sm:text-5xl">
-            {lang === "bn" ? (
-              <>
-                পবিত্র কুরআন — <span className="gold-text">শব্দে শব্দে</span> বুঝে পড়ুন
-              </>
-            ) : (
-              <>
-                The Holy Quran — understand it <span className="gold-text">word by word</span>
-              </>
-            )}
+          <h1 className="mt-6 text-3xl font-bold leading-tight sm:text-5xl">
+            আমি <span className="gold-text">আলম</span>
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/80">{t("heroSub")}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-white/80 sm:text-base">
+            শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। আমার
+            লেখার মাধ্যমে আমি ক্ষণিকের ভাবনাগুলোকে এমন বাক্যে রূপ দিতে চাই, যা পাঠের অনেক পরেও
+            মনে রয়ে যায়। শব্দ আমার ক্যানভাস, আর গল্প আমার রঙ — যেগুলো দিয়ে আমি আঁকি।
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button
               asChild
               size="lg"
@@ -74,6 +70,7 @@ function HomePage() {
           </div>
         </div>
       </section>
+
 
       <section className="border-t border-border bg-secondary/40">
         <div className="mx-auto w-full max-w-6xl px-4 py-14">
