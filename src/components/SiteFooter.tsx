@@ -15,9 +15,6 @@ export function SiteFooter() {
           <Link to="/" className="text-muted-foreground hover:text-primary">
             {t("home")}
           </Link>
-          <Link to="/surah/$id" params={{ id: "1" }} className="text-muted-foreground hover:text-primary">
-            {t("readQuran")}
-          </Link>
           <Link to="/articles" className="text-muted-foreground hover:text-primary">
             {t("articles")}
           </Link>
