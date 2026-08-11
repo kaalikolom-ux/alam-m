@@ -14,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { OfflineSyncAdmin } from "@/components/OfflineSyncAdmin";
 import { AuthorsAdmin } from "@/components/AuthorsAdmin";
 
 export const Route = createFileRoute("/admin")({
@@ -64,25 +63,17 @@ function AdminPage() {
       <Tabs defaultValue="articles" className="mt-8">
         <TabsList>
           <TabsTrigger value="articles">{t("articles")}</TabsTrigger>
-          <TabsTrigger value="translations">{t("translationsTab")}</TabsTrigger>
           <TabsTrigger value="posts">{t("postSettings")}</TabsTrigger>
-          <TabsTrigger value="offline">{t("offlineTab")}</TabsTrigger>
           <TabsTrigger value="subs">{t("subscribersTab")}</TabsTrigger>
         </TabsList>
         <TabsContent value="articles" className="mt-6">
           <ArticlesAdmin />
-        </TabsContent>
-        <TabsContent value="translations" className="mt-6">
-          <TranslationsAdmin />
         </TabsContent>
         <TabsContent value="posts" className="mt-6">
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">{t("authorsTab")}</p>
             <AuthorsAdmin />
           </div>
-        </TabsContent>
-        <TabsContent value="offline" className="mt-6">
-          <OfflineSyncAdmin />
         </TabsContent>
         <TabsContent value="subs" className="mt-6">
           <SubscribersAdmin />
@@ -318,158 +309,6 @@ function ArticlesAdmin() {
               size="icon"
               aria-label={t("delete")}
               onClick={() => remove.mutate(a.id)}
-            >
-              <Trash2 className="size-4 text-destructive" />
-            </Button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-const transSchema = z.object({
-  surah: z.coerce.number().int().min(1).max(114),
-  ayah: z.coerce.number().int().min(1).max(300),
-  lang: z.enum(["bn", "en", "bn_std", "en_std"]),
-  text: z.string().trim().min(1).max(8000),
-  note: z.string().trim().max(4000),
-});
-
-function TranslationsAdmin() {
-  const { t } = usePrefs();
-  const { user } = useSession();
-  const queryClient = useQueryClient();
-  const [surah, setSurah] = useState("1");
-  const [ayah, setAyah] = useState("1");
-  const [lng, setLng] = useState<"bn" | "en" | "bn_std" | "en_std">("bn");
-  const [text, setText] = useState("");
-  const [note, setNote] = useState("");
-
-  const list = useQuery({
-    queryKey: ["admin-verse-translations", surah],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("verse_translations")
-        .select("*")
-        .eq("surah", Number(surah) || 1)
-        .order("ayah");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const save = useMutation({
-    mutationFn: async () => {
-      const parsed = transSchema.safeParse({ surah, ayah, lang: lng, text, note });
-      if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Invalid input");
-      const { error } = await supabase.from("verse_translations").upsert(
-        {
-          surah: parsed.data.surah,
-          ayah: parsed.data.ayah,
-          lang: parsed.data.lang,
-          text: parsed.data.text,
-          note: parsed.data.note || null,
-          created_by: user!.id,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "surah,ayah,lang" },
-      );
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-verse-translations"] });
-      queryClient.invalidateQueries({ queryKey: ["verse-translations"] });
-      setText("");
-      setNote("");
-      toast.success(t("saved"));
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-
-  const remove = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("verse_translations").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-verse-translations"] });
-      queryClient.invalidateQueries({ queryKey: ["verse-translations"] });
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-
-  return (
-    <div className="space-y-8">
-      <form
-        className="card-soft space-y-4 p-6"
-        onSubmit={(e) => {
-          e.preventDefault();
-          save.mutate();
-        }}
-      >
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="space-y-2">
-            <Label htmlFor="surah">{t("surahNumber")}</Label>
-            <Input
-              id="surah"
-              type="number"
-              min={1}
-              max={114}
-              value={surah}
-              onChange={(e) => setSurah(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="ayah">{t("ayahNumber")}</Label>
-            <Input
-              id="ayah"
-              type="number"
-              min={1}
-              value={ayah}
-              onChange={(e) => setAyah(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="lng">{t("translationType")}</Label>
-            <select
-              id="lng"
-              value={lng}
-              onChange={(e) => setLng(e.target.value as typeof lng)}
-              className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
-            >
-              <option value="bn">{t("sciBn")}</option>
-              <option value="en">{t("sciEn")}</option>
-              <option value="bn_std">{t("stdBn")}</option>
-              <option value="en_std">{t("stdEn")}</option>
-            </select>
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="text">{t("translationText")}</Label>
-          <Textarea id="text" rows={5} value={text} onChange={(e) => setText(e.target.value)} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="note">{t("note")}</Label>
-          <Textarea id="note" rows={3} value={note} onChange={(e) => setNote(e.target.value)} />
-        </div>
-        <Button type="submit" disabled={save.isPending}>
-          {t("save")}
-        </Button>
-      </form>
-
-      <div className="space-y-3">
-        {list.data?.map((v) => (
-          <div key={v.id} className="card-soft flex items-start gap-3 p-4">
-            <span className="rounded-full bg-accent px-2.5 py-1 text-xs text-accent-foreground">
-              {v.surah}:{v.ayah} · {v.lang}
-            </span>
-            <p className="min-w-0 flex-1 text-sm">{v.text}</p>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={t("delete")}
-              onClick={() => remove.mutate(v.id)}
             >
               <Trash2 className="size-4 text-destructive" />
             </Button>
