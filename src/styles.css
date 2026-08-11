@@ -49,7 +49,7 @@
   --font-sans: "Noto Serif Bengali", "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", "Noto Serif Bengali", ui-sans-serif, sans-serif;
   --font-arabic: "Amiri", "Scheherazade New", serif;
-  --font-logo: "Kaushan Script", cursive;
+  --font-logo: "Kaushan Script", "Brush Script MT", "Segoe Script", "Snell Roundhand", cursive;
   --shadow-soft: 0 1px 2px oklch(0.2 0.06 262 / 0.06), 0 12px 32px -18px oklch(0.2 0.06 262 / 0.3);
   --shadow-lift: 0 2px 6px oklch(0.2 0.06 262 / 0.1), 0 24px 56px -24px oklch(0.2 0.06 262 / 0.35);
 }
