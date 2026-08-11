@@ -339,6 +339,7 @@ function ArticlesAdmin() {
               onClick={() => {
                 setEditingId(null);
                 setForm({ ...EMPTY });
+                setCatIds([]);
               }}
             >
               {t("cancel")}
@@ -364,6 +365,7 @@ function ArticlesAdmin() {
                 setEditingId(a.id);
                 setPublished(a.published);
                 setAuthorId(a.author_id ?? "");
+                setCatIds((a.article_categories ?? []).map((ac) => ac.category_id));
                 setForm({
                   slug: a.slug,
                   title_bn: a.title_bn,
