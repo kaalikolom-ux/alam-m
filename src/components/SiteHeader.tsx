@@ -3,35 +3,46 @@ import { Bookmark, Languages, LogIn, LogOut, Moon, Shield, Sun, Menu } from "luc
 import { useState } from "react";
 
 import { usePrefs } from "@/lib/prefs";
+import { useMenu } from "@/lib/menu";
 import { useIsAdmin, useSession } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
-  const { t } = usePrefs();
+const FALLBACK = [
+  { id: "home", label_bn: "হোম", label_en: "Home", url: "/" },
+  { id: "articles", label_bn: "আর্টিকেল", label_en: "Articles", url: "/articles" },
+  { id: "about", label_bn: "আমার পাতা", label_en: "About Me", url: "/about" },
+  { id: "contact", label_bn: "যোগাযোগ", label_en: "Contact", url: "/contact" },
+];
+
+function NavLinks({ onNavigate, mobile }: { onNavigate?: () => void; mobile?: boolean }) {
+  const { lang } = usePrefs();
+  const menu = useMenu("header");
+  const items = menu.data && menu.data.length > 0 ? menu.data : FALLBACK;
+
   return (
     <>
-      <Link
-        to="/"
-        onClick={onNavigate}
-        activeOptions={{ exact: true }}
-        activeProps={{ className: "text-primary" }}
-        className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
-      >
-        {t("home")}
-      </Link>
-      <Link
-        to="/articles"
-        onClick={onNavigate}
-        activeProps={{ className: "text-primary" }}
-        className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
-      >
-        {t("articles")}
-      </Link>
+      {items.map((item) => (
+        <Link
+          key={item.id}
+          to={item.url as "/"}
+          onClick={onNavigate}
+          activeOptions={{ exact: item.url === "/" }}
+          activeProps={{ className: "text-primary" }}
+          className={
+            mobile
+              ? "text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
+              : "text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
+          }
+        >
+          {lang === "en" && item.label_en ? item.label_en : item.label_bn}
+        </Link>
+      ))}
     </>
   );
 }
+
 
 export function SiteHeader() {
   const { t, lang, toggleLang, dark, setDark } = usePrefs();

@@ -29,7 +29,9 @@ function ArticlesPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select("id, slug, title_bn, title_en, excerpt_bn, excerpt_en, published_at, cover_image_url")
+        .select(
+          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en))",
+        )
         .eq("published", true)
         .order("published_at", { ascending: false });
       if (error) throw error;
@@ -71,6 +73,23 @@ function ArticlesPage() {
               )}
             </div>
             <div className="flex min-w-0 flex-1 flex-col p-5">
+              {a.article_categories.length > 0 && (
+                <div className="mb-2 flex flex-wrap gap-1.5">
+                  {a.article_categories.map(
+                    (ac) =>
+                      ac.categories && (
+                        <span
+                          key={ac.categories.id}
+                          className="rounded-full border border-primary/40 px-2 py-0.5 text-[11px] text-primary"
+                        >
+                          {lang === "en" && ac.categories.name_en
+                            ? ac.categories.name_en
+                            : ac.categories.name_bn}
+                        </span>
+                      ),
+                  )}
+                </div>
+              )}
               <h2 className="text-lg font-semibold transition-colors group-hover:text-primary">
                 {lang === "en" && a.title_en ? a.title_en : a.title_bn}
               </h2>

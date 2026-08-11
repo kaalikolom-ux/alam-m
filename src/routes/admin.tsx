@@ -15,6 +15,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuthorsAdmin } from "@/components/AuthorsAdmin";
+import { CategoriesAdmin } from "@/components/admin/CategoriesAdmin";
+import { PagesAdmin } from "@/components/admin/PagesAdmin";
+import { MenuAdmin } from "@/components/admin/MenuAdmin";
+import { MessagesAdmin } from "@/components/admin/MessagesAdmin";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -61,13 +65,26 @@ function AdminPage() {
     <div className="mx-auto w-full max-w-4xl px-4 py-12">
       <h1 className="text-3xl font-semibold">{t("dashboard")}</h1>
       <Tabs defaultValue="articles" className="mt-8">
-        <TabsList>
+        <TabsList className="flex flex-wrap">
           <TabsTrigger value="articles">{t("articles")}</TabsTrigger>
+          <TabsTrigger value="categories">{t("categoriesTab")}</TabsTrigger>
+          <TabsTrigger value="pages">{t("pagesTab")}</TabsTrigger>
+          <TabsTrigger value="menus">{t("menusTab")}</TabsTrigger>
           <TabsTrigger value="posts">{t("postSettings")}</TabsTrigger>
+          <TabsTrigger value="messages">{t("messagesTab")}</TabsTrigger>
           <TabsTrigger value="subs">{t("subscribersTab")}</TabsTrigger>
         </TabsList>
         <TabsContent value="articles" className="mt-6">
           <ArticlesAdmin />
+        </TabsContent>
+        <TabsContent value="categories" className="mt-6">
+          <CategoriesAdmin />
+        </TabsContent>
+        <TabsContent value="pages" className="mt-6">
+          <PagesAdmin />
+        </TabsContent>
+        <TabsContent value="menus" className="mt-6">
+          <MenuAdmin />
         </TabsContent>
         <TabsContent value="posts" className="mt-6">
           <div className="space-y-4">
@@ -75,10 +92,14 @@ function AdminPage() {
             <AuthorsAdmin />
           </div>
         </TabsContent>
+        <TabsContent value="messages" className="mt-6">
+          <MessagesAdmin />
+        </TabsContent>
         <TabsContent value="subs" className="mt-6">
           <SubscribersAdmin />
         </TabsContent>
       </Tabs>
+
     </div>
   );
 }
@@ -118,6 +139,7 @@ function ArticlesAdmin() {
   const [published, setPublished] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [authorId, setAuthorId] = useState<string>("");
+  const [catIds, setCatIds] = useState<string[]>([]);
 
   const authors = useQuery({
     queryKey: ["authors"],
@@ -128,12 +150,21 @@ function ArticlesAdmin() {
     },
   });
 
+  const categories = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("categories").select("*").order("name_bn");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const list = useQuery({
     queryKey: ["admin-articles"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select("*")
+        .select("*, article_categories(category_id)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -157,12 +188,27 @@ function ArticlesAdmin() {
         published_at: published ? new Date().toISOString() : null,
         created_by: user!.id,
       };
+      let articleId = editingId;
       if (editingId) {
         const { error } = await supabase.from("articles").update(payload).eq("id", editingId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("articles").insert(payload);
+        const { data, error } = await supabase.from("articles").insert(payload).select("id").single();
         if (error) throw error;
+        articleId = data.id;
+      }
+      if (articleId) {
+        const { error: delError } = await supabase
+          .from("article_categories")
+          .delete()
+          .eq("article_id", articleId);
+        if (delError) throw delError;
+        if (catIds.length > 0) {
+          const { error: insError } = await supabase
+            .from("article_categories")
+            .insert(catIds.map((category_id) => ({ article_id: articleId!, category_id })));
+          if (insError) throw insError;
+        }
       }
     },
     onSuccess: () => {
@@ -171,10 +217,12 @@ function ArticlesAdmin() {
       setForm({ ...EMPTY });
       setEditingId(null);
       setAuthorId("");
+      setCatIds([]);
       toast.success(t("saved"));
     },
     onError: (error: Error) => toast.error(error.message),
   });
+
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
@@ -253,6 +301,33 @@ function ArticlesAdmin() {
             ))}
           </select>
         </div>
+        <div className="space-y-2">
+          <Label>{t("categories")}</Label>
+          {categories.data?.length === 0 && (
+            <p className="text-xs text-muted-foreground">{t("noCategories")}</p>
+          )}
+          <div className="flex flex-wrap gap-2">
+            {categories.data?.map((c) => {
+              const active = catIds.includes(c.id);
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() =>
+                    setCatIds(active ? catIds.filter((id) => id !== c.id) : [...catIds, c.id])
+                  }
+                  className={
+                    active
+                      ? "rounded-full border border-primary bg-primary px-3 py-1 text-xs font-medium text-primary-foreground"
+                      : "rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:border-primary"
+                  }
+                >
+                  {c.name_bn}
+                </button>
+              );
+            })}
+          </div>
+        </div>
         <div className="flex gap-2">
           <Button type="submit" disabled={save.isPending}>
             <Plus className="size-4" /> {t("save")}
@@ -264,6 +339,7 @@ function ArticlesAdmin() {
               onClick={() => {
                 setEditingId(null);
                 setForm({ ...EMPTY });
+                setCatIds([]);
               }}
             >
               {t("cancel")}
@@ -289,6 +365,7 @@ function ArticlesAdmin() {
                 setEditingId(a.id);
                 setPublished(a.published);
                 setAuthorId(a.author_id ?? "");
+                setCatIds((a.article_categories ?? []).map((ac) => ac.category_id));
                 setForm({
                   slug: a.slug,
                   title_bn: a.title_bn,
