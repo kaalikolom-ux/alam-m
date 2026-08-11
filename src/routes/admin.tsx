@@ -15,6 +15,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuthorsAdmin } from "@/components/AuthorsAdmin";
+import { CategoriesAdmin } from "@/components/admin/CategoriesAdmin";
+import { PagesAdmin } from "@/components/admin/PagesAdmin";
+import { MenuAdmin } from "@/components/admin/MenuAdmin";
+import { MessagesAdmin } from "@/components/admin/MessagesAdmin";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
