@@ -444,6 +444,36 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          created_at: string
+          footer_about_bn: string | null
+          footer_about_en: string | null
+          footer_copyright_bn: string | null
+          footer_copyright_en: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          footer_about_bn?: string | null
+          footer_about_en?: string | null
+          footer_copyright_bn?: string | null
+          footer_copyright_en?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          footer_about_bn?: string | null
+          footer_about_en?: string | null
+          footer_copyright_bn?: string | null
+          footer_copyright_en?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
