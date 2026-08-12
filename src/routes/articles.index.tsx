@@ -43,6 +43,18 @@ function ArticlesPage() {
     },
   });
 
+  const isMobile = useIsMobile();
+  const pageSize = isMobile ? 6 : 9;
+  const [page, setPage] = useState(0);
+  const items = articles.data ?? [];
+  const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
+
+  useEffect(() => {
+    setPage(0);
+  }, [pageSize, items.length]);
+
+  const visible = items.slice(page * pageSize, page * pageSize + pageSize);
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12">
       <h1 className="text-3xl font-semibold">{t("articles")}</h1>
@@ -54,10 +66,11 @@ function ArticlesPage() {
         <p className="mt-8 text-sm text-muted-foreground">{t("noArticles")}</p>
       )}
 
-      <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {articles.data?.map((a) => (
+      <div className="mt-8 grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {visible.map((a) => (
           <Link
             key={a.id}
+
             to="/articles/$slug"
             params={{ slug: a.slug }}
             className="card-soft group flex h-full flex-col overflow-hidden border border-border/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]"
