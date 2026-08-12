@@ -5,8 +5,8 @@ type Dict = Record<string, { bn: string; en: string }>;
 export const dict: Dict = {
   siteName: { bn: "কুরআন অন্বেষা", en: "Quran Explorer" },
   tagline: {
-    bn: "শব্দে শব্দে অর্থ, প্রচলিত ও বিজ্ঞানভিত্তিক অনুবাদ — একই পাতায়",
-    en: "Word-by-word meaning, classical and science-based translation — on one page",
+    bn: "শব্দ আমার ক্যানভাস, গল্প আমার রঙ; লেখার তুলিতে আঁকি ভাবনা",
+    en: "Words are my canvas, stories my colours; with the brush of writing I paint thoughts",
   },
   heroSub: {
     bn: "পবিত্র কুরআনের প্রতিটি আয়াত পড়ুন আরবি, শব্দে শব্দে অর্থ, বাংলা ও ইংরেজি অনুবাদসহ। যেকোনো অংশ টগল করে দেখুন বা লুকান।",
