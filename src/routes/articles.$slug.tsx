@@ -71,6 +71,15 @@ function ArticlePage() {
   const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
   const content = lang === "en" && a.content_en ? a.content_en : a.content_bn;
 
+  const list = siblings.data ?? [];
+  const idx = list.findIndex((s) => s.slug === slug);
+  const newer = idx > 0 ? list[idx - 1] : null;
+  const older = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
+  const label = (s: { title_bn: string; title_en: string | null }) =>
+    lang === "en" && s.title_en ? s.title_en : s.title_bn;
+
+
+
   return (
     <article className="mx-auto w-full max-w-3xl px-4 py-12">
       <Link to="/articles" className="inline-flex items-center gap-1 text-sm text-primary">
