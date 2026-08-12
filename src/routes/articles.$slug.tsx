@@ -161,7 +161,3 @@ function ArticlePage() {
     </article>
   );
 }
-
-
-  );
-}
