@@ -116,8 +116,52 @@ function ArticlePage() {
         ))}
       </div>
 
+      {(newer || older) && (
+        <nav className="mt-12 grid gap-4 sm:grid-cols-2">
+          {newer ? (
+            <Link
+              to="/articles/$slug"
+              params={{ slug: newer.slug }}
+              className="card-soft group flex items-center gap-3 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]"
+            >
+              <ArrowLeft className="size-4 shrink-0 text-primary transition-transform group-hover:-translate-x-1" />
+              <span className="min-w-0">
+                <span className="block text-[11px] uppercase tracking-wide text-muted-foreground">
+                  {lang === "bn" ? "পূর্ববর্তী পোস্ট" : "Previous post"}
+                </span>
+                <span className="mt-0.5 line-clamp-2 block text-xs font-medium transition-colors group-hover:text-primary">
+                  {label(newer)}
+                </span>
+              </span>
+            </Link>
+          ) : (
+            <span />
+          )}
+          {older && (
+            <Link
+              to="/articles/$slug"
+              params={{ slug: older.slug }}
+              className="card-soft group flex items-center justify-end gap-3 p-4 text-right transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]"
+            >
+              <span className="min-w-0">
+                <span className="block text-[11px] uppercase tracking-wide text-muted-foreground">
+                  {lang === "bn" ? "পরবর্তী পোস্ট" : "Next post"}
+                </span>
+                <span className="mt-0.5 line-clamp-2 block text-xs font-medium transition-colors group-hover:text-primary">
+                  {label(older)}
+                </span>
+              </span>
+              <ArrowRight className="size-4 shrink-0 text-primary transition-transform group-hover:translate-x-1" />
+            </Link>
+          )}
+        </nav>
+      )}
+
       {a.author_id && <AuthorCard authorId={a.author_id} />}
     </article>
+  );
+}
+
 
   );
 }
