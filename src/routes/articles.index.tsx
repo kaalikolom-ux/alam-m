@@ -118,14 +118,41 @@ function ArticlesPage() {
               <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
                 {lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn}
               </p>
-              <span className="mt-4 text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+              <span className="mt-auto pt-4 text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
                 {t("readMore")} →
               </span>
             </div>
           </Link>
         ))}
       </div>
+
+      {pageCount > 1 && (
+        <div className="mt-10 flex items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            disabled={page === 0}
+            className="inline-flex items-center gap-1 rounded-full border border-border px-4 py-2 text-sm transition-colors hover:border-primary/60 hover:text-primary disabled:opacity-40 disabled:hover:border-border disabled:hover:text-foreground"
+          >
+            <ChevronLeft className="size-4" />
+            {lang === "bn" ? "পূর্ববর্তী" : "Previous"}
+          </button>
+          <span className="text-sm text-muted-foreground">
+            {page + 1} / {pageCount}
+          </span>
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+            disabled={page >= pageCount - 1}
+            className="inline-flex items-center gap-1 rounded-full border border-border px-4 py-2 text-sm transition-colors hover:border-primary/60 hover:text-primary disabled:opacity-40 disabled:hover:border-border disabled:hover:text-foreground"
+          >
+            {lang === "bn" ? "পরবর্তী" : "Next"}
+            <ChevronRight className="size-4" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
+
 
