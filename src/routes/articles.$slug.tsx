@@ -38,6 +38,20 @@ function ArticlePage() {
     },
   });
 
+  const siblings = useQuery({
+    queryKey: ["articles", "nav-list"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("articles")
+        .select("slug, title_bn, title_en, published_at")
+        .eq("published", true)
+        .order("published_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+
   if (article.isLoading) {
     return <p className="mx-auto max-w-3xl px-4 py-16 text-sm text-muted-foreground">{t("loading")}</p>;
   }
