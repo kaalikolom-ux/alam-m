@@ -1,5 +1,8 @@
 import { Link } from "@tanstack/react-router";
 
+import { useQuery } from "@tanstack/react-query";
+
+import { supabase } from "@/integrations/supabase/client";
 import { usePrefs } from "@/lib/prefs";
 import { useMenu } from "@/lib/menu";
 
@@ -7,6 +10,21 @@ export function SiteFooter() {
   const { t, lang } = usePrefs();
   const header = useMenu("header");
   const footer = useMenu("footer");
+  const settings = useQuery({
+    queryKey: ["site-settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("*")
+        .eq("id", "main")
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const about = lang === "en" ? settings.data?.footer_about_en : settings.data?.footer_about_bn;
+  const copyright =
+    lang === "en" ? settings.data?.footer_copyright_en : settings.data?.footer_copyright_bn;
   const items = [...(footer.data ?? []), ...(footer.data?.length ? [] : header.data ?? [])];
 
   return (
@@ -33,12 +51,10 @@ export function SiteFooter() {
         </div>
 
         <div className="text-sm text-muted-foreground">
-          <p>
-            {lang === "en"
-              ? "Quran text and classical translations: Quran.com API."
-              : "কুরআনের টেক্সট ও প্রচলিত অনুবাদ: Quran.com API।"}
+          {about ? <p className="whitespace-pre-line">{about}</p> : null}
+          <p className={about ? "mt-2" : undefined}>
+            {copyright || `© ${new Date().getFullYear()} ${t("siteName")}`}
           </p>
-          <p className="mt-2">© {new Date().getFullYear()} {t("siteName")}</p>
         </div>
       </div>
     </footer>

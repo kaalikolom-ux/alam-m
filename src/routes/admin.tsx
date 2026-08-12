@@ -19,6 +19,7 @@ import { CategoriesAdmin } from "@/components/admin/CategoriesAdmin";
 import { PagesAdmin } from "@/components/admin/PagesAdmin";
 import { MenuAdmin } from "@/components/admin/MenuAdmin";
 import { MessagesAdmin } from "@/components/admin/MessagesAdmin";
+import { FooterAdmin } from "@/components/admin/FooterAdmin";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -71,6 +72,7 @@ function AdminPage() {
           <TabsTrigger value="pages">{t("pagesTab")}</TabsTrigger>
           <TabsTrigger value="menus">{t("menusTab")}</TabsTrigger>
           <TabsTrigger value="posts">{t("postSettings")}</TabsTrigger>
+          <TabsTrigger value="footer">{t("footerTab")}</TabsTrigger>
           <TabsTrigger value="messages">{t("messagesTab")}</TabsTrigger>
           <TabsTrigger value="subs">{t("subscribersTab")}</TabsTrigger>
         </TabsList>
@@ -91,6 +93,9 @@ function AdminPage() {
             <p className="text-sm text-muted-foreground">{t("authorsTab")}</p>
             <AuthorsAdmin />
           </div>
+        </TabsContent>
+        <TabsContent value="footer" className="mt-6">
+          <FooterAdmin />
         </TabsContent>
         <TabsContent value="messages" className="mt-6">
           <MessagesAdmin />
