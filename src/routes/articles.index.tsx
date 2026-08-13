@@ -75,13 +75,15 @@ function ArticlesPage() {
             params={{ slug: a.slug }}
             className="card-soft group flex h-full flex-col overflow-hidden border border-border/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]"
           >
-            <div className="aspect-[16/10] w-full overflow-hidden bg-accent/50">
+            <div className="aspect-[16/10] w-full shrink-0 overflow-hidden bg-accent/50">
               {a.cover_image_url ? (
                 <img
                   src={a.cover_image_url}
                   alt={lang === "en" && a.title_en ? a.title_en : a.title_bn}
                   loading="lazy"
-                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  width={1600}
+                  height={1000}
+                  className="block size-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                 />
               ) : (
                 <div className="flex size-full items-center justify-center font-display text-3xl text-primary/40">
@@ -90,34 +92,33 @@ function ArticlesPage() {
               )}
             </div>
             <div className="flex min-w-0 flex-1 flex-col p-5">
-              {a.article_categories.length > 0 && (
-                <div className="mb-2 flex flex-wrap gap-1.5">
-                  {a.article_categories.map(
-                    (ac) =>
-                      ac.categories && (
-                        <span
-                          key={ac.categories.id}
-                          className="rounded-full border border-primary/40 px-2 py-0.5 text-[11px] text-primary"
-                        >
-                          {lang === "en" && ac.categories.name_en
-                            ? ac.categories.name_en
-                            : ac.categories.name_bn}
-                        </span>
-                      ),
-                  )}
-                </div>
-              )}
-              <h2 className="text-lg font-semibold transition-colors group-hover:text-primary">
+              <div className="mb-2 flex h-6 flex-wrap gap-1.5 overflow-hidden">
+                {a.article_categories.map(
+                  (ac) =>
+                    ac.categories && (
+                      <span
+                        key={ac.categories.id}
+                        className="rounded-full border border-primary/40 px-2 py-0.5 text-[11px] text-primary"
+                      >
+                        {lang === "en" && ac.categories.name_en
+                          ? ac.categories.name_en
+                          : ac.categories.name_bn}
+                      </span>
+                    ),
+                )}
+              </div>
+              <h2 className="line-clamp-2 min-h-[3.5rem] text-lg font-semibold transition-colors group-hover:text-primary">
                 {lang === "en" && a.title_en ? a.title_en : a.title_bn}
               </h2>
-              {a.published_at && (
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {new Date(a.published_at).toLocaleDateString(lang === "bn" ? "bn-BD" : "en-GB")}
-                </p>
-              )}
-              <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
+              <p className="mt-1 h-4 text-xs text-muted-foreground">
+                {a.published_at
+                  ? new Date(a.published_at).toLocaleDateString(lang === "bn" ? "bn-BD" : "en-GB")
+                  : ""}
+              </p>
+              <p className="mt-2 line-clamp-3 min-h-[3.75rem] text-sm text-muted-foreground">
                 {lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn}
               </p>
+
               <span className="mt-auto pt-4 text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
                 {t("readMore")} →
               </span>
