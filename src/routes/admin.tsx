@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { AuthorsAdmin } from "@/components/AuthorsAdmin";
 import { CategoriesAdmin } from "@/components/admin/CategoriesAdmin";
 import { PagesAdmin } from "@/components/admin/PagesAdmin";
@@ -38,6 +38,7 @@ function AdminPage() {
   const { t } = usePrefs();
   const { user, loading } = useSession();
   const { isAdmin, loading: roleLoading } = useIsAdmin();
+  const [activeTab, setActiveTab] = useState("articles");
 
   if (loading || (user && roleLoading)) {
     return <p className="mx-auto max-w-3xl px-4 py-16 text-sm text-muted-foreground">{t("loading")}</p>;
@@ -62,20 +63,40 @@ function AdminPage() {
     );
   }
 
+  const tabOptions = [
+    { value: "articles", label: t("articles") },
+    { value: "categories", label: t("categoriesTab") },
+    { value: "pages", label: t("pagesTab") },
+    { value: "menus", label: t("menusTab") },
+    { value: "posts", label: t("postSettings") },
+    { value: "footer", label: t("footerTab") },
+    { value: "messages", label: t("messagesTab") },
+    { value: "subs", label: t("subscribersTab") },
+  ];
+
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-12">
       <h1 className="text-3xl font-semibold">{t("dashboard")}</h1>
-      <Tabs defaultValue="articles" className="mt-8">
-        <TabsList className="flex flex-wrap">
-          <TabsTrigger value="articles">{t("articles")}</TabsTrigger>
-          <TabsTrigger value="categories">{t("categoriesTab")}</TabsTrigger>
-          <TabsTrigger value="pages">{t("pagesTab")}</TabsTrigger>
-          <TabsTrigger value="menus">{t("menusTab")}</TabsTrigger>
-          <TabsTrigger value="posts">{t("postSettings")}</TabsTrigger>
-          <TabsTrigger value="footer">{t("footerTab")}</TabsTrigger>
-          <TabsTrigger value="messages">{t("messagesTab")}</TabsTrigger>
-          <TabsTrigger value="subs">{t("subscribersTab")}</TabsTrigger>
-        </TabsList>
+      
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
+        {/* কাস্টম ড্রপডাউন মেনু */}
+        <div className="relative w-full max-w-xs">
+          <select
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value)}
+            className="w-full appearance-none rounded-lg border border-input bg-background px-4 py-2.5 pr-10 text-sm font-medium text-foreground shadow-sm transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+          >
+            {tabOptions.map((opt) => (
+              <option key={opt.value} value={opt.value} className="bg-background text-foreground py-1">
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground">
+            <ChevronDown className="size-4" />
+          </div>
+        </div>
+
         <TabsContent value="articles" className="mt-6">
           <ArticlesAdmin />
         </TabsContent>
@@ -104,7 +125,6 @@ function AdminPage() {
           <SubscribersAdmin />
         </TabsContent>
       </Tabs>
-
     </div>
   );
 }
@@ -227,7 +247,6 @@ function ArticlesAdmin() {
     },
     onError: (error: Error) => toast.error(error.message),
   });
-
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
