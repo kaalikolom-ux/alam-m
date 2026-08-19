@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -8,24 +8,21 @@ import { usePrefs } from "@/lib/prefs";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export const Route = createFileRoute("/articles/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: typeof search.q === "string" ? search.q : undefined,
+  }),
   head: () => ({
     meta: [
-      { title: "আর্টিকেল — কুরআন অন্বেষা" },
+      { title: "লেখালেখি — কুরআন অন্বেষা" },
       {
         name: "description",
-        content: "কুরআন, বিজ্ঞান ও চিন্তাভাবনা নিয়ে নিয়মিত বাংলা ও ইংরেজি আর্টিকেল।",
-      },
-      { property: "og:title", content: "আর্টিকেল — কুরআন অন্বেষা" },
-      {
-        property: "og:description",
-        content: "কুরআন ও বিজ্ঞান নিয়ে বাংলা ও ইংরেজি লেখা।",
+        content: "নিয়মিত বাংলা ও ইংরেজি লেখালেখি।",
       },
     ],
   }),
   component: ArticlesPage,
 });
 
-// HTML ট্যাগ মুছে স্বয়ংক্রিয় এক্সসার্পট তৈরির ফাংশন
 function getAutoExcerpt(content?: string | null, maxLength = 180) {
   if (!content) return "";
   const plainText = content.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
@@ -34,13 +31,16 @@ function getAutoExcerpt(content?: string | null, maxLength = 180) {
 
 function ArticlesPage() {
   const { t, lang } = usePrefs();
+  const search = useSearch({ from: "/articles/" });
+  const queryFilter = search.q?.trim() || "";
+
   const articles = useQuery({
     queryKey: ["articles", "published"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
         .select(
-          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en))",
+          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en, slug))",
         )
         .eq("published", true)
         .order("published_at", { ascending: false });
@@ -49,31 +49,58 @@ function ArticlesPage() {
     },
   });
 
+  // ক্যাটাগরি বা সার্চ অনুযায়ী ফিল্টার করা
+  const allArticles = articles.data ?? [];
+  const filteredArticles = queryFilter
+    ? allArticles.filter((a) => {
+        const matchesCategory = (a.article_categories ?? []).some(
+          (ac: any) =>
+            ac.categories?.name_bn?.includes(queryFilter) ||
+            ac.categories?.name_en?.toLowerCase().includes(queryFilter.toLowerCase()) ||
+            ac.categories?.slug?.toLowerCase().includes(queryFilter.toLowerCase())
+        );
+        const matchesTitle =
+          a.title_bn?.includes(queryFilter) ||
+          a.title_en?.toLowerCase().includes(queryFilter.toLowerCase());
+        return matchesCategory || matchesTitle;
+      })
+    : allArticles;
+
   const isMobile = useIsMobile();
   const pageSize = isMobile ? 6 : 9;
   const [page, setPage] = useState(0);
-  const items = articles.data ?? [];
-  const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
+  const pageCount = Math.max(1, Math.ceil(filteredArticles.length / pageSize));
 
   useEffect(() => {
     setPage(0);
-  }, [pageSize, items.length]);
+  }, [pageSize, filteredArticles.length, queryFilter]);
 
-  const visible = items.slice(page * pageSize, page * pageSize + pageSize);
+  const visible = filteredArticles.slice(page * pageSize, page * pageSize + pageSize);
+
+  // পেজের হেডিং নির্ধারণ
+  const pageTitle = queryFilter ? queryFilter : lang === "bn" ? "সকল লেখা" : "All Posts";
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12">
-      <h1 className="text-3xl font-semibold">{t("articles")}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{t("newsletterSub")}</p>
+      <h1 className="text-3xl font-semibold">{pageTitle}</h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        {queryFilter
+          ? lang === "bn"
+            ? `"${queryFilter}" বিভাগের প্রকাশনা সমূহ`
+            : `Posts under "${queryFilter}"`
+          : t("newsletterSub")}
+      </p>
 
       {articles.isLoading && <p className="mt-8 text-sm text-muted-foreground">{t("loading")}</p>}
 
-      {articles.data && articles.data.length === 0 && (
-        <p className="mt-8 text-sm text-muted-foreground">{t("noArticles")}</p>
+      {!articles.isLoading && filteredArticles.length === 0 && (
+        <p className="mt-8 text-sm text-muted-foreground">
+          {lang === "bn" ? "এই বিভাগে এখনও কোনো লেখা প্রকাশিত হয়নি।" : "No posts found in this section."}
+        </p>
       )}
 
       <div className="mt-8 grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {visible.map((a) => {
+        {visible.map((a: any) => {
           const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
           const rawExcerpt = lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn;
           const rawContent = lang === "en" && a.content_en ? a.content_en : a.content_bn;
@@ -107,8 +134,8 @@ function ArticlesPage() {
 
               <div className="flex min-w-0 flex-1 flex-col p-5">
                 <div className="mb-2.5 flex flex-wrap items-center gap-2">
-                  {a.article_categories.map(
-                    (ac) =>
+                  {a.article_categories?.map(
+                    (ac: any) =>
                       ac.categories && (
                         <span
                           key={ac.categories.id}

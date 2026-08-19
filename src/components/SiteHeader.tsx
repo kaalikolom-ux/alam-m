@@ -11,9 +11,9 @@ import { Switch } from "@/components/ui/switch";
 
 const FALLBACK = [
   { id: "home", label_bn: "হোম", label_en: "Home", url: "/" },
-  { id: "story", label_bn: "গল্প", label_en: "Stories", url: "/c/গল্প" },
-  { id: "poem", label_bn: "কবিতা", label_en: "Poems", url: "/c/কবিতা" },
-  { id: "memory", label_bn: "স্মৃতিকথা", label_en: "Memories", url: "/c/স্মৃতিকথা" },
+  { id: "story", label_bn: "গল্প", label_en: "Stories", url: "/articles?q=গল্প" },
+  { id: "poem", label_bn: "কবিতা", label_en: "Poems", url: "/articles?q=কবিতা" },
+  { id: "memory", label_bn: "স্মৃতিকথা", label_en: "Memories", url: "/articles?q=স্মৃতিকথা" },
   { id: "about", label_bn: "আমার পাতা", label_en: "About Me", url: "/about" },
   { id: "contact", label_bn: "যোগাযোগ", label_en: "Contact", url: "/contact" },
 ];
@@ -28,7 +28,7 @@ function NavLinks({ onNavigate, mobile }: { onNavigate?: () => void; mobile?: bo
       {items.map((item) => (
         <Link
           key={item.id}
-          to={item.url as "/"}
+          to={item.url as any}
           onClick={onNavigate}
           activeOptions={{ exact: item.url === "/" }}
           activeProps={{
@@ -57,7 +57,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-3 px-4">
-        {/* লোগো ও ট্যাগলাইন সেকশন */}
+        {/* লোগো ও ট্যাগলাইন */}
         <Link to="/" className="flex flex-col group justify-center py-1">
           <span className="font-logo text-2xl leading-tight text-primary transition-opacity group-hover:opacity-90 sm:text-3xl">
             Alam M
@@ -67,7 +67,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        {/* হেডার মেনু বাটনসমূহ */}
+        {/* হেডার মেনু বাটন */}
         <nav className="ml-6 hidden items-center gap-1.5 md:flex">
           <NavLinks />
         </nav>
