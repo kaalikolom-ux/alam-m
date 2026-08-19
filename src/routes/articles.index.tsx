@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { usePrefs } from "@/lib/prefs";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-
 export const Route = createFileRoute("/articles/")({
   head: () => ({
     meta: [
@@ -67,64 +66,72 @@ function ArticlesPage() {
       )}
 
       <div className="mt-8 grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {visible.map((a) => (
-          <Link
-            key={a.id}
+        {visible.map((a) => {
+          const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
+          const excerpt = lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn;
 
-            to="/articles/$slug"
-            params={{ slug: a.slug }}
-            className="card-soft group flex h-full flex-col overflow-hidden border border-border/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]"
-          >
-            <div className="aspect-[16/10] w-full shrink-0 overflow-hidden bg-accent/50">
-              {a.cover_image_url ? (
-                <img
-                  src={a.cover_image_url}
-                  alt={lang === "en" && a.title_en ? a.title_en : a.title_bn}
-                  loading="lazy"
-                  width={1600}
-                  height={1000}
-                  className="block size-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                />
-              ) : (
-                <div className="flex size-full items-center justify-center font-display text-3xl text-primary/40">
-                  ﷽
-                </div>
-              )}
-            </div>
-            <div className="flex min-w-0 flex-1 flex-col p-5">
-              <div className="mb-2 flex h-6 flex-wrap gap-1.5 overflow-hidden">
-                {a.article_categories.map(
-                  (ac) =>
-                    ac.categories && (
-                      <span
-                        key={ac.categories.id}
-                        className="rounded-full border border-primary/40 px-2 py-0.5 text-[11px] text-primary"
-                      >
-                        {lang === "en" && ac.categories.name_en
-                          ? ac.categories.name_en
-                          : ac.categories.name_bn}
-                      </span>
-                    ),
+          return (
+            <Link
+              key={a.id}
+              to="/articles/$slug"
+              params={{ slug: a.slug }}
+              className="card-soft group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]"
+            >
+              {/* ওপরের অংশ: ইমেজ অথবা সেন্টার্ড পোস্ট টাইটেল */}
+              <div className="aspect-[16/10] w-full shrink-0 overflow-hidden bg-accent/40 relative">
+                {a.cover_image_url ? (
+                  <img
+                    src={a.cover_image_url}
+                    alt={title}
+                    loading="lazy"
+                    width={1600}
+                    height={1000}
+                    className="block size-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex size-full items-center justify-center p-6 text-center bg-gradient-to-br from-primary/5 via-accent/20 to-primary/10 transition-colors group-hover:from-primary/10 group-hover:to-primary/20">
+                    <h3 className="line-clamp-3 text-lg font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">
+                      {title}
+                    </h3>
+                  </div>
                 )}
               </div>
-              <h2 className="line-clamp-2 min-h-[3.5rem] text-lg font-semibold transition-colors group-hover:text-primary">
-                {lang === "en" && a.title_en ? a.title_en : a.title_bn}
-              </h2>
-              <p className="mt-1 h-4 text-xs text-muted-foreground">
-                {a.published_at
-                  ? new Date(a.published_at).toLocaleDateString(lang === "bn" ? "bn-BD" : "en-GB")
-                  : ""}
-              </p>
-              <p className="mt-2 line-clamp-3 min-h-[3.75rem] text-sm text-muted-foreground">
-                {lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn}
-              </p>
 
-              <span className="mt-auto pt-4 text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                {t("readMore")} →
-              </span>
-            </div>
-          </Link>
-        ))}
+              {/* নিচের অংশ: ক্যাটাগরি, তারিখ ও সারসংক্ষেপ */}
+              <div className="flex min-w-0 flex-1 flex-col p-5">
+                <div className="mb-2.5 flex flex-wrap items-center gap-2">
+                  {a.article_categories.map(
+                    (ac) =>
+                      ac.categories && (
+                        <span
+                          key={ac.categories.id}
+                          className="rounded-full border border-primary/30 bg-primary/5 px-2.5 py-0.5 text-[11px] font-medium text-primary"
+                        >
+                          {lang === "en" && ac.categories.name_en
+                            ? ac.categories.name_en
+                            : ac.categories.name_bn}
+                        </span>
+                      ),
+                  )}
+                  {a.published_at && (
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(a.published_at).toLocaleDateString(lang === "bn" ? "bn-BD" : "en-GB")}
+                    </span>
+                  )}
+                </div>
+
+                {/* সারসংক্ষেপ (Excerpt) */}
+                <p className="line-clamp-4 text-sm leading-relaxed text-muted-foreground">
+                  {excerpt || "কোনো সারসংক্ষেপ যুক্ত করা হয়নি..."}
+                </p>
+
+                <span className="mt-auto pt-4 text-xs font-semibold uppercase tracking-wider text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                  {t("readMore")} →
+                </span>
+              </div>
+            </Link>
+          );
+        })}
       </div>
 
       {pageCount > 1 && (
@@ -155,5 +162,3 @@ function ArticlesPage() {
     </div>
   );
 }
-
-
