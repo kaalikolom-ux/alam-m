@@ -25,6 +25,13 @@ export const Route = createFileRoute("/articles/")({
   component: ArticlesPage,
 });
 
+// HTML ট্যাগ মুছে স্বয়ংক্রিয় এক্সসার্পট তৈরির ফাংশন
+function getAutoExcerpt(content?: string | null, maxLength = 180) {
+  if (!content) return "";
+  const plainText = content.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  return plainText.length > maxLength ? `${plainText.slice(0, maxLength)}...` : plainText;
+}
+
 function ArticlesPage() {
   const { t, lang } = usePrefs();
   const articles = useQuery({
@@ -33,7 +40,7 @@ function ArticlesPage() {
       const { data, error } = await supabase
         .from("articles")
         .select(
-          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en))",
+          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en))",
         )
         .eq("published", true)
         .order("published_at", { ascending: false });
@@ -68,7 +75,9 @@ function ArticlesPage() {
       <div className="mt-8 grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((a) => {
           const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
-          const excerpt = lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn;
+          const rawExcerpt = lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn;
+          const rawContent = lang === "en" && a.content_en ? a.content_en : a.content_bn;
+          const excerpt = rawExcerpt || getAutoExcerpt(rawContent);
 
           return (
             <Link
@@ -77,7 +86,6 @@ function ArticlesPage() {
               params={{ slug: a.slug }}
               className="card-soft group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]"
             >
-              {/* ওপরের অংশ: ইমেজ অথবা সেন্টার্ড পোস্ট টাইটেল */}
               <div className="aspect-[16/10] w-full shrink-0 overflow-hidden bg-accent/40 relative">
                 {a.cover_image_url ? (
                   <img
@@ -97,7 +105,6 @@ function ArticlesPage() {
                 )}
               </div>
 
-              {/* নিচের অংশ: ক্যাটাগরি, তারিখ ও সারসংক্ষেপ */}
               <div className="flex min-w-0 flex-1 flex-col p-5">
                 <div className="mb-2.5 flex flex-wrap items-center gap-2">
                   {a.article_categories.map(
@@ -120,9 +127,8 @@ function ArticlesPage() {
                   )}
                 </div>
 
-                {/* সারসংক্ষেপ (Excerpt) */}
                 <p className="line-clamp-4 text-sm leading-relaxed text-muted-foreground">
-                  {excerpt || "কোনো সারসংক্ষেপ যুক্ত করা হয়নি..."}
+                  {excerpt}
                 </p>
 
                 <span className="mt-auto pt-4 text-xs font-semibold uppercase tracking-wider text-primary opacity-0 transition-opacity group-hover:opacity-100">

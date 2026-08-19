@@ -43,7 +43,6 @@ function NavLinks({ onNavigate, mobile }: { onNavigate?: () => void; mobile?: bo
   );
 }
 
-
 export function SiteHeader() {
   const { t, lang, toggleLang, dark, setDark } = usePrefs();
   const { user } = useSession();
@@ -53,12 +52,15 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-3 px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="font-logo text-2xl leading-none text-primary sm:text-3xl">
+        {/* লোগো ও ট্যাগলাইন সেকশন */}
+        <Link to="/" className="flex flex-col group justify-center py-1">
+          <span className="font-logo text-2xl leading-tight text-primary transition-opacity group-hover:opacity-90 sm:text-3xl">
             Alam M
           </span>
+          <span className="text-[10px] font-medium tracking-tight text-muted-foreground transition-colors group-hover:text-foreground">
+            {lang === "bn" ? "শব্দ আমার ক্যানভাস" : "Worlds Painted with Words"}
+          </span>
         </Link>
-
 
         <nav className="ml-6 hidden items-center gap-5 md:flex">
           <NavLinks />
@@ -114,7 +116,6 @@ export function SiteHeader() {
               </Link>
             </Button>
           )}
-
 
           <button
             className="md:hidden rounded-md border border-border p-1.5"
