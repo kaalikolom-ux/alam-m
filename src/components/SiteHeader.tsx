@@ -29,11 +29,14 @@ function NavLinks({ onNavigate, mobile }: { onNavigate?: () => void; mobile?: bo
           to={item.url as "/"}
           onClick={onNavigate}
           activeOptions={{ exact: item.url === "/" }}
-          activeProps={{ className: "text-primary" }}
+          activeProps={{
+            className:
+              "bg-primary/15 text-primary border-primary/30 font-semibold shadow-sm",
+          }}
           className={
             mobile
-              ? "text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
-              : "text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
+              ? "flex items-center rounded-lg px-3.5 py-2 text-sm font-medium text-foreground/80 border border-transparent transition-all duration-200 hover:bg-primary/10 hover:border-primary/20 hover:text-primary active:scale-[0.98]"
+              : "relative inline-flex items-center justify-center rounded-lg px-3.5 py-1.5 text-sm font-medium text-foreground/80 border border-transparent transition-all duration-200 hover:bg-primary/10 hover:border-primary/20 hover:text-primary hover:-translate-y-0.5 hover:shadow-sm active:scale-95"
           }
         >
           {lang === "en" && item.label_en ? item.label_en : item.label_bn}
@@ -62,14 +65,15 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="ml-6 hidden items-center gap-5 md:flex">
+        {/* হেডার নেভিগেশন বাটনসমূহ */}
+        <nav className="ml-6 hidden items-center gap-1.5 md:flex">
           <NavLinks />
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={toggleLang}
-            className="flex size-9 items-center justify-center rounded-md border border-border text-foreground/80 transition-colors hover:bg-accent hover:text-accent-foreground"
+            className="flex size-9 items-center justify-center rounded-md border border-border text-foreground/80 transition-all duration-200 hover:bg-accent hover:text-accent-foreground hover:border-primary/30"
             aria-label={t("language")}
             title={lang === "bn" ? "বাংলা → English" : "English → বাংলা"}
           >
@@ -118,7 +122,7 @@ export function SiteHeader() {
           )}
 
           <button
-            className="md:hidden rounded-md border border-border p-1.5"
+            className="md:hidden rounded-md border border-border p-1.5 transition-colors hover:bg-accent"
             onClick={() => setOpen((v) => !v)}
             aria-label="Menu"
           >
@@ -129,20 +133,29 @@ export function SiteHeader() {
 
       {open && (
         <div className="border-t border-border bg-background px-4 py-4 md:hidden">
-          <div className="flex flex-col gap-3">
-            <NavLinks onNavigate={() => setOpen(false)} />
+          <div className="flex flex-col gap-1.5">
+            <NavLinks onNavigate={() => setOpen(false)} mobile />
+            <div className="my-2 border-t border-border/50" />
             {user ? (
               <>
-                <Link to="/bookmarks" onClick={() => setOpen(false)} className="text-sm font-medium">
+                <Link
+                  to="/bookmarks"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center rounded-lg px-3.5 py-2 text-sm font-medium hover:bg-accent"
+                >
                   {t("bookmarks")}
                 </Link>
                 {isAdmin && (
-                  <Link to="/admin" onClick={() => setOpen(false)} className="text-sm font-medium">
+                  <Link
+                    to="/admin"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center rounded-lg px-3.5 py-2 text-sm font-medium hover:bg-accent"
+                  >
                     {t("admin")}
                   </Link>
                 )}
                 <button
-                  className="text-left text-sm font-medium text-destructive"
+                  className="flex items-center rounded-lg px-3.5 py-2 text-left text-sm font-medium text-destructive hover:bg-destructive/10"
                   onClick={async () => {
                     await supabase.auth.signOut();
                     window.location.href = "/";
@@ -152,7 +165,11 @@ export function SiteHeader() {
                 </button>
               </>
             ) : (
-              <Link to="/auth" onClick={() => setOpen(false)} className="text-sm font-medium text-primary">
+              <Link
+                to="/auth"
+                onClick={() => setOpen(false)}
+                className="flex items-center rounded-lg px-3.5 py-2 text-sm font-medium text-primary hover:bg-primary/10"
+              >
                 {t("signIn")}
               </Link>
             )}
