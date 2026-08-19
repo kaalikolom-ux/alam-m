@@ -16,12 +16,12 @@ export const Route = createFileRoute("/articles/")({
       { title: "লেখালেখি — Alam M" },
       {
         name: "description",
-        content: "গল্প, কবিতা, স্মৃতিকথা ও ভাবনা নিয়ে নিয়মিত লেখালেখি।",
+        content: "গল্প, কবিতা, স্মৃতিকথা ও ভাবনা নিয়ে নিয়মিত প্রকাশনা।",
       },
       { property: "og:title", content: "লেখালেখি — Alam M" },
       {
         property: "og:description",
-        content: "গল্প, কবিতা, স্মৃতিকথা ও ভাবনা নিয়ে নিয়মিত লেখালেখি।",
+        content: "গল্প, কবিতা, স্মৃতিকথা ও ভাবনা নিয়ে নিয়মিত প্রকাশনা।",
       },
     ],
   }),
@@ -75,6 +75,16 @@ function ArticlesPage() {
   const rawQuery = search.q?.trim() || "";
   const cleanFilter = rawQuery.replace(/^.*\?q=/, "").replace(/^\//, "").trim();
 
+  // ক্যাটাগরি তালিকা আনা
+  const categoriesQuery = useQuery({
+    queryKey: ["all-categories-list"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("categories").select("id, name_bn, name_en, slug").order("name_bn");
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   const articles = useQuery({
     queryKey: ["articles", "published"],
     queryFn: async () => {
@@ -117,6 +127,7 @@ function ArticlesPage() {
       })
     : allArticles;
 
+  // মোবাইল ভিউতে ৬টি, ডেস্কে ৯টি
   const isMobile = useIsMobile();
   const pageSize = isMobile ? 6 : 9;
   const [page, setPage] = useState(0);
@@ -137,8 +148,46 @@ function ArticlesPage() {
           ? lang === "bn"
             ? `"${pageTitle}" বিভাগের প্রকাশনা সমূহ`
             : `Posts under "${pageTitle}"`
-          : t("newsletterSub")}
+          : lang === "bn"
+          ? "সকল লেখালেখি ও প্রকাশনা"
+          : "All published writings and posts"}
       </p>
+
+      {/* ক্যাটাগরি হোভার স্টাইল বাটনসমূহ */}
+      <div className="mt-6 flex flex-wrap items-center gap-2 border-b border-border/50 pb-6">
+        <Link
+          to="/articles"
+          className={`inline-flex items-center rounded-lg px-3.5 py-1.5 text-xs font-medium border transition-all duration-200 ${
+            !cleanFilter
+              ? "border-primary/40 bg-primary/15 text-primary shadow-sm font-semibold"
+              : "border-border text-foreground/80 hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
+          }`}
+        >
+          {lang === "bn" ? "সবগুলো" : "All"}
+        </Link>
+        {categoriesQuery.data?.map((cat) => {
+          const name = lang === "en" && cat.name_en ? cat.name_en : cat.name_bn;
+          const isActive =
+            cleanFilter === cat.name_bn ||
+            cleanFilter.toLowerCase() === cat.name_en?.toLowerCase() ||
+            cleanFilter.toLowerCase() === cat.slug?.toLowerCase();
+
+          return (
+            <Link
+              key={cat.id}
+              to="/articles"
+              search={{ q: cat.name_bn } as any}
+              className={`inline-flex items-center rounded-lg px-3.5 py-1.5 text-xs font-medium border transition-all duration-200 ${
+                isActive
+                  ? "border-primary/40 bg-primary/15 text-primary shadow-sm font-semibold"
+                  : "border-border text-foreground/80 hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
+              }`}
+            >
+              {name}
+            </Link>
+          );
+        })}
+      </div>
 
       {articles.isLoading && <p className="mt-8 text-sm text-muted-foreground">{t("loading")}</p>}
 
@@ -148,6 +197,7 @@ function ArticlesPage() {
         </p>
       )}
 
+      {/* ৩ কলামের গ্রিড (ডেস্কে ৯টি, মোবাইলে ৬টি) */}
       <div className="mt-8 grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((a: any) => {
           const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
@@ -216,6 +266,7 @@ function ArticlesPage() {
         })}
       </div>
 
+      {/* পেজিনেশন */}
       {pageCount > 1 && (
         <div className="mt-10 flex items-center justify-center gap-3">
           <button

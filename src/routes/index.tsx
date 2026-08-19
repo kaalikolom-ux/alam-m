@@ -25,6 +25,12 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
+function getAutoExcerpt(content?: string | null, maxLength = 180) {
+  if (!content) return "";
+  const plainText = content.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  return plainText.length > maxLength ? `${plainText.slice(0, maxLength)}...` : plainText;
+}
+
 function HomePage() {
   const { t, lang } = usePrefs();
 
@@ -64,29 +70,31 @@ function HomePage() {
               variant="outline"
               className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
             >
-              <Link to="/articles">{t("articles")}</Link>
+              <Link to="/articles">{lang === "bn" ? "সকল লেখা" : "All Posts"}</Link>
             </Button>
           </div>
         </div>
       </section>
 
+      {/* সাম্প্রতিক লেখা সেকশন (৩ কলামে ৩টি পোস্ট) */}
       <section className="border-t border-border bg-secondary/40">
         <div className="mx-auto w-full max-w-6xl px-4 py-14">
           <div className="flex items-end justify-between gap-4">
-            <h2 className="text-2xl font-semibold">{t("latestArticles")}</h2>
-            <Link to="/articles" className="inline-flex items-center gap-1 text-sm text-primary">
-              {t("articles")} <ArrowRight className="size-4" />
+            <h2 className="text-2xl font-semibold">
+              {lang === "bn" ? "সাম্প্রতিক লেখা" : "Latest Articles"}
+            </h2>
+            <Link to="/articles" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+              {lang === "bn" ? "সকল লেখা" : "All Posts"} <ArrowRight className="size-4" />
             </Link>
           </div>
+
           {articles.data && articles.data.length > 0 ? (
             <div className="mt-6 grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {articles.data.map((a) => {
                 const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
                 const rawExcerpt = lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn;
                 const rawContent = lang === "en" && a.content_en ? a.content_en : a.content_bn;
-                const excerpt =
-                  rawExcerpt ||
-                  (rawContent ? `${rawContent.replace(/<[^>]+>/g, "").slice(0, 180)}...` : "");
+                const excerpt = rawExcerpt || getAutoExcerpt(rawContent);
 
                 return (
                   <Link
@@ -136,7 +144,7 @@ function HomePage() {
                         )}
                       </div>
 
-                      <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                      <p className="line-clamp-4 text-sm leading-relaxed text-muted-foreground">
                         {excerpt}
                       </p>
 
