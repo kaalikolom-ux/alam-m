@@ -10,16 +10,15 @@ import { NewsletterForm } from "@/components/NewsletterForm";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "কুরআন অন্বেষা — শব্দে শব্দে অর্থসহ কুরআন ও আর্টিকেল" },
+      { title: "Alam M — শব্দ আমার ক্যানভাস" },
       {
         name: "description",
-        content:
-          "আরবি, শব্দে শব্দে অর্থ, বাংলা (তাইসিরুল কুরআন) ও ইংরেজি (Pickthall) অনুবাদ এবং বিজ্ঞানভিত্তিক অনুবাদসহ কুরআন পড়ুন। বুকমার্ক ও আর্টিকেল সুবিধা।",
+        content: "শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। গল্প, কবিতা ও স্মৃতিকথা।",
       },
-      { property: "og:title", content: "কুরআন অন্বেষা — শব্দে শব্দে অর্থসহ কুরআন" },
+      { property: "og:title", content: "Alam M — শব্দ আমার ক্যানভাস" },
       {
         property: "og:description",
-        content: "শব্দে শব্দে অর্থ, প্রচলিত ও বিজ্ঞানভিত্তিক অনুবাদ একই পাতায়।",
+        content: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।",
       },
     ],
   }),
@@ -34,7 +33,7 @@ function HomePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select("id, slug, title_bn, title_en, excerpt_bn, excerpt_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en))")
+        .select("id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en))")
         .eq("published", true)
         .order("published_at", { ascending: false })
         .limit(3);
@@ -83,7 +82,11 @@ function HomePage() {
             <div className="mt-6 grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {articles.data.map((a) => {
                 const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
-                const excerpt = lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn;
+                const rawExcerpt = lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn;
+                const rawContent = lang === "en" && a.content_en ? a.content_en : a.content_bn;
+                const excerpt =
+                  rawExcerpt ||
+                  (rawContent ? `${rawContent.replace(/<[^>]+>/g, "").slice(0, 180)}...` : "");
 
                 return (
                   <Link
@@ -92,7 +95,6 @@ function HomePage() {
                     params={{ slug: a.slug }}
                     className="card-soft group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]"
                   >
-                    {/* ওপরের অংশ: ইমেজ অথবা সেন্টার্ড পোস্ট টাইটেল */}
                     <div className="aspect-[16/10] w-full shrink-0 overflow-hidden bg-accent/40 relative">
                       {a.cover_image_url ? (
                         <img
@@ -112,7 +114,6 @@ function HomePage() {
                       )}
                     </div>
 
-                    {/* নিচের অংশ: ক্যাটাগরি, তারিখ ও সারসংক্ষেপ */}
                     <div className="flex min-w-0 flex-1 flex-col p-5">
                       <div className="mb-2.5 flex flex-wrap items-center gap-2">
                         {a.article_categories?.map(
@@ -135,9 +136,8 @@ function HomePage() {
                         )}
                       </div>
 
-                      {/* সারসংক্ষেপ (Excerpt) */}
                       <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
-                        {excerpt || "কোনো সারসংক্ষেপ যুক্ত করা হয়নি..."}
+                        {excerpt}
                       </p>
 
                       <span className="mt-auto pt-4 text-xs font-semibold uppercase tracking-wider text-primary opacity-0 transition-opacity group-hover:opacity-100">

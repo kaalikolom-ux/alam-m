@@ -13,10 +13,15 @@ export const Route = createFileRoute("/articles/")({
   }),
   head: () => ({
     meta: [
-      { title: "লেখালেখি — কুরআন অন্বেষা" },
+      { title: "লেখালেখি — Alam M" },
       {
         name: "description",
-        content: "নিয়মিত বাংলা ও ইংরেজি লেখালেখি।",
+        content: "গল্প, কবিতা, স্মৃতিকথা ও ভাবনা নিয়ে নিয়মিত লেখালেখি।",
+      },
+      { property: "og:title", content: "লেখালেখি — Alam M" },
+      {
+        property: "og:description",
+        content: "গল্প, কবিতা, স্মৃতিকথা ও ভাবনা নিয়ে নিয়মিত লেখালেখি।",
       },
     ],
   }),
@@ -29,7 +34,6 @@ function getAutoExcerpt(content?: string | null, maxLength = 180) {
   return plainText.length > maxLength ? `${plainText.slice(0, maxLength)}...` : plainText;
 }
 
-// স্লাগ ও নামের ম্যাপিং হেল্পার
 const CATEGORY_MAP: Record<string, { bn: string; en: string }> = {
   golpo: { bn: "গল্প", en: "Stories" },
   story: { bn: "গল্প", en: "Stories" },
@@ -51,7 +55,6 @@ const CATEGORY_MAP: Record<string, { bn: string; en: string }> = {
 function formatDisplayTitle(raw: string, lang: string): string {
   if (!raw) return lang === "bn" ? "সকল লেখা" : "All Posts";
   
-  // কুয়েরি প্যারাম স্ট্রিং ক্লিন করা (?q= বা / থাকলে সরানো)
   const clean = raw.replace(/^.*\?q=/, "").replace(/^\//, "").trim();
   const lower = clean.toLowerCase();
 
@@ -69,7 +72,6 @@ function ArticlesPage() {
   const { t, lang } = usePrefs();
   const search = useSearch({ from: "/articles/" });
   
-  // কুয়েরি থেকে বিশুদ্ধ সার্চ কি-ওয়ার্ড আলাদা করা
   const rawQuery = search.q?.trim() || "";
   const cleanFilter = rawQuery.replace(/^.*\?q=/, "").replace(/^\//, "").trim();
 

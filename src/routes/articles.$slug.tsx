@@ -23,10 +23,10 @@ import { Textarea } from "@/components/ui/textarea";
 export const Route = createFileRoute("/articles/$slug")({
   head: ({ params }) => ({
     meta: [
-      { title: `${params.slug} — কুরআন অন্বেষা` },
-      { name: "description", content: "কুরআন ও বিজ্ঞান নিয়ে আর্টিকেল — কুরআন অন্বেষা।" },
-      { property: "og:title", content: `${params.slug} — কুরআন অন্বেষা` },
-      { property: "og:description", content: "কুরআন ও বিজ্ঞান নিয়ে আর্টিকেল।" },
+      { title: `${params.slug} — Alam M` },
+      { name: "description", content: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা — Alam M।" },
+      { property: "og:title", content: `${params.slug} — Alam M` },
+      { property: "og:description", content: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা।" },
     ],
   }),
   component: ArticlePage,
@@ -159,7 +159,6 @@ function ArticlePage() {
         />
       )}
 
-      {/* পোস্ট কনটেন্ট এরিয়া: বহিরাগত সাদা ব্যাকগ্রাউন্ড ও কালার ফিক্সড */}
       <div className="prose-reader mt-8 text-base leading-relaxed text-foreground">
         {isHtml ? (
           <div
@@ -177,7 +176,6 @@ function ArticlePage() {
         )}
       </div>
 
-      {/* পোস্টের নীচে মেটা বাটনসমূহ */}
       <div className="mt-10 flex flex-wrap items-center gap-2 border-t border-border/40 pt-6">
         {authorName && (
           <Link
@@ -217,7 +215,6 @@ function ArticlePage() {
         )}
       </div>
 
-      {/* Prev / Next Cards */}
       {(newer || older) && (
         <nav className="mt-10 grid gap-4 sm:grid-cols-2">
           {newer ? (
@@ -270,7 +267,6 @@ function ArticlePage() {
         </div>
       )}
 
-      {/* কমেন্ট সেকশন */}
       <section className="mt-12 rounded-xl border border-border bg-card/40 p-6 shadow-sm">
         <div className="flex items-center gap-2 border-b border-border/40 pb-4">
           <MessageSquare className="size-5 text-primary" />

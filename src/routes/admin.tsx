@@ -40,11 +40,11 @@ import { FooterAdmin } from "@/components/admin/FooterAdmin";
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "অ্যাডমিন ড্যাশবোর্ড — কুরআন অন্বেষা" },
-      { name: "description", content: "আর্টিকেল ও বিজ্ঞানভিত্তিক অনুবাদ ইনপুট দেওয়ার প্যানেল।" },
+      { title: "অ্যাডমিন ড্যাশবোর্ড — Alam M" },
+      { name: "description", content: "কনটেন্ট ও প্রকাশনা ব্যবস্থাপনা প্যানেল।" },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "অ্যাডমিন ড্যাশবোর্ড — কুরআন অন্বেষা" },
-      { property: "og:description", content: "কনটেন্ট ব্যবস্থাপনা প্যানেল।" },
+      { property: "og:title", content: "অ্যাডমিন ড্যাশবোর্ড — Alam M" },
+      { property: "og:description", content: "কনটেন্ট ও প্রকাশনা ব্যবস্থাপনা প্যানেল।" },
     ],
   }),
   component: AdminPage,
@@ -144,7 +144,6 @@ function AdminPage() {
   );
 }
 
-// রিচ-টেক্সট ও HTML কোড এডিটর কম্পোনেন্ট
 function RichTextEditor({
   label,
   value,
@@ -197,7 +196,6 @@ function RichTextEditor({
       </div>
 
       <div className="rounded-lg border border-input bg-background shadow-sm focus-within:ring-2 focus-within:ring-primary/20">
-        {/* টুলবার */}
         <div className="flex flex-wrap items-center gap-1 border-b border-border bg-muted/30 p-1.5">
           <button
             type="button"
@@ -288,7 +286,6 @@ function RichTextEditor({
           </button>
         </div>
 
-        {/* এডিটিং এরিয়া */}
         {isHtmlMode ? (
           <Textarea
             rows={10}
@@ -492,7 +489,6 @@ function ArticlesAdmin() {
           {field("excerpt_en", t("excerptEn"), true)}
         </div>
 
-        {/* রিচ টেক্সট ও HTML এডিটর */}
         <RichTextEditor
           label={t("contentBn")}
           value={form.content_bn}
