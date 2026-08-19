@@ -29,7 +29,6 @@ function sanitizeNavUrl(url: string, labelBn: string): string {
     return "/articles";
   }
   
-  // মেনু থেকে শুধু আসল নাম বের করে নেওয়া
   const cleanParam = labelBn || url.replace(/^\/(c\/|articles\?q=)?/, "");
   return `/articles?q=${encodeURIComponent(cleanParam)}`;
 }
@@ -39,12 +38,23 @@ function NavLinks({ onNavigate, mobile }: { onNavigate?: () => void; mobile?: bo
   const menu = useMenu("header");
   const rawItems = menu.data && menu.data.length > 0 ? menu.data : FALLBACK;
 
-  const items = rawItems
+  // ১. "আর্টিকেল" ফিল্টার করে বাদ দেওয়া এবং ইউআরএল স্যানিটাইজ করা
+  const filteredItems = rawItems
     .filter((item) => item.label_bn !== "আর্টিকেল" && item.label_en?.toLowerCase() !== "articles")
     .map((item) => ({
       ...item,
       url: sanitizeNavUrl(item.url, item.label_bn),
     }));
+
+  // ২. "হোম" মেনু আইটেমটিকে খুঁজে সবার প্রথমে সেট করা
+  const homeItem = filteredItems.find(
+    (item) => item.url === "/" || item.label_bn === "হোম" || item.label_en?.toLowerCase() === "home"
+  );
+  const otherItems = filteredItems.filter(
+    (item) => item !== homeItem
+  );
+
+  const items = homeItem ? [homeItem, ...otherItems] : otherItems;
 
   return (
     <>
@@ -75,6 +85,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-3 px-4">
+        {/* লোগো ও ট্যাগলাইন */}
         <Link to="/" className="flex flex-col group justify-center py-1">
           <span className="font-logo text-2xl leading-tight text-primary transition-opacity group-hover:opacity-90 sm:text-3xl">
             Alam M
@@ -84,6 +95,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
+        {/* হেডার মেনু বাটনসমূহ (হোম সর্বদা প্রথমে) */}
         <nav className="ml-6 hidden items-center gap-1.5 md:flex">
           <NavLinks />
         </nav>
