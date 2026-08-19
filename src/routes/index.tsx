@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { usePrefs } from "@/lib/prefs";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,7 +32,100 @@ function getAutoExcerpt(content?: string | null, maxLength = 180) {
   return plainText.length > maxLength ? `${plainText.slice(0, maxLength)}...` : plainText;
 }
 
-// মাঝখান থেকে দুই পাশে টাইপিং লুপ কম্পোনেন্ট
+// লাইভ স্মোক পার্টিকেল ইফেক্ট
+function SmokeBackground() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let width = (canvas.width = canvas.offsetWidth);
+    let height = (canvas.height = canvas.offsetHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    };
+    window.addEventListener("resize", handleResize);
+
+    const particles: Array<{
+      x: number;
+      y: number;
+      radius: number;
+      vx: number;
+      vy: number;
+      alpha: number;
+      alphaSpeed: number;
+    }> = [];
+
+    const particleCount = 28;
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 80 + 50,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -Math.random() * 0.35 - 0.1,
+        alpha: Math.random() * 0.18 + 0.05,
+        alphaSpeed: (Math.random() * 0.003 + 0.001) * (Math.random() > 0.5 ? 1 : -1),
+      });
+    }
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha += p.alphaSpeed;
+
+        if (p.alpha <= 0.03 || p.alpha >= 0.22) {
+          p.alphaSpeed = -p.alphaSpeed;
+        }
+
+        if (p.y + p.radius < 0) {
+          p.y = height + p.radius;
+          p.x = Math.random() * width;
+        }
+        if (p.x - p.radius > width) p.x = -p.radius;
+        if (p.x + p.radius < 0) p.x = width + p.radius;
+
+        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${p.alpha})`);
+        gradient.addColorStop(0.6, `rgba(212, 175, 55, ${p.alpha * 0.4})`);
+        gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="pointer-events-none absolute inset-0 size-full opacity-60 mix-blend-screen"
+    />
+  );
+}
+
+// ধীরগতির মাঝখান থেকে দুই দিকে টাইপিং লুপ
 function CenterTypingText({ fullText }: { fullText: string }) {
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -42,23 +135,18 @@ function CenterTypingText({ fullText }: { fullText: string }) {
     const len = fullText.length;
     const mid = Math.floor(len / 2);
     const maxRadius = Math.max(mid, len - mid);
-
-    // বর্তমান দৃশ্যমান অক্ষরের সংখ্যা অনুযায়ী রেডিয়াস বের করা
     const currentRadius = Math.ceil(displayText.length / 2);
 
     if (!isDeleting && currentRadius < maxRadius) {
-      // টাইপ হওয়া (মাঝখান থেকে দুই পাশে ছড়ানো)
       timer = setTimeout(() => {
         const nextRadius = currentRadius + 1;
         const start = Math.max(0, mid - nextRadius);
         const end = Math.min(len, mid + nextRadius);
         setDisplayText(fullText.slice(start, end));
-      }, 55);
+      }, 80); // পড়ার উপযোগী শান্ত টাইপিং স্পিড
     } else if (!isDeleting && currentRadius >= maxRadius) {
-      // পুরো লেখা শেষ হলে কিছুক্ষণ পজ দেওয়া
-      timer = setTimeout(() => setIsDeleting(true), 2800);
+      timer = setTimeout(() => setIsDeleting(true), 4200); // পড়ার জন্য বর্ধিত বিরতি
     } else if (isDeleting && displayText.length > 0) {
-      // মুছে যাওয়া (দুই পাশ থেকে মাঝখানে ফিরে আসা)
       timer = setTimeout(() => {
         const nextRadius = Math.max(0, currentRadius - 1);
         if (nextRadius === 0) {
@@ -68,20 +156,19 @@ function CenterTypingText({ fullText }: { fullText: string }) {
           const end = Math.min(len, mid + nextRadius);
           setDisplayText(fullText.slice(start, end));
         }
-      }, 30);
+      }, 45);
     } else if (isDeleting && displayText.length === 0) {
-      // সম্পূর্ণ মুছে গেলে আবার নতুন করে শুরু
-      timer = setTimeout(() => setIsDeleting(false), 500);
+      timer = setTimeout(() => setIsDeleting(false), 700);
     }
 
     return () => clearTimeout(timer);
   }, [displayText, isDeleting, fullText]);
 
   return (
-    <div className="relative inline-flex items-center justify-center min-h-[3rem] px-4 py-1.5">
-      <p className="text-center font-medium tracking-wide text-white/85 sm:text-lg">
+    <div className="relative inline-flex min-h-[3.5rem] items-center justify-center px-4 py-2">
+      <p className="bg-gradient-to-r from-white/60 via-white/95 to-white/60 bg-clip-text text-center font-medium tracking-wider text-transparent text-lg sm:text-2xl drop-shadow-sm">
         {displayText}
-        <span className="inline-block w-[2px] h-4 ml-1 bg-primary align-middle animate-pulse" />
+        <span className="ml-1.5 inline-block h-5 w-[2px] animate-pulse bg-gold align-middle sm:h-6" />
       </p>
     </div>
   );
@@ -93,7 +180,7 @@ function HomePage() {
   const taglineText =
     lang === "bn"
       ? "শব্দ আমার ক্যানভাস, গল্প আমার রঙ; লেখার তুলিতে আঁকি ভাবনা"
-      : "Words are my canvas, stories my colors; painting thoughts with the pen";
+      : "Words are my canvas, stories my colors; painting thoughts with the pencil";
 
   const articles = useQuery({
     queryKey: ["articles", "published", "home"],
@@ -113,19 +200,21 @@ function HomePage() {
 
   return (
     <div>
-      {/* হিরো সেকশন */}
+      {/* লাইভ স্মোক ওয়ালপেপারযুক্ত হিরো সেকশন */}
       <section className="hero-surface relative overflow-hidden">
-        <div className="mx-auto w-full max-w-3xl px-4 py-16 text-center sm:py-24">
-          <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/25 px-3 py-1 text-xs font-medium tracking-wide">
+        <SmokeBackground />
+
+        <div className="relative z-10 mx-auto w-full max-w-3xl px-4 py-16 text-center sm:py-24">
+          <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/25 px-3.5 py-1 text-xs font-medium tracking-wide backdrop-blur-sm">
             <Sparkles className="size-3.5" /> {t("tagline")}
           </p>
 
-          {/* নাম এবং em-dash */}
+          {/* নাম এবং গোল্ডেন em-dash */}
           <h1 className="mt-6 text-3xl font-bold leading-tight sm:text-5xl">
-            আমি <span className="gold-text">আলম</span> —
+            আমি <span className="gold-text">আলম —</span>
           </h1>
 
-          {/* মাঝখান থেকে দুই দিকে টাইপিং লুপ লাইন */}
+          {/* ট্রান্সপারেন্ট টাইপিং লাইন */}
           <div className="mt-3 flex justify-center">
             <CenterTypingText fullText={taglineText} />
           </div>
@@ -149,7 +238,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* সাম্প্রতিক লেখা সেকশন (৩ কলামে ৩টি পোস্ট) */}
+      {/* সাম্প্রতিক লেখা সেকশন */}
       <section className="border-t border-border bg-secondary/40">
         <div className="mx-auto w-full max-w-6xl px-4 py-14">
           <div className="flex items-end justify-between gap-4">
