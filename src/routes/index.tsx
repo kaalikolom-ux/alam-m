@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { usePrefs } from "@/lib/prefs";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,15 +32,77 @@ function getAutoExcerpt(content?: string | null, maxLength = 180) {
   return plainText.length > maxLength ? `${plainText.slice(0, maxLength)}...` : plainText;
 }
 
+// মাঝখান থেকে দুই পাশে টাইপিং লুপ কম্পোনেন্ট
+function CenterTypingText({ fullText }: { fullText: string }) {
+  const [displayText, setDisplayText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    const len = fullText.length;
+    const mid = Math.floor(len / 2);
+    const maxRadius = Math.max(mid, len - mid);
+
+    // বর্তমান দৃশ্যমান অক্ষরের সংখ্যা অনুযায়ী রেডিয়াস বের করা
+    const currentRadius = Math.ceil(displayText.length / 2);
+
+    if (!isDeleting && currentRadius < maxRadius) {
+      // টাইপ হওয়া (মাঝখান থেকে দুই পাশে ছড়ানো)
+      timer = setTimeout(() => {
+        const nextRadius = currentRadius + 1;
+        const start = Math.max(0, mid - nextRadius);
+        const end = Math.min(len, mid + nextRadius);
+        setDisplayText(fullText.slice(start, end));
+      }, 55);
+    } else if (!isDeleting && currentRadius >= maxRadius) {
+      // পুরো লেখা শেষ হলে কিছুক্ষণ পজ দেওয়া
+      timer = setTimeout(() => setIsDeleting(true), 2800);
+    } else if (isDeleting && displayText.length > 0) {
+      // মুছে যাওয়া (দুই পাশ থেকে মাঝখানে ফিরে আসা)
+      timer = setTimeout(() => {
+        const nextRadius = Math.max(0, currentRadius - 1);
+        if (nextRadius === 0) {
+          setDisplayText("");
+        } else {
+          const start = Math.max(0, mid - nextRadius);
+          const end = Math.min(len, mid + nextRadius);
+          setDisplayText(fullText.slice(start, end));
+        }
+      }, 30);
+    } else if (isDeleting && displayText.length === 0) {
+      // সম্পূর্ণ মুছে গেলে আবার নতুন করে শুরু
+      timer = setTimeout(() => setIsDeleting(false), 500);
+    }
+
+    return () => clearTimeout(timer);
+  }, [displayText, isDeleting, fullText]);
+
+  return (
+    <div className="relative inline-flex items-center justify-center min-h-[3rem] px-4 py-1.5">
+      <p className="text-center font-medium tracking-wide text-white/85 sm:text-lg">
+        {displayText}
+        <span className="inline-block w-[2px] h-4 ml-1 bg-primary align-middle animate-pulse" />
+      </p>
+    </div>
+  );
+}
+
 function HomePage() {
   const { t, lang } = usePrefs();
+
+  const taglineText =
+    lang === "bn"
+      ? "শব্দ আমার ক্যানভাস, গল্প আমার রঙ; লেখার তুলিতে আঁকি ভাবনা"
+      : "Words are my canvas, stories my colors; painting thoughts with the pen";
 
   const articles = useQuery({
     queryKey: ["articles", "published", "home"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select("id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en))")
+        .select(
+          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en))",
+        )
         .eq("published", true)
         .order("published_at", { ascending: false })
         .limit(3);
@@ -50,19 +113,29 @@ function HomePage() {
 
   return (
     <div>
+      {/* হিরো সেকশন */}
       <section className="hero-surface relative overflow-hidden">
         <div className="mx-auto w-full max-w-3xl px-4 py-16 text-center sm:py-24">
           <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/25 px-3 py-1 text-xs font-medium tracking-wide">
             <Sparkles className="size-3.5" /> {t("tagline")}
           </p>
+
+          {/* নাম এবং em-dash */}
           <h1 className="mt-6 text-3xl font-bold leading-tight sm:text-5xl">
-            আমি <span className="gold-text">আলম</span>
+            আমি <span className="gold-text">আলম</span> —
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-white/80 sm:text-base">
+
+          {/* মাঝখান থেকে দুই দিকে টাইপিং লুপ লাইন */}
+          <div className="mt-3 flex justify-center">
+            <CenterTypingText fullText={taglineText} />
+          </div>
+
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/75 sm:text-base">
             শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। আমার
             লেখার মাধ্যমে আমি ক্ষণিকের ভাবনাগুলোকে এমন বাক্যে রূপ দিতে চাই, যা পাঠের অনেক পরেও
-            মনে রয়ে যায়। শব্দ আমার ক্যানভাস, আর গল্প আমার রঙ — যেগুলো দিয়ে আমি আঁকি।
+            মনে রয়ে যায়।
           </p>
+
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button
               asChild
@@ -83,7 +156,10 @@ function HomePage() {
             <h2 className="text-2xl font-semibold">
               {lang === "bn" ? "সাম্প্রতিক লেখা" : "Latest Articles"}
             </h2>
-            <Link to="/articles" className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+            <Link
+              to="/articles"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+            >
               {lang === "bn" ? "সকল লেখা" : "All Posts"} <ArrowRight className="size-4" />
             </Link>
           </div>
@@ -139,7 +215,9 @@ function HomePage() {
                         )}
                         {a.published_at && (
                           <span className="text-xs text-muted-foreground">
-                            {new Date(a.published_at).toLocaleDateString(lang === "bn" ? "bn-BD" : "en-GB")}
+                            {new Date(a.published_at).toLocaleDateString(
+                              lang === "bn" ? "bn-BD" : "en-GB",
+                            )}
                           </span>
                         )}
                       </div>
@@ -162,6 +240,7 @@ function HomePage() {
         </div>
       </section>
 
+      {/* নিউজলেটার সেকশন */}
       <section className="mx-auto w-full max-w-3xl px-4 py-16">
         <div className="card-soft p-8 text-center">
           <h2 className="text-xl font-semibold">{t("newsletter")}</h2>
