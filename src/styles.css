@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap");
 
 @custom-variant dark (&:is(.dark *));
 
@@ -46,8 +47,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: "Noto Serif Bengali", "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Outfit", "Noto Serif Bengali", ui-sans-serif, sans-serif;
+  --font-sans: "Noto Serif Bengali", "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Montserrat", "Noto Serif Bengali", ui-sans-serif, sans-serif;
   --font-arabic: "Amiri", "Scheherazade New", serif;
   --font-logo: "Kaushan Script", "Brush Script MT", "Segoe Script", "Snell Roundhand", cursive;
   --shadow-soft: 0 1px 2px oklch(0.2 0.06 262 / 0.06), 0 12px 32px -18px oklch(0.2 0.06 262 / 0.3);
