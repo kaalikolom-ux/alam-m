@@ -29,10 +29,49 @@ function getAutoExcerpt(content?: string | null, maxLength = 180) {
   return plainText.length > maxLength ? `${plainText.slice(0, maxLength)}...` : plainText;
 }
 
+// স্লাগ ও নামের ম্যাপিং হেল্পার
+const CATEGORY_MAP: Record<string, { bn: string; en: string }> = {
+  golpo: { bn: "গল্প", en: "Stories" },
+  story: { bn: "গল্প", en: "Stories" },
+  stories: { bn: "গল্প", en: "Stories" },
+  "গল্প": { bn: "গল্প", en: "Stories" },
+
+  kobita: { bn: "কবিতা", en: "Poems" },
+  poem: { bn: "কবিতা", en: "Poems" },
+  poems: { bn: "কবিতা", en: "Poems" },
+  poetry: { bn: "কবিতা", en: "Poems" },
+  "কবিতা": { bn: "কবিতা", en: "Poems" },
+
+  smritikotha: { bn: "স্মৃতিকথা", en: "Memories" },
+  memory: { bn: "স্মৃতিকথা", en: "Memories" },
+  memories: { bn: "স্মৃতিকথা", en: "Memories" },
+  "স্মৃতিকথা": { bn: "স্মৃতিকথা", en: "Memories" },
+};
+
+function formatDisplayTitle(raw: string, lang: string): string {
+  if (!raw) return lang === "bn" ? "সকল লেখা" : "All Posts";
+  
+  // কুয়েরি প্যারাম স্ট্রিং ক্লিন করা (?q= বা / থাকলে সরানো)
+  const clean = raw.replace(/^.*\?q=/, "").replace(/^\//, "").trim();
+  const lower = clean.toLowerCase();
+
+  if (CATEGORY_MAP[lower]) {
+    return lang === "en" ? CATEGORY_MAP[lower].en : CATEGORY_MAP[lower].bn;
+  }
+  if (CATEGORY_MAP[clean]) {
+    return lang === "en" ? CATEGORY_MAP[clean].en : CATEGORY_MAP[clean].bn;
+  }
+
+  return clean;
+}
+
 function ArticlesPage() {
   const { t, lang } = usePrefs();
   const search = useSearch({ from: "/articles/" });
-  const queryFilter = search.q?.trim() || "";
+  
+  // কুয়েরি থেকে বিশুদ্ধ সার্চ কি-ওয়ার্ড আলাদা করা
+  const rawQuery = search.q?.trim() || "";
+  const cleanFilter = rawQuery.replace(/^.*\?q=/, "").replace(/^\//, "").trim();
 
   const articles = useQuery({
     queryKey: ["articles", "published"],
@@ -49,19 +88,29 @@ function ArticlesPage() {
     },
   });
 
-  // ক্যাটাগরি বা সার্চ অনুযায়ী ফিল্টার করা
   const allArticles = articles.data ?? [];
-  const filteredArticles = queryFilter
+  const filteredArticles = cleanFilter
     ? allArticles.filter((a) => {
-        const matchesCategory = (a.article_categories ?? []).some(
-          (ac: any) =>
-            ac.categories?.name_bn?.includes(queryFilter) ||
-            ac.categories?.name_en?.toLowerCase().includes(queryFilter.toLowerCase()) ||
-            ac.categories?.slug?.toLowerCase().includes(queryFilter.toLowerCase())
-        );
+        const matchesCategory = (a.article_categories ?? []).some((ac: any) => {
+          const catBn = ac.categories?.name_bn || "";
+          const catEn = ac.categories?.name_en || "";
+          const catSlug = ac.categories?.slug || "";
+          
+          return (
+            catBn.includes(cleanFilter) ||
+            catEn.toLowerCase().includes(cleanFilter.toLowerCase()) ||
+            catSlug.toLowerCase().includes(cleanFilter.toLowerCase()) ||
+            (CATEGORY_MAP[cleanFilter.toLowerCase()] && (
+              catBn.includes(CATEGORY_MAP[cleanFilter.toLowerCase()].bn) ||
+              catEn.toLowerCase().includes(CATEGORY_MAP[cleanFilter.toLowerCase()].en.toLowerCase())
+            ))
+          );
+        });
+
         const matchesTitle =
-          a.title_bn?.includes(queryFilter) ||
-          a.title_en?.toLowerCase().includes(queryFilter.toLowerCase());
+          a.title_bn?.includes(cleanFilter) ||
+          a.title_en?.toLowerCase().includes(cleanFilter.toLowerCase());
+
         return matchesCategory || matchesTitle;
       })
     : allArticles;
@@ -73,21 +122,19 @@ function ArticlesPage() {
 
   useEffect(() => {
     setPage(0);
-  }, [pageSize, filteredArticles.length, queryFilter]);
+  }, [pageSize, filteredArticles.length, cleanFilter]);
 
   const visible = filteredArticles.slice(page * pageSize, page * pageSize + pageSize);
-
-  // পেজের হেডিং নির্ধারণ
-  const pageTitle = queryFilter ? queryFilter : lang === "bn" ? "সকল লেখা" : "All Posts";
+  const pageTitle = formatDisplayTitle(cleanFilter, lang);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-12">
       <h1 className="text-3xl font-semibold">{pageTitle}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        {queryFilter
+        {cleanFilter
           ? lang === "bn"
-            ? `"${queryFilter}" বিভাগের প্রকাশনা সমূহ`
-            : `Posts under "${queryFilter}"`
+            ? `"${pageTitle}" বিভাগের প্রকাশনা সমূহ`
+            : `Posts under "${pageTitle}"`
           : t("newsletterSub")}
       </p>
 
