@@ -18,6 +18,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ArticlesIndexRouteImport } from './routes/articles.index'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
+import { Route as CSlugRouteImport } from './routes/c.$slug'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as SurahIdRouteImport } from './routes/surah.$id'
 
@@ -66,6 +67,11 @@ const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
   path: '/articles/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CSlugRoute = CSlugRouteImport.update({
+  id: '/c/$slug',
+  path: '/c/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PSlugRoute = PSlugRouteImport.update({
   id: '/p/$slug',
   path: '/p/$slug',
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/c/$slug': typeof CSlugRoute
   '/p/$slug': typeof PSlugRoute
   '/surah/$id': typeof SurahIdRoute
   '/articles/': typeof ArticlesIndexRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/c/$slug': typeof CSlugRoute
   '/p/$slug': typeof PSlugRoute
   '/surah/$id': typeof SurahIdRoute
   '/articles': typeof ArticlesIndexRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
   '/articles/$slug': typeof ArticlesSlugRoute
+  '/c/$slug': typeof CSlugRoute
   '/p/$slug': typeof PSlugRoute
   '/surah/$id': typeof SurahIdRoute
   '/articles/': typeof ArticlesIndexRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/reset-password'
     | '/articles/$slug'
+    | '/c/$slug'
     | '/p/$slug'
     | '/surah/$id'
     | '/articles/'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/reset-password'
     | '/articles/$slug'
+    | '/c/$slug'
     | '/p/$slug'
     | '/surah/$id'
     | '/articles'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/reset-password'
     | '/articles/$slug'
+    | '/c/$slug'
     | '/p/$slug'
     | '/surah/$id'
     | '/articles/'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
+  CSlugRoute: typeof CSlugRoute
   PSlugRoute: typeof PSlugRoute
   SurahIdRoute: typeof SurahIdRoute
   ArticlesIndexRoute: typeof ArticlesIndexRoute
@@ -238,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArticlesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/c/$slug': {
+      id: '/c/$slug'
+      path: '/c/$slug'
+      fullPath: '/c/$slug'
+      preLoaderRoute: typeof CSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/p/$slug': {
       id: '/p/$slug'
       path: '/p/$slug'
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
+  CSlugRoute: CSlugRoute,
   PSlugRoute: PSlugRoute,
   SurahIdRoute: SurahIdRoute,
   ArticlesIndexRoute: ArticlesIndexRoute,

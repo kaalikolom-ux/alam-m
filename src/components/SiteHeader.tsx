@@ -11,7 +11,9 @@ import { Switch } from "@/components/ui/switch";
 
 const FALLBACK = [
   { id: "home", label_bn: "হোম", label_en: "Home", url: "/" },
-  { id: "articles", label_bn: "আর্টিকেল", label_en: "Articles", url: "/articles" },
+  { id: "story", label_bn: "গল্প", label_en: "Stories", url: "/c/গল্প" },
+  { id: "poem", label_bn: "কবিতা", label_en: "Poems", url: "/c/কবিতা" },
+  { id: "memory", label_bn: "স্মৃতিকথা", label_en: "Memories", url: "/c/স্মৃতিকথা" },
   { id: "about", label_bn: "আমার পাতা", label_en: "About Me", url: "/about" },
   { id: "contact", label_bn: "যোগাযোগ", label_en: "Contact", url: "/contact" },
 ];
@@ -65,7 +67,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        {/* হেডার নেভিগেশন বাটনসমূহ */}
+        {/* হেডার মেনু বাটনসমূহ */}
         <nav className="ml-6 hidden items-center gap-1.5 md:flex">
           <NavLinks />
         </nav>
