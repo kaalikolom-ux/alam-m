@@ -8,6 +8,7 @@ import {
   Bold,
   ChevronDown,
   Code,
+  Copy,
   Eye,
   Italic,
   List,
@@ -430,6 +431,68 @@ function ArticlesAdmin() {
     onError: (error: Error) => toast.error(error.message),
   });
 
+  // পোস্ট ডুপ্লিকেট করার মিউটেশন
+  const duplicate = useMutation({
+    mutationFn: async (article: any) => {
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      const newSlug = `${article.slug}-copy-${randomSuffix}`.slice(0, 120);
+
+      const payload = {
+        slug: newSlug,
+        title_bn: `${article.title_bn} (কপি)`,
+        title_en: article.title_en ? `${article.title_en} (Copy)` : null,
+        excerpt_bn: article.excerpt_bn || null,
+        excerpt_en: article.excerpt_en || null,
+        content_bn: article.content_bn || null,
+        content_en: article.content_en || null,
+        cover_image_url: article.cover_image_url || null,
+        published: false, // ডুপ্লিকেট পোস্ট শুরুতে ড্রাফট হিসেবে থাকবে
+        author_id: article.author_id || null,
+        published_at: null,
+        created_by: user!.id,
+      };
+
+      const { data, error } = await supabase.from("articles").insert(payload).select("id").single();
+      if (error) throw error;
+
+      const newId = data.id;
+      const categoriesToAdd = (article.article_categories || []).map((ac: any) => ac.category_id);
+
+      if (categoriesToAdd.length > 0) {
+        const { error: catError } = await supabase
+          .from("article_categories")
+          .insert(categoriesToAdd.map((category_id: string) => ({ article_id: newId, category_id })));
+        if (catError) throw catError;
+      }
+
+      return { newId, ...payload, catIds: categoriesToAdd };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
+      queryClient.invalidateQueries({ queryKey: ["articles"] });
+      
+      // ডুপ্লিকেট করা পোস্টটি সরাসরি এডিট ফর্মে লোড করে উপরে স্ক্রল করানো
+      setEditingId(data.newId);
+      setPublished(false);
+      setAuthorId(data.author_id ?? "");
+      setCatIds(data.catIds || []);
+      setForm({
+        slug: data.slug,
+        title_bn: data.title_bn,
+        title_en: data.title_en ?? "",
+        excerpt_bn: data.excerpt_bn ?? "",
+        excerpt_en: data.excerpt_en ?? "",
+        content_bn: data.content_bn ?? "",
+        content_en: data.content_en ?? "",
+        cover_image_url: data.cover_image_url ?? "",
+      });
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      toast.success("পোস্ট সফলভাবে ডুপ্লিকেট করা হয়েছে!");
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
   const remove = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("articles").delete().eq("id", id);
@@ -564,6 +627,7 @@ function ArticlesAdmin() {
         </div>
       </form>
 
+      {/* পোস্ট তালিকা ও অ্যাকশন বাটনসমূহ */}
       <div className="space-y-3">
         {list.data?.map((a) => (
           <div key={a.id} className="card-soft flex items-center gap-3 p-4">
@@ -573,15 +637,30 @@ function ArticlesAdmin() {
                 /{a.slug} · {a.published ? t("published") : t("draft")}
               </p>
             </div>
+            
+            {/* ডুপ্লিকেট বাটন */}
             <Button
               variant="ghost"
               size="icon"
+              title="ডুপ্লিকেট করুন"
+              aria-label="Duplicate"
+              disabled={duplicate.isPending}
+              onClick={() => duplicate.mutate(a)}
+            >
+              <Copy className="size-4 text-muted-foreground hover:text-foreground" />
+            </Button>
+
+            {/* এডিট বাটন */}
+            <Button
+              variant="ghost"
+              size="icon"
+              title={t("edit")}
               aria-label={t("edit")}
               onClick={() => {
                 setEditingId(a.id);
                 setPublished(a.published);
                 setAuthorId(a.author_id ?? "");
-                setCatIds((a.article_categories ?? []).map((ac) => ac.category_id));
+                setCatIds((a.article_categories ?? []).map((ac: any) => ac.category_id));
                 setForm({
                   slug: a.slug,
                   title_bn: a.title_bn,
@@ -597,9 +676,12 @@ function ArticlesAdmin() {
             >
               <Pencil className="size-4" />
             </Button>
+
+            {/* ডিলিট বাটন */}
             <Button
               variant="ghost"
               size="icon"
+              title={t("delete")}
               aria-label={t("delete")}
               onClick={() => remove.mutate(a.id)}
             >
