@@ -43,7 +43,6 @@ function ArticlePage() {
   const { slug } = Route.useParams();
   const { t, lang } = usePrefs();
 
-  // সিম্পল কমেন্ট স্টেট
   const [comments, setComments] = useState<CommentItem[]>([]);
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
@@ -101,7 +100,6 @@ function ArticlePage() {
   const label = (s: { title_bn: string; title_en: string | null }) =>
     lang === "en" && s.title_en ? s.title_en : s.title_bn;
 
-  // ক্যাটাগরি ও লেখক তথ্য প্রস্তুতকরণ
   const categoriesList = (a.article_categories ?? [])
     .map((ac: any) => ac.categories)
     .filter(Boolean);
@@ -161,12 +159,12 @@ function ArticlePage() {
         />
       )}
 
-      {/* পোস্ট কনটেন্ট এরিয়া (HTML এবং সাধারণ টেক্সট উভয়ই সাপোর্ট করবে) */}
-      <div className="prose-reader mt-8 text-base leading-relaxed">
+      {/* পোস্ট কনটেন্ট এরিয়া: বহিরাগত সাদা ব্যাকগ্রাউন্ড ও কালার ফিক্সড */}
+      <div className="prose-reader mt-8 text-base leading-relaxed text-foreground">
         {isHtml ? (
           <div
             dangerouslySetInnerHTML={{ __html: content || "" }}
-            className="space-y-4 [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-4 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"
+            className="space-y-4 [&_*]:!bg-transparent [&_*]:!text-inherit [&_blockquote]:!border-l-4 [&_blockquote]:!border-primary [&_blockquote]:!pl-4 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"
           />
         ) : (
           <div className="space-y-4">
@@ -179,7 +177,7 @@ function ArticlePage() {
         )}
       </div>
 
-      {/* পোস্টের নীচে মেটা বাটনসমূহ: লেখক, ক্যাটাগরি, তারিখ */}
+      {/* পোস্টের নীচে মেটা বাটনসমূহ */}
       <div className="mt-10 flex flex-wrap items-center gap-2 border-t border-border/40 pt-6">
         {authorName && (
           <Link
@@ -219,7 +217,7 @@ function ArticlePage() {
         )}
       </div>
 
-      {/* Prev / Next দুইপাশের Hover Arrow Cards */}
+      {/* Prev / Next Cards */}
       {(newer || older) && (
         <nav className="mt-10 grid gap-4 sm:grid-cols-2">
           {newer ? (
@@ -281,7 +279,6 @@ function ArticlePage() {
           </h2>
         </div>
 
-        {/* মন্তব্য ফর্ম */}
         <form onSubmit={handleCommentSubmit} className="mt-5 space-y-3">
           <div>
             <Input
@@ -307,7 +304,6 @@ function ArticlePage() {
           </Button>
         </form>
 
-        {/* মন্তব্যের তালিকা */}
         <div className="mt-6 space-y-3 divide-y divide-border/30">
           {comments.length === 0 ? (
             <p className="pt-2 text-xs text-muted-foreground">

@@ -18,23 +18,42 @@ const FALLBACK = [
   { id: "contact", label_bn: "যোগাযোগ", label_en: "Contact", url: "/contact" },
 ];
 
+// ভুল ও ব্রোকেন লিংক অটো ফিক্স ফাংশন
+function sanitizeNavUrl(url: string, labelBn: string): string {
+  if (url === "/" || url.startsWith("/about") || url.startsWith("/contact") || url.startsWith("/p/")) {
+    return url;
+  }
+  if (url.startsWith("/articles?q=")) {
+    return url;
+  }
+  if (url === "/articles" || url === "/articles/") {
+    return "/articles";
+  }
+  // ড্যাশবোর্ড থেকে /গল্প, /কবিতা বা যেকোনো কাস্টম ক্যাটাগরি এলে সেটিকে /articles?q= এ কনভার্ট করা
+  const cleanName = url.replace(/^\/(c\/)?/, "") || labelBn;
+  return `/articles?q=${encodeURIComponent(cleanName)}`;
+}
+
 function NavLinks({ onNavigate, mobile }: { onNavigate?: () => void; mobile?: boolean }) {
   const { lang } = usePrefs();
   const menu = useMenu("header");
-  const items = menu.data && menu.data.length > 0 ? menu.data : FALLBACK;
+  const rawItems = menu.data && menu.data.length > 0 ? menu.data : FALLBACK;
+
+  // "আর্টিকেল" নামক মেন্যু থাকলে স্বয়ংক্রিয়ভাবে ফিল্টার করে বাদ দেওয়া
+  const items = rawItems
+    .filter((item) => item.label_bn !== "আর্টিকেল" && item.label_en?.toLowerCase() !== "articles")
+    .map((item) => ({
+      ...item,
+      url: sanitizeNavUrl(item.url, item.label_bn),
+    }));
 
   return (
     <>
       {items.map((item) => (
-        <Link
+        <a
           key={item.id}
-          to={item.url as any}
+          href={item.url}
           onClick={onNavigate}
-          activeOptions={{ exact: item.url === "/" }}
-          activeProps={{
-            className:
-              "bg-primary/15 text-primary border-primary/30 font-semibold shadow-sm",
-          }}
           className={
             mobile
               ? "flex items-center rounded-lg px-3.5 py-2 text-sm font-medium text-foreground/80 border border-transparent transition-all duration-200 hover:bg-primary/10 hover:border-primary/20 hover:text-primary active:scale-[0.98]"
@@ -42,7 +61,7 @@ function NavLinks({ onNavigate, mobile }: { onNavigate?: () => void; mobile?: bo
           }
         >
           {lang === "en" && item.label_en ? item.label_en : item.label_bn}
-        </Link>
+        </a>
       ))}
     </>
   );
