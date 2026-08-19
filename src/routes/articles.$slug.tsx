@@ -5,7 +5,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Calendar,
-  FolderTag,
+  Folder,
   MessageSquare,
   Send,
   User,
@@ -201,7 +201,7 @@ function ArticlePage() {
               search={{ q: catName } as any}
               className="inline-flex h-9 items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-xs font-medium text-foreground shadow-sm transition-colors hover:border-primary hover:bg-accent hover:text-accent-foreground"
             >
-              <FolderTag className="size-3.5 text-primary" />
+              <Folder className="size-3.5 text-primary" />
               <span>{catName}</span>
             </Link>
           );
