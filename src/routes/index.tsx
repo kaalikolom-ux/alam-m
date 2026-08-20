@@ -1,193 +1,190 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Sparkles } from "lucide-react";
-import { useEffect, useRef, useState, memo } from "react";
+import { useMemo, useState, memo, useRef, useEffect } from "react";
+import { ArrowRight, BookOpen, FileText, Search, Settings, Sparkles } from "lucide-react";
 
+import { chaptersQuery, localNumber } from "@/lib/quran";
 import { usePrefs } from "@/lib/prefs";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { NewsletterForm } from "@/components/NewsletterForm";
+import { Typewriter } from "@/components/Typewriter";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Alam M — শব্দ আমার ক্যানভাস" },
+      { title: "কুরআন অন্বেষা — শব্দে শব্দে অর্থসহ কুরআন ও আর্টিকেল" },
       {
         name: "description",
-        content: "শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। গল্প, কবিতা ও স্মৃতিকথা।",
+        content:
+          "আরবি, শব্দে শব্দে অর্থ, বাংলা (তাইসিরুল কুরআন) ও ইংরেজি (Pickthall) অনুবাদ এবং বিজ্ঞানভিত্তিক অনুবাদসহ কুরআন পড়ুন। বুকমার্ক ও আর্টিকেল সুবিধা।",
       },
-      { property: "og:title", content: "Alam M — শব্দ আমার ক্যানভাস" },
+      { property: "og:type", content: "website" },
+      { property: "og:title", content: "কুরআন অন্বেষা — শব্দে শব্দে অর্থসহ কুরআন" },
       {
         property: "og:description",
-        content: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।",
+        content: "শব্দে শব্দে অর্থ, প্রচলিত ও বিজ্ঞানভিত্তিক অনুবাদ একই পাতায়।",
       },
+      { property: "og:image", content: "/og-image.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "কুরআন অন্বেষা — শব্দে শব্দে অর্থসহ কুরআন" },
+      {
+        name: "twitter:description",
+        content: "শব্দে শব্দে অর্থ, প্রচলিত ও বিজ্ঞানভিত্তিক অনুবাদ একই পাতায়।",
+      },
+      { name: "twitter:image", content: "/og-image.jpg" },
     ],
   }),
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(chaptersQuery("bn"));
+  },
   component: HomePage,
 });
 
-function getAutoExcerpt(content?: string | null, maxLength = 160) {
-  if (!content) return "";
-  const plainText = content.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
-  return plainText.length > maxLength ? `${plainText.slice(0, maxLength)}...` : plainText;
+function bnToEnDigits(str: string): string {
+  const bnDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+  return str.replace(/[০-৯]/g, (w) => String(bnDigits.indexOf(w)));
 }
 
-// মোবাইল ফ্রেন্ডলি ও পারফরম্যান্স অপ্টিমাইজড স্মোক
-const SmokeBackground = memo(function SmokeBackground() {
+// স্টিল-ব্লু ড্রপলেট ও লাইভ ক্লাউড ব্যাকগ্রাউন্ড
+const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    if (typeof window === "undefined" || window.innerWidth < 768) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d", { alpha: true });
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationFrameId: number;
-    let width = (canvas.width = canvas.offsetWidth);
-    let height = (canvas.height = canvas.offsetHeight);
+    let animId: number;
+    let w = (canvas.width = canvas.offsetWidth);
+    let h = (canvas.height = canvas.offsetHeight);
 
-    const handleResize = () => {
+    const onResize = () => {
       if (!canvas) return;
-      width = canvas.width = canvas.offsetWidth;
-      height = canvas.height = canvas.offsetHeight;
+      w = canvas.width = canvas.offsetWidth;
+      h = canvas.height = canvas.offsetHeight;
     };
-    window.addEventListener("resize", handleResize, { passive: true });
+    window.addEventListener("resize", onResize);
 
-    const particles = Array.from({ length: 10 }).map(() => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      radius: Math.random() * 50 + 35,
-      vx: (Math.random() - 0.5) * 0.2,
-      vy: -Math.random() * 0.2 - 0.05,
-      alpha: Math.random() * 0.1 + 0.03,
-      alphaSpeed: (Math.random() * 0.002 + 0.001) * (Math.random() > 0.5 ? 1 : -1),
+    const droplets = Array.from({ length: 95 }).map(() => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 2.8 + 1.2,
+      stretch: Math.random() * 1.8 + 1,
+      angle: (Math.random() - 0.5) * 0.4,
+      alpha: Math.random() * 0.55 + 0.25,
+      speedY: Math.random() * 0.08 + 0.02,
     }));
 
-    const render = () => {
-      ctx.clearRect(0, 0, width, height);
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha += p.alphaSpeed;
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
 
-        if (p.alpha <= 0.02 || p.alpha >= 0.14) p.alphaSpeed = -p.alphaSpeed;
-        if (p.y + p.radius < 0) {
-          p.y = height + p.radius;
-          p.x = Math.random() * width;
+      for (let i = 0; i < droplets.length; i++) {
+        const d = droplets[i];
+        d.y += d.speedY;
+        if (d.y > h + 10) {
+          d.y = -10;
+          d.x = Math.random() * w;
         }
-        if (p.x - p.radius > width) p.x = -p.radius;
-        if (p.x + p.radius < 0) p.x = width + p.radius;
 
-        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-        gradient.addColorStop(0, `rgba(255, 255, 255, ${p.alpha})`);
-        gradient.addColorStop(0.7, `rgba(212, 175, 55, ${p.alpha * 0.3})`);
-        gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+        ctx.save();
+        ctx.translate(d.x, d.y);
+        ctx.rotate(d.angle);
 
-        ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.ellipse(0, 0, d.r * d.stretch, d.r, 0, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(10, 20, 32, ${d.alpha * 0.85})`;
         ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(-d.r * 0.3, -d.r * 0.3, d.r * 0.4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(235, 245, 255, ${d.alpha * 0.7})`;
+        ctx.fill();
+
+        ctx.restore();
       }
-      animationFrameId = requestAnimationFrame(render);
+
+      animId = requestAnimationFrame(draw);
     };
 
-    render();
+    draw();
 
     return () => {
-      window.removeEventListener("resize", handleResize);
-      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(animId);
     };
   }, []);
 
   return (
-    <>
-      <div className="pointer-events-none absolute inset-0 block md:hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+    <div className="pointer-events-none absolute inset-0 overflow-hidden select-none bg-[#182635]">
+      {/* স্টিল ব্লু গ্রেডিয়েন্ট বেস */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: "linear-gradient(180deg, #324757 0%, #20313f 50%, #101c27 100%)",
+        }}
+      />
+
+      {/* ড্রপলেট ক্যানভাস */}
       <canvas
         ref={canvasRef}
-        className="pointer-events-none absolute inset-0 hidden md:block size-full opacity-60 mix-blend-screen"
+        className="absolute inset-0 size-full opacity-80 mix-blend-multiply"
       />
-    </>
+
+      {/* ভাসমান ট্রান্সপারেন্ট মেঘ লেয়ার ১ */}
+      <div
+        className="absolute inset-x-[-20%] bottom-0 h-64 opacity-35 blur-2xl"
+        style={{
+          background:
+            "radial-gradient(ellipse 75% 45% at 35% 95%, rgba(255, 255, 255, 0.45), transparent 70%), radial-gradient(ellipse 65% 55% at 75% 85%, rgba(195, 220, 240, 0.35), transparent 65%)",
+          animation: "cloudDriftOne 20s ease-in-out infinite alternate",
+        }}
+      />
+
+      {/* ভাসমান ট্রান্সপারেন্ট মেঘ লেয়ার ২ */}
+      <div
+        className="absolute inset-x-[-25%] -bottom-8 h-52 opacity-30 blur-3xl"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 50% at 65% 95%, rgba(255, 255, 255, 0.45), transparent 70%), radial-gradient(ellipse 55% 45% at 20% 80%, rgba(180, 210, 235, 0.3), transparent 60%)",
+          animation: "cloudDriftTwo 28s linear infinite",
+        }}
+      />
+
+      {/* হিরো ও পরবর্তী সেকশনের মসৃণ ব্লেন্ডিং ফেড (স্ক্রিনশটের মতো গভীর কালো ব্লেন্ড) */}
+      <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-[#070d14]/70 to-[#070d14]" />
+
+      <style>{`
+        @keyframes cloudDriftOne {
+          0% { transform: translate3d(0, 0, 0) scale(1); }
+          50% { transform: translate3d(-40px, -12px, 0) scale(1.04); }
+          100% { transform: translate3d(30px, 6px, 0) scale(0.97); }
+        }
+        @keyframes cloudDriftTwo {
+          0% { transform: translate3d(0, 0, 0); }
+          50% { transform: translate3d(50px, -8px, 0); }
+          100% { transform: translate3d(0, 0, 0); }
+        }
+      `}</style>
+    </div>
   );
 });
 
-// লাইটহাউস-ফ্রেন্ডলি টাইপিং কম্পোনেন্ট (ডিলেড স্টার্ট)
-function CenterTypingText({ fullText }: { fullText: string }) {
-  const [displayText, setDisplayText] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-
-  // পেজ লোড শেষ হওয়ার পর অ্যানিমেশন শুরু হবে
-  useEffect(() => {
-    const initTimer = setTimeout(() => setIsReady(true), 1200);
-    return () => clearTimeout(initTimer);
-  }, []);
-
-  useEffect(() => {
-    if (!isReady) return;
-
-    let timer: NodeJS.Timeout;
-    const len = fullText.length;
-    const mid = Math.floor(len / 2);
-    const maxRadius = Math.max(mid, len - mid);
-    const currentRadius = Math.ceil(displayText.length / 2);
-
-    if (!isDeleting && currentRadius < maxRadius) {
-      timer = setTimeout(() => {
-        const nextRadius = currentRadius + 1;
-        const start = Math.max(0, mid - nextRadius);
-        const end = Math.min(len, mid + nextRadius);
-        setDisplayText(fullText.slice(start, end));
-      }, 70);
-    } else if (!isDeleting && currentRadius >= maxRadius) {
-      timer = setTimeout(() => setIsDeleting(true), 4200);
-    } else if (isDeleting && displayText.length > 0) {
-      timer = setTimeout(() => {
-        const nextRadius = Math.max(0, currentRadius - 1);
-        if (nextRadius === 0) {
-          setDisplayText("");
-        } else {
-          const start = Math.max(0, mid - nextRadius);
-          const end = Math.min(len, mid + nextRadius);
-          setDisplayText(fullText.slice(start, end));
-        }
-      }, 35);
-    } else if (isDeleting && displayText.length === 0) {
-      timer = setTimeout(() => setIsDeleting(false), 600);
-    }
-
-    return () => clearTimeout(timer);
-  }, [displayText, isDeleting, isReady, fullText]);
-
-  return (
-    <div className="relative flex h-20 sm:h-16 w-full max-w-2xl items-center justify-center overflow-hidden px-3">
-      <p className="bg-gradient-to-r from-white/60 via-white/95 to-white/60 bg-clip-text text-center font-medium tracking-normal sm:tracking-wider text-transparent text-sm sm:text-lg md:text-xl leading-snug sm:leading-normal drop-shadow-sm">
-        {displayText || (isReady ? "" : fullText)}
-        <span className="ml-1 inline-block h-3.5 w-[2px] animate-pulse bg-gold align-middle sm:h-5" />
-      </p>
-    </div>
-  );
-}
-
 function HomePage() {
   const { t, lang } = usePrefs();
-
-  const taglineText =
-    lang === "bn"
-      ? "শব্দ আমার ক্যানভাস, গল্প আমার রঙ; লেখার তুলিতে আঁকি ভাবনা"
-      : "Words are my canvas, stories my colors; painting thoughts with the pencil";
+  const [term, setTerm] = useState("");
+  const chapters = useQuery(chaptersQuery(lang));
+  const navigate = useNavigate();
 
   const articles = useQuery({
     queryKey: ["articles", "published", "home"],
-    staleTime: 1000 * 60 * 10,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select(
-          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en))",
-        )
+        .select("id, slug, title_bn, title_en, excerpt_bn, excerpt_en, published_at, cover_image_url")
         .eq("published", true)
         .order("published_at", { ascending: false })
         .limit(3);
@@ -196,128 +193,289 @@ function HomePage() {
     },
   });
 
-  return (
-    <div>
-      <section className="hero-surface relative overflow-hidden">
-        <SmokeBackground />
+  const normalizedTerm = useMemo(() => {
+    return bnToEnDigits(term.trim().toLowerCase());
+  }, [term]);
 
-        <div className="relative z-10 mx-auto w-full max-w-3xl px-4 py-16 text-center sm:py-24">
-          <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/25 px-3.5 py-1 text-xs font-medium tracking-wide backdrop-blur-sm">
-            <Sparkles className="size-3.5" /> {t("tagline")}
+  const parsedAyahTarget = useMemo(() => {
+    const match = normalizedTerm.match(/^(\d{1,3})[:ঃ\/\.\-](\d{1,3})$/);
+    if (match) {
+      return {
+        surah: Number(match[1]),
+        ayah: Number(match[2]),
+      };
+    }
+    return null;
+  }, [normalizedTerm]);
+
+  const filtered = useMemo(() => {
+    const list = chapters.data ?? [];
+    if (!normalizedTerm) return list;
+
+    if (parsedAyahTarget) {
+      return list.filter((c) => c.id === parsedAyahTarget.surah);
+    }
+
+    const isNum = /^\d+$/.test(normalizedTerm);
+    if (isNum) {
+      return list.filter((c) => String(c.id) === normalizedTerm);
+    }
+
+    const rawQ = term.trim().toLowerCase();
+    return list.filter(
+      (c) =>
+        c.name_simple.toLowerCase().includes(rawQ) ||
+        c.translated_name.name.toLowerCase().includes(rawQ) ||
+        String(c.id) === normalizedTerm
+    );
+  }, [chapters.data, normalizedTerm, term, parsedAyahTarget]);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!normalizedTerm) return;
+
+    if (parsedAyahTarget) {
+      const { surah, ayah } = parsedAyahTarget;
+      if (surah >= 1 && surah <= 114) {
+        navigate({
+          to: "/surah/$id",
+          params: { id: String(surah) },
+          search: { ayah: Number(ayah) },
+        });
+        return;
+      }
+    }
+
+    if (/^\d+$/.test(normalizedTerm)) {
+      const sNum = Number(normalizedTerm);
+      if (sNum >= 1 && sNum <= 114) {
+        navigate({
+          to: "/surah/$id",
+          params: { id: String(sNum) },
+        });
+        return;
+      }
+    }
+
+    if (filtered.length > 0) {
+      navigate({
+        to: "/surah/$id",
+        params: { id: String(filtered[0].id) },
+      });
+    }
+  };
+
+  return (
+    <div className="bg-[#070d14]">
+      {/* হিরো সেকশন */}
+      <section className="relative overflow-hidden pt-12 pb-24 sm:py-28">
+        <WaterDropletCloudBackground />
+
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-4">
+          <p className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3.5 py-1 text-xs font-medium tracking-wide bg-black/25 backdrop-blur-md shadow-xs text-white">
+            <Sparkles className="size-3.5 text-amber-300" /> {t("tagline")}
           </p>
 
-          <h1 className="mt-6 text-3xl font-bold leading-tight sm:text-5xl">
-            আমি <span className="gold-text">আলম —</span>
+          <h1 className="mt-6 max-w-3xl text-3xl font-bold leading-tight sm:text-5xl text-white drop-shadow-md">
+            {lang === "bn" ? (
+              <>
+                পবিত্র কুরআন — বুঝে পড়ুন <br />
+                <span className="inline-block mt-1 font-semibold text-amber-300">
+                  <Typewriter
+                    words={[
+                      "শব্দে শব্দে অর্থসহ",
+                      "বিজ্ঞানভিত্তিক ব্যাখ্যায়",
+                      "সহজ বাংলা অনুবাদে",
+                      "প্রামাণ্য তথ্যসূত্রসহ",
+                    ]}
+                    typingSpeed={90}
+                    deletingSpeed={50}
+                    delayBetweenWords={1500}
+                  />
+                </span>
+              </>
+            ) : (
+              <>
+                The Holy Quran — understand it <br />
+                <span className="inline-block mt-1 font-semibold text-amber-300">
+                  <Typewriter
+                    words={[
+                      "word by word",
+                      "with scientific context",
+                      "in clear translation",
+                      "with authentic notes",
+                    ]}
+                    typingSpeed={80}
+                    deletingSpeed={40}
+                    delayBetweenWords={1500}
+                  />
+                </span>
+              </>
+            )}
           </h1>
 
-          <div className="mt-4 flex justify-center">
-            <CenterTypingText fullText={taglineText} />
-          </div>
-
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/75 sm:text-base">
-            শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। আমার
-            লেখার মাধ্যমে আমি ক্ষণিকের ভাবনাগুলোকে এমন বাক্যে রূপ দিতে চাই, যা পাঠের অনেক পরেও
-            মনে রয়ে যায়।
+          <p className="mt-5 max-w-2xl text-sm sm:text-base leading-relaxed text-white/90 drop-shadow-sm">
+            {lang === "bn"
+              ? "আরবি, শব্দে শব্দে অর্থ, বাংলা ও ইংরেজি অনুবাদ এবং বিজ্ঞানভিত্তিক অনুবাদসহ পবিত্র কুরআন পড়ুন। শব্দে শব্দে অর্থ, প্রচলিত ও বিজ্ঞানভিত্তিক অনুবাদ একই পাতায়।"
+              : "Read the Holy Quran with Arabic, word-by-word meaning, Bengali & English translations, and scientific context on a single platform."}
           </p>
-
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          
+          <div className="mt-8 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3 max-w-lg sm:max-w-none">
             <Button
               asChild
               size="lg"
-              variant="outline"
-              className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              variant="ghost"
+              className="w-full sm:w-auto px-2 sm:px-4 text-xs sm:text-base bg-black/30 text-white shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-black/45 hover:text-white hover:scale-[1.02] border border-white/20"
             >
-              <Link to="/articles">{lang === "bn" ? "সকল লেখা" : "All Posts"}</Link>
+              <Link to="/surah/$id" params={{ id: "1" }}>
+                <BookOpen className="size-3.5 sm:size-4 mr-1 sm:mr-2 shrink-0 text-amber-300" /> 
+                <span className="truncate">{t("readQuran")}</span>
+              </Link>
+            </Button>
+
+            <Button
+              asChild
+              size="lg"
+              variant="ghost"
+              className="w-full sm:w-auto px-2 sm:px-4 text-xs sm:text-base bg-black/30 text-white shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-black/45 hover:text-white hover:scale-[1.02] border border-white/20"
+            >
+              <Link to="/articles">
+                <FileText className="size-3.5 sm:size-4 mr-1 sm:mr-2 shrink-0 text-sky-300" /> 
+                <span className="truncate">{lang === "bn" ? "আর্টিকেল" : "Articles"}</span>
+              </Link>
+            </Button>
+
+            <Button
+              asChild
+              size="lg"
+              variant="ghost"
+              className="w-full sm:w-auto px-2 sm:px-4 text-xs sm:text-base bg-black/30 text-white shadow-sm backdrop-blur-md transition-all duration-200 hover:bg-black/45 hover:text-white hover:scale-[1.02] border border-white/20"
+            >
+              <Link to="/settings">
+                <Settings className="size-3.5 sm:size-4 mr-1 sm:mr-2 shrink-0 text-amber-200" /> 
+                <span className="truncate">{lang === "bn" ? "সেটিংস" : "Settings"}</span>
+              </Link>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* সাম্প্রতিক লেখা সেকশন */}
-      <section className="border-t border-border bg-secondary/40">
-        <div className="mx-auto w-full max-w-6xl px-4 py-14">
-          <div className="flex items-end justify-between gap-4">
-            <h2 className="text-2xl font-semibold">
-              {lang === "bn" ? "সাম্প্রতিক লেখা" : "Latest Articles"}
+      {/* সুরা তালিকা সেকশন */}
+      <section className="relative z-10 mx-auto w-full max-w-6xl px-4 py-14">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <h2 className="text-2xl font-semibold text-foreground">
+              {t("surahs")} <span className="text-muted-foreground">({localNumber(114, lang)})</span>
             </h2>
-            <Link
-              to="/articles"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-            >
-              {lang === "bn" ? "সকল লেখা" : "All Posts"} <ArrowRight className="size-4" />
-            </Link>
+
+            <div className="w-full max-w-sm space-y-1.5">
+              <form
+                onSubmit={handleSearchSubmit}
+                className="relative flex items-center rounded-xl border border-border/80 bg-card/70 px-3 py-1.5 shadow-xs focus-within:border-foreground/40 transition-all"
+              >
+                <Search className="size-4 text-muted-foreground shrink-0 mr-2" />
+                <input
+                  type="text"
+                  value={term}
+                  onChange={(e) => setTerm(e.target.value)}
+                  placeholder={
+                    lang === "bn"
+                      ? "সুরা খুঁজুন... / আয়াত খুঁজুন..."
+                      : "Search Surah... / Ayah..."
+                  }
+                  className="w-full bg-transparent border-none outline-none text-sm text-foreground placeholder:text-muted-foreground"
+                />
+                <button
+                  type="submit"
+                  className="rounded-lg bg-primary/15 hover:bg-primary/25 text-primary px-2.5 py-1 text-xs font-semibold transition-colors border border-primary/20 shrink-0 cursor-pointer"
+                >
+                  যান
+                </button>
+              </form>
+              <p className="text-[11px] leading-tight text-muted-foreground/70 px-1">
+                {lang === "bn"
+                  ? "💡 সুরা খুঁজতে নাম বা নম্বর (৩৩ বা 33) লিখুন। আয়াত খুঁজতে ৩৩ঃ৪০ বা 33:40 লিখে ইন্টার চাপুন।"
+                  : "💡 Search surah by name or no. (33). Search ayah like 33:40 and press Enter."}
+              </p>
+            </div>
           </div>
 
-          {articles.data && articles.data.length > 0 ? (
-            <div className="mt-6 grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {articles.data.map((a) => {
-                const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
-                const rawExcerpt = lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn;
-                const rawContent = lang === "en" && a.content_en ? a.content_en : a.content_bn;
-                const excerpt = rawExcerpt || getAutoExcerpt(rawContent);
+          {chapters.isLoading ? (
+            <p className="mt-8 text-sm text-muted-foreground">{t("loading")}</p>
+          ) : (
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((c) => {
+                const targetAyah = parsedAyahTarget && parsedAyahTarget.surah === c.id ? parsedAyahTarget.ayah : undefined;
 
                 return (
                   <Link
-                    key={a.id}
-                    to="/articles/$slug"
-                    params={{ slug: a.slug }}
-                    className="card-soft group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]"
+                    key={c.id}
+                    to="/surah/$id"
+                    params={{ id: String(c.id) }}
+                    search={targetAyah ? { ayah: targetAyah } : undefined}
+                    className="card-soft group flex items-center gap-4 p-4 transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)] cursor-pointer"
                   >
-                    <div className="aspect-[16/10] w-full shrink-0 overflow-hidden bg-accent/40 relative">
-                      {a.cover_image_url ? (
-                        <img
-                          src={a.cover_image_url}
-                          alt={title}
-                          loading="lazy"
-                          decoding="async"
-                          width={400}
-                          height={250}
-                          className="block size-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="flex size-full items-center justify-center p-6 text-center bg-gradient-to-br from-primary/5 via-accent/20 to-primary/10 transition-colors group-hover:from-primary/10 group-hover:to-primary/20">
-                          <h3 className="line-clamp-3 text-lg font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">
-                            {title}
-                          </h3>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex min-w-0 flex-1 flex-col p-5">
-                      <div className="mb-2.5 flex flex-wrap items-center gap-2">
-                        {a.article_categories?.map(
-                          (ac) =>
-                            ac.categories && (
-                              <span
-                                key={ac.categories.id}
-                                className="rounded-full border border-primary/30 bg-primary/5 px-2.5 py-0.5 text-[11px] font-medium text-primary"
-                              >
-                                {lang === "en" && ac.categories.name_en
-                                  ? ac.categories.name_en
-                                  : ac.categories.name_bn}
-                              </span>
-                            ),
-                        )}
-                        {a.published_at && (
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(a.published_at).toLocaleDateString(
-                              lang === "bn" ? "bn-BD" : "en-GB",
-                            )}
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent text-sm font-semibold text-accent-foreground">
+                      {localNumber(c.id, lang)}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-medium">
+                        {c.name_simple}
+                        {targetAyah && (
+                          <span className="ml-2 text-xs font-semibold text-primary">
+                            ({localNumber(targetAyah, lang)} নং আয়াত)
                           </span>
                         )}
-                      </div>
-
-                      <p className="line-clamp-4 text-sm leading-relaxed text-muted-foreground">
-                        {excerpt}
-                      </p>
-
-                      <span className="mt-auto pt-4 text-xs font-semibold uppercase tracking-wider text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                        {t("readMore")} →
                       </span>
-                    </div>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {c.translated_name.name} · {localNumber(c.verses_count, lang)} {t("verses")}
+                      </span>
+                    </span>
+                    <span className="arabic text-lg text-primary">{c.name_arabic}</span>
                   </Link>
                 );
               })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* আর্টিকেল সেকশন */}
+      <section className="border-t border-border bg-secondary/40">
+        <div className="mx-auto w-full max-w-6xl px-4 py-14">
+          <div className="flex items-end justify-between gap-4">
+            <h2 className="text-2xl font-semibold">{t("latestArticles")}</h2>
+            <Link to="/articles" className="inline-flex items-center gap-1 text-sm text-primary">
+              {t("articles")} <ArrowRight className="size-4" />
+            </Link>
+          </div>
+          {articles.data && articles.data.length > 0 ? (
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {articles.data.map((a) => (
+                <Link
+                  key={a.id}
+                  to="/articles/$slug"
+                  params={{ slug: a.slug }}
+                  className="card-soft flex flex-col overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
+                >
+                  {a.cover_image_url && (
+                    <img
+                      src={a.cover_image_url}
+                      alt={a.title_bn}
+                      loading="lazy"
+                      className="h-40 w-full object-cover"
+                    />
+                  )}
+                  <div className="p-5">
+                    <h3 className="text-base font-semibold">
+                      {lang === "en" && a.title_en ? a.title_en : a.title_bn}
+                    </h3>
+                    <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
+                      {lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn}
+                    </p>
+                  </div>
+                </Link>
+              ))}
             </div>
           ) : (
             <p className="mt-6 text-sm text-muted-foreground">{t("noArticles")}</p>
@@ -325,7 +483,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* নিউজলেটার সেকশন */}
+      {/* নিউজলেটার */}
       <section className="mx-auto w-full max-w-3xl px-4 py-16">
         <div className="card-soft p-8 text-center">
           <h2 className="text-xl font-semibold">{t("newsletter")}</h2>
