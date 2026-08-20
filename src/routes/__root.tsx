@@ -84,37 +84,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "কুরআন অন্বেষা — শব্দে শব্দে অর্থসহ কুরআন" },
+      { title: "Alam M — শব্দ আমার ক্যানভাস" },
       {
         name: "description",
-        content:
-          "আরবি, শব্দে শব্দে অর্থ, বাংলা ও ইংরেজি অনুবাদ এবং বিজ্ঞানভিত্তিক অনুবাদসহ পবিত্র কুরআন পড়ুন।",
+        content: "শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। গল্প, কবিতা ও স্মৃতিকথা।",
       },
-      { property: "og:title", content: "কুরআন অন্বেষা — শব্দে শব্দে অর্থসহ কুরআন" },
+      { property: "og:title", content: "Alam M — শব্দ আমার ক্যানভাস" },
       {
         property: "og:description",
-        content: "শব্দে শব্দে অর্থ, প্রচলিত ও বিজ্ঞানভিত্তিক অনুবাদ একই পাতায়।",
+        content: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "theme-color", content: "#14532d" },
+      { name: "theme-color", content: "#0f172a" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
-        rel: "preload",
-        as: "style",
-        href: "https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap",
-      },
-      {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Serif+Bengali:wght@400..700&family=Outfit:wght@400..800&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Hind+Siliguri:wght@400;500;600;700&display=swap",
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
       { rel: "apple-touch-icon", href: "/favicon.png" },
@@ -129,11 +119,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="bn">
+    <html lang="bn" className="dark scroll-smooth">
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20 selection:text-primary">
         {children}
         <Scripts />
       </body>
@@ -172,7 +162,6 @@ function RootComponent() {
         <div className="flex min-h-screen flex-col bg-background">
           <SiteHeader />
           <main className="flex-1">
-            {/* Required: nested routes render here. */}
             <Outlet />
           </main>
           <SiteFooter />
