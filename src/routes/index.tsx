@@ -143,9 +143,9 @@ function CenterTypingText({ fullText }: { fullText: string }) {
         const start = Math.max(0, mid - nextRadius);
         const end = Math.min(len, mid + nextRadius);
         setDisplayText(fullText.slice(start, end));
-      }, 80); // পড়ার উপযোগী শান্ত টাইপিং স্পিড
+      }, 80);
     } else if (!isDeleting && currentRadius >= maxRadius) {
-      timer = setTimeout(() => setIsDeleting(true), 4200); // পড়ার জন্য বর্ধিত বিরতি
+      timer = setTimeout(() => setIsDeleting(true), 4200);
     } else if (isDeleting && displayText.length > 0) {
       timer = setTimeout(() => {
         const nextRadius = Math.max(0, currentRadius - 1);
@@ -219,13 +219,14 @@ function HomePage() {
             <CenterTypingText fullText={taglineText} />
           </div>
 
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/75 sm:text-base">
+          {/* টাইপিং বাক্যের পরের অংশ (মার্জিন বাড়িয়ে কিছুটা নিচে নামানো হয়েছে) */}
+          <p className="mx-auto mt-8 max-w-2xl text-sm leading-relaxed text-white/75 sm:text-base">
             শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। আমার
             লেখার মাধ্যমে আমি ক্ষণিকের ভাবনাগুলোকে এমন বাক্যে রূপ দিতে চাই, যা পাঠের অনেক পরেও
             মনে রয়ে যায়।
           </p>
 
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
             <Button
               asChild
               size="lg"
