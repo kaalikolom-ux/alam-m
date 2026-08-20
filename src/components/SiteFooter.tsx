@@ -31,12 +31,12 @@ export function SiteFooter() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border/70 bg-background/80 py-12 backdrop-blur-md">
+    <footer className="border-t border-border/70 bg-background/80 py-10 backdrop-blur-md">
       <div className="mx-auto w-full max-w-6xl px-4">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 items-start gap-8 sm:grid-cols-2 lg:grid-cols-3">
           
           {/* বামের কলাম: লোগো ও সোশাল লিংক */}
-          <div className="flex flex-col items-start space-y-3">
+          <div className="flex flex-col items-start space-y-2.5">
             <Link to="/" className="font-logo text-3xl text-primary transition-opacity hover:opacity-90">
               Alam M
             </Link>
@@ -47,7 +47,7 @@ export function SiteFooter() {
               {lang === "bn" ? "স্বচ্ছ ভাবনা। সার্থক রূপায়ণ।" : "Clear thoughts. Meaningful expression."}
             </p>
 
-            <div className="flex items-center gap-2 pt-2">
+            <div className="flex items-center gap-2 pt-1.5">
               <a
                 href="https://facebook.com"
                 target="_blank"
@@ -67,17 +67,17 @@ export function SiteFooter() {
             </div>
           </div>
 
-          {/* মাঝের কলাম: মেনু লিঙ্ক (বাটন হোভার স্টাইল) */}
-          <div className="flex flex-col space-y-3">
+          {/* মাঝের কলাম: ২ কলাম গ্রিড মেনু (হাইট ব্যালেন্সড) */}
+          <div className="flex flex-col space-y-2.5">
             <h3 className="text-sm font-semibold text-foreground">
               {lang === "bn" ? "মেনু লিংক" : "Menu Links"}
             </h3>
-            <nav className="flex flex-col items-start gap-1.5">
+            <nav className="grid grid-cols-2 gap-x-2 gap-y-1">
               {items.map((item) => (
                 <a
                   key={item.id}
                   href={item.url}
-                  className="relative inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-medium text-foreground/80 border border-transparent transition-all duration-200 hover:bg-primary/10 hover:border-primary/20 hover:text-primary hover:translate-x-1 active:scale-95"
+                  className="relative inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium text-foreground/80 border border-transparent transition-all duration-200 hover:bg-primary/10 hover:border-primary/20 hover:text-primary hover:translate-x-0.5 active:scale-95"
                 >
                   {lang === "en" && item.label_en ? item.label_en : item.label_bn}
                 </a>
@@ -86,7 +86,7 @@ export function SiteFooter() {
           </div>
 
           {/* ডানের কলাম: নিউজলেটার ও কপিরাইট */}
-          <div className="flex flex-col space-y-3">
+          <div className="flex flex-col space-y-2.5">
             <h3 className="text-sm font-semibold text-foreground">
               {lang === "bn" ? "নিউজলেটার সাবস্ক্রাইব করুন" : "Subscribe to Newsletter"}
             </h3>
@@ -96,12 +96,12 @@ export function SiteFooter() {
                 : "Get updates on new stories, poems and thoughts directly to your inbox."}
             </p>
 
-            <div className="pt-1">
+            <div className="pt-0.5">
               <NewsletterForm />
             </div>
 
-            {/* কপিরাইট + Upwork লিঙ্কযুক্ত লোগো টেক্সট */}
-            <div className="border-t border-border/40 pt-4 mt-2">
+            {/* কপিরাইট + Upwork প্রোফাইল লিঙ্ক */}
+            <div className="border-t border-border/40 pt-3 mt-1">
               <p className="text-xs text-muted-foreground">
                 © {currentYear}{" "}
                 <a

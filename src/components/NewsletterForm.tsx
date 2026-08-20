@@ -1,56 +1,61 @@
-import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { Send } from "lucide-react";
 import { toast } from "sonner";
-import { z } from "zod";
-
 import { supabase } from "@/integrations/supabase/client";
 import { usePrefs } from "@/lib/prefs";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-const schema = z.object({
-  email: z.string().trim().email().max(255),
-});
+import { Button } from "@/components/ui/button";
 
 export function NewsletterForm() {
-  const { t } = usePrefs();
+  const { lang } = usePrefs();
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const mutation = useMutation({
-    mutationFn: async () => {
-      const parsed = schema.safeParse({ email });
-      if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Invalid email");
-      const { error } = await supabase
-        .from("newsletter_subscribers")
-        .insert({ email: parsed.data.email.toLowerCase() });
-      if (error && !error.message.includes("duplicate")) throw error;
-      return true;
-    },
-    onSuccess: () => {
-      setEmail("");
-      toast.success(t("thanks"));
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !email.includes("@")) {
+      toast.error(lang === "bn" ? "সঠিক ইমেইল লিখুন" : "Please enter a valid email");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.from("newsletter_subscribers").insert({ email: email.trim() });
+      if (error) {
+        if (error.code === "23505") {
+          toast.info(lang === "bn" ? "আপনি আগেই সাবস্ক্রাইব করেছেন!" : "You are already subscribed!");
+        } else {
+          throw error;
+        }
+      } else {
+        toast.success(lang === "bn" ? "ধন্যবাদ সাবস্ক্রাইব করার জন্য!" : "Thank you for subscribing!");
+        setEmail("");
+      }
+    } catch (err: any) {
+      toast.error(err.message || (lang === "bn" ? "ব্যর্থ হয়েছে" : "Failed to subscribe"));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <form
-      className="mx-auto flex max-w-md flex-col gap-2 sm:flex-row"
-      onSubmit={(e) => {
-        e.preventDefault();
-        mutation.mutate();
-      }}
-    >
+    <form onSubmit={handleSubmit} className="relative flex w-full items-center">
       <Input
         type="email"
-        required
-        maxLength={255}
+        placeholder={lang === "bn" ? "আপনার ইমেইল অ্যাড্রেস..." : "Your email address..."}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder={t("email")}
+        required
+        className="h-11 w-full rounded-full border-border/80 bg-background/60 pl-4 pr-14 text-xs backdrop-blur-sm focus-visible:ring-1 focus-visible:ring-primary"
       />
-      <Button type="submit" disabled={mutation.isPending}>
-        {t("subscribe")}
+      <Button
+        type="submit"
+        disabled={loading}
+        size="icon"
+        className="absolute right-1.5 top-1.5 size-8 rounded-full bg-primary text-primary-foreground transition-transform hover:scale-105 active:scale-95"
+        aria-label="Subscribe"
+      >
+        <Send className="size-3.5" />
       </Button>
     </form>
   );
