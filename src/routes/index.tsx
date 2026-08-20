@@ -26,19 +26,18 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-function getAutoExcerpt(content?: string | null, maxLength = 180) {
+function getAutoExcerpt(content?: string | null, maxLength = 160) {
   if (!content) return "";
   const plainText = content.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
   return plainText.length > maxLength ? `${plainText.slice(0, maxLength)}...` : plainText;
 }
 
-// মোবাইল ফ্রেন্ডলি হাই-পারফরম্যান্স স্মোক ক্যানভাস
+// মোবাইল ফ্রেন্ডলি ও পারফরম্যান্স অপ্টিমাইজড স্মোক
 const SmokeBackground = memo(function SmokeBackground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    // লো-এন্ড মোবাইল ডিভাইসে ব্যাটারি ও সিপিইউ লোড কমাতে ক্যানভাস রেন্ডার বন্ধ রাখা
-    if (window.innerWidth < 768) return;
+    if (typeof window === "undefined" || window.innerWidth < 768) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -56,27 +55,25 @@ const SmokeBackground = memo(function SmokeBackground() {
     };
     window.addEventListener("resize", handleResize, { passive: true });
 
-    // ডেস্কটপের জন্য সীমিত ও দ্রুতগতির ১২টি পার্টিকেল
-    const particles = Array.from({ length: 12 }).map(() => ({
+    const particles = Array.from({ length: 10 }).map(() => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      radius: Math.random() * 60 + 40,
-      vx: (Math.random() - 0.5) * 0.25,
-      vy: -Math.random() * 0.25 - 0.05,
-      alpha: Math.random() * 0.12 + 0.04,
+      radius: Math.random() * 50 + 35,
+      vx: (Math.random() - 0.5) * 0.2,
+      vy: -Math.random() * 0.2 - 0.05,
+      alpha: Math.random() * 0.1 + 0.03,
       alphaSpeed: (Math.random() * 0.002 + 0.001) * (Math.random() > 0.5 ? 1 : -1),
     }));
 
     const render = () => {
       ctx.clearRect(0, 0, width, height);
-
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
         p.alpha += p.alphaSpeed;
 
-        if (p.alpha <= 0.02 || p.alpha >= 0.16) p.alphaSpeed = -p.alphaSpeed;
+        if (p.alpha <= 0.02 || p.alpha >= 0.14) p.alphaSpeed = -p.alphaSpeed;
         if (p.y + p.radius < 0) {
           p.y = height + p.radius;
           p.x = Math.random() * width;
@@ -94,7 +91,6 @@ const SmokeBackground = memo(function SmokeBackground() {
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fill();
       }
-
       animationFrameId = requestAnimationFrame(render);
     };
 
@@ -108,9 +104,7 @@ const SmokeBackground = memo(function SmokeBackground() {
 
   return (
     <>
-      {/* মোবাইলের জন্য হালকা সিএসএস গ্লো যা ০% সিপিইউ ব্যবহার করে */}
       <div className="pointer-events-none absolute inset-0 block md:hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-      {/* ডেস্কটপের জন্য ক্যানভাস */}
       <canvas
         ref={canvasRef}
         className="pointer-events-none absolute inset-0 hidden md:block size-full opacity-60 mix-blend-screen"
@@ -119,12 +113,21 @@ const SmokeBackground = memo(function SmokeBackground() {
   );
 });
 
-// লাইটওয়েট জিরো-ব্লকিং টাইপিং কম্পোনেন্ট
+// লাইটহাউস-ফ্রেন্ডলি টাইপিং কম্পোনেন্ট (ডিলেড স্টার্ট)
 function CenterTypingText({ fullText }: { fullText: string }) {
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  // পেজ লোড শেষ হওয়ার পর অ্যানিমেশন শুরু হবে
+  useEffect(() => {
+    const initTimer = setTimeout(() => setIsReady(true), 1200);
+    return () => clearTimeout(initTimer);
+  }, []);
 
   useEffect(() => {
+    if (!isReady) return;
+
     let timer: NodeJS.Timeout;
     const len = fullText.length;
     const mid = Math.floor(len / 2);
@@ -137,9 +140,9 @@ function CenterTypingText({ fullText }: { fullText: string }) {
         const start = Math.max(0, mid - nextRadius);
         const end = Math.min(len, mid + nextRadius);
         setDisplayText(fullText.slice(start, end));
-      }, 75);
+      }, 70);
     } else if (!isDeleting && currentRadius >= maxRadius) {
-      timer = setTimeout(() => setIsDeleting(true), 4000);
+      timer = setTimeout(() => setIsDeleting(true), 4200);
     } else if (isDeleting && displayText.length > 0) {
       timer = setTimeout(() => {
         const nextRadius = Math.max(0, currentRadius - 1);
@@ -150,18 +153,18 @@ function CenterTypingText({ fullText }: { fullText: string }) {
           const end = Math.min(len, mid + nextRadius);
           setDisplayText(fullText.slice(start, end));
         }
-      }, 40);
+      }, 35);
     } else if (isDeleting && displayText.length === 0) {
       timer = setTimeout(() => setIsDeleting(false), 600);
     }
 
     return () => clearTimeout(timer);
-  }, [displayText, isDeleting, fullText]);
+  }, [displayText, isDeleting, isReady, fullText]);
 
   return (
     <div className="relative flex h-20 sm:h-16 w-full max-w-2xl items-center justify-center overflow-hidden px-3">
       <p className="bg-gradient-to-r from-white/60 via-white/95 to-white/60 bg-clip-text text-center font-medium tracking-normal sm:tracking-wider text-transparent text-sm sm:text-lg md:text-xl leading-snug sm:leading-normal drop-shadow-sm">
-        {displayText}
+        {displayText || (isReady ? "" : fullText)}
         <span className="ml-1 inline-block h-3.5 w-[2px] animate-pulse bg-gold align-middle sm:h-5" />
       </p>
     </div>
@@ -178,7 +181,7 @@ function HomePage() {
 
   const articles = useQuery({
     queryKey: ["articles", "published", "home"],
-    staleTime: 1000 * 60 * 5, // ৫ মিনিট ক্যাশ করে অপ্রয়োজনীয় রি-ফেচ বন্ধ করা
+    staleTime: 1000 * 60 * 10,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
@@ -267,8 +270,8 @@ function HomePage() {
                           alt={title}
                           loading="lazy"
                           decoding="async"
-                          width={600}
-                          height={375}
+                          width={400}
+                          height={250}
                           className="block size-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                         />
                       ) : (
