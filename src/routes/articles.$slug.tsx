@@ -159,16 +159,17 @@ function ArticlePage() {
         />
       )}
 
+      {/* পোস্ট কনটেন্ট এরিয়া: অতিরিক্ত লাইন স্পেসিং ও অনুচ্ছেদ নিয়ন্ত্রণ */}
       <div className="prose-reader mt-8 text-base leading-relaxed text-foreground">
         {isHtml ? (
           <div
             dangerouslySetInnerHTML={{ __html: content || "" }}
-            className="space-y-4 [&_*]:!bg-transparent [&_*]:!text-inherit [&_blockquote]:!border-l-4 [&_blockquote]:!border-primary [&_blockquote]:!pl-4 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"
+            className="[&_*]:!bg-transparent [&_*]:!text-inherit [&_p]:mb-2 [&_p:empty]:h-3 [&_div]:mb-1 [&_blockquote]:!border-l-4 [&_blockquote]:!border-primary [&_blockquote]:!pl-4 [&_blockquote]:italic [&_blockquote]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"
           />
         ) : (
-          <div className="space-y-4">
+          <div>
             {(content ?? "").split(/\n{2,}/).map((para, i) => (
-              <p key={i} className="whitespace-pre-line">
+              <p key={i} className="mb-4 whitespace-pre-line last:mb-0">
                 {para}
               </p>
             ))}
