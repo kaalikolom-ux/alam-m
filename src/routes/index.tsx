@@ -8,7 +8,6 @@ import { usePrefs } from "@/lib/prefs";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { NewsletterForm } from "@/components/NewsletterForm";
-import { Typewriter } from "@/components/Typewriter";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -46,6 +45,56 @@ export const Route = createFileRoute("/")({
 function bnToEnDigits(str: string): string {
   const bnDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
   return str.replace(/[০-৯]/g, (w) => String(bnDigits.indexOf(w)));
+}
+
+// সেলফ-কনটেইন্ড টাইপরাইটার কম্পোনেন্ট
+function InlineTypewriter({
+  words,
+  typingSpeed = 90,
+  deletingSpeed = 50,
+  delayBetweenWords = 1500,
+}: {
+  words: string[];
+  typingSpeed?: number;
+  deletingSpeed?: number;
+  delayBetweenWords?: number;
+}) {
+  const [wordIndex, setWordIndex] = useState(0);
+  const [text, setText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentWord = words[wordIndex % words.length];
+    let timer: NodeJS.Timeout;
+
+    if (!isDeleting) {
+      if (text.length < currentWord.length) {
+        timer = setTimeout(() => {
+          setText(currentWord.slice(0, text.length + 1));
+        }, typingSpeed);
+      } else {
+        timer = setTimeout(() => setIsDeleting(true), delayBetweenWords);
+      }
+    } else {
+      if (text.length > 0) {
+        timer = setTimeout(() => {
+          setText(currentWord.slice(0, text.length - 1));
+        }, deletingSpeed);
+      } else {
+        setIsDeleting(false);
+        setWordIndex((prev) => (prev + 1) % words.length);
+      }
+    }
+
+    return () => clearTimeout(timer);
+  }, [text, isDeleting, wordIndex, words, typingSpeed, deletingSpeed, delayBetweenWords]);
+
+  return (
+    <span>
+      {text}
+      <span className="inline-block animate-pulse text-amber-300">|</span>
+    </span>
+  );
 }
 
 // স্টিল-ব্লু ড্রপলেট ও লাইভ ক্লাউড ব্যাকগ্রাউন্ড
@@ -120,7 +169,6 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden select-none bg-[#182635]">
-      {/* স্টিল ব্লু গ্রেডিয়েন্ট বেস */}
       <div 
         className="absolute inset-0"
         style={{
@@ -128,13 +176,11 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
         }}
       />
 
-      {/* ড্রপলেট ক্যানভাস */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 size-full opacity-80 mix-blend-multiply"
       />
 
-      {/* ভাসমান ট্রান্সপারেন্ট মেঘ লেয়ার ১ */}
       <div
         className="absolute inset-x-[-20%] bottom-0 h-64 opacity-35 blur-2xl"
         style={{
@@ -144,7 +190,6 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
         }}
       />
 
-      {/* ভাসমান ট্রান্সপারেন্ট মেঘ লেয়ার ২ */}
       <div
         className="absolute inset-x-[-25%] -bottom-8 h-52 opacity-30 blur-3xl"
         style={{
@@ -154,7 +199,7 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
         }}
       />
 
-      {/* হিরো ও পরবর্তী সেকশনের মসৃণ ব্লেন্ডিং ফেড (স্ক্রিনশটের মতো গভীর কালো ব্লেন্ড) */}
+      {/* হিরো ও পরের সেকশনের মসৃণ ব্লেন্ডিং ফেড */}
       <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-[#070d14]/70 to-[#070d14]" />
 
       <style>{`
@@ -281,7 +326,7 @@ function HomePage() {
               <>
                 পবিত্র কুরআন — বুঝে পড়ুন <br />
                 <span className="inline-block mt-1 font-semibold text-amber-300">
-                  <Typewriter
+                  <InlineTypewriter
                     words={[
                       "শব্দে শব্দে অর্থসহ",
                       "বিজ্ঞানভিত্তিক ব্যাখ্যায়",
@@ -298,7 +343,7 @@ function HomePage() {
               <>
                 The Holy Quran — understand it <br />
                 <span className="inline-block mt-1 font-semibold text-amber-300">
-                  <Typewriter
+                  <InlineTypewriter
                     words={[
                       "word by word",
                       "with scientific context",
