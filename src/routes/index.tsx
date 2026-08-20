@@ -125,7 +125,7 @@ function SmokeBackground() {
   );
 }
 
-// ধীরগতির মাঝখান থেকে দুই দিকে টাইপিং লুপ
+// ফিক্সড হাইট ও জিরো-লেআউট শিফট টাইপিং কম্পোনেন্ট
 function CenterTypingText({ fullText }: { fullText: string }) {
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -165,10 +165,11 @@ function CenterTypingText({ fullText }: { fullText: string }) {
   }, [displayText, isDeleting, fullText]);
 
   return (
-    <div className="relative inline-flex min-h-[3.5rem] items-center justify-center px-4 py-2">
-      <p className="bg-gradient-to-r from-white/60 via-white/95 to-white/60 bg-clip-text text-center font-medium tracking-wider text-transparent text-lg sm:text-2xl drop-shadow-sm">
+    /* h-20 (মোবাইলে সর্বোচ্চ উচ্চতা লক) এবং sm:h-16 (ডেস্কটপে উচ্চতা লক) */
+    <div className="relative flex h-20 sm:h-16 w-full max-w-2xl items-center justify-center overflow-hidden px-3">
+      <p className="bg-gradient-to-r from-white/60 via-white/95 to-white/60 bg-clip-text text-center font-medium tracking-normal sm:tracking-wider text-transparent text-sm sm:text-lg md:text-xl leading-snug sm:leading-normal drop-shadow-sm">
         {displayText}
-        <span className="ml-1.5 inline-block h-5 w-[2px] animate-pulse bg-gold align-middle sm:h-6" />
+        <span className="ml-1 inline-block h-3.5 w-[2px] animate-pulse bg-gold align-middle sm:h-5" />
       </p>
     </div>
   );
@@ -200,7 +201,7 @@ function HomePage() {
 
   return (
     <div>
-      {/* লাইভ স্মোক ওয়ালপেপারযুক্ত হিরো সেকশন */}
+      {/* হিরো সেকশন */}
       <section className="hero-surface relative overflow-hidden">
         <SmokeBackground />
 
@@ -209,24 +210,23 @@ function HomePage() {
             <Sparkles className="size-3.5" /> {t("tagline")}
           </p>
 
-          {/* নাম এবং গোল্ডেন em-dash */}
           <h1 className="mt-6 text-3xl font-bold leading-tight sm:text-5xl">
             আমি <span className="gold-text">আলম —</span>
           </h1>
 
-          {/* ট্রান্সপারেন্ট টাইপিং লাইন */}
-          <div className="mt-3 flex justify-center">
+          {/* ফিক্সড হাইট কন্টেইনার (কোনো লাফালাফি হবে না) */}
+          <div className="mt-4 flex justify-center">
             <CenterTypingText fullText={taglineText} />
           </div>
 
-          {/* টাইপিং বাক্যের পরের অংশ (মার্জিন বাড়িয়ে কিছুটা নিচে নামানো হয়েছে) */}
-          <p className="mx-auto mt-8 max-w-2xl text-sm leading-relaxed text-white/75 sm:text-base">
+          {/* প্যারাগ্রাফ অংশ (স্থির পজিশনে থাকবে) */}
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/75 sm:text-base">
             শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। আমার
             লেখার মাধ্যমে আমি ক্ষণিকের ভাবনাগুলোকে এমন বাক্যে রূপ দিতে চাই, যা পাঠের অনেক পরেও
             মনে রয়ে যায়।
           </p>
 
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button
               asChild
               size="lg"
