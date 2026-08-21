@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { usePrefs } from "@/lib/prefs";
+import { translate } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +18,7 @@ const EMPTY = {
 };
 
 export function FooterAdmin() {
-  const { t } = usePrefs();
+  const { lang } = usePrefs();
   const queryClient = useQueryClient();
   const [form, setForm] = useState({ ...EMPTY });
 
@@ -53,7 +54,7 @@ export function FooterAdmin() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success(t("saved"));
+      toast.success(translate(lang, "saved"));
       queryClient.invalidateQueries({ queryKey: ["site-settings"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -62,7 +63,7 @@ export function FooterAdmin() {
   return (
     <div className="max-w-2xl space-y-4">
       <div className="space-y-2">
-        <Label>{t("footerAboutBn")}</Label>
+        <Label>{translate(lang, "footerAboutBn")}</Label>
         <Textarea
           rows={3}
           value={form.footer_about_bn}
@@ -70,7 +71,7 @@ export function FooterAdmin() {
         />
       </div>
       <div className="space-y-2">
-        <Label>{t("footerAboutEn")}</Label>
+        <Label>{translate(lang, "footerAboutEn")}</Label>
         <Textarea
           rows={3}
           value={form.footer_about_en}
@@ -78,21 +79,21 @@ export function FooterAdmin() {
         />
       </div>
       <div className="space-y-2">
-        <Label>{t("footerCopyrightBn")}</Label>
+        <Label>{translate(lang, "footerCopyrightBn")}</Label>
         <Input
           value={form.footer_copyright_bn}
           onChange={(e) => setForm({ ...form, footer_copyright_bn: e.target.value })}
         />
       </div>
       <div className="space-y-2">
-        <Label>{t("footerCopyrightEn")}</Label>
+        <Label>{translate(lang, "footerCopyrightEn")}</Label>
         <Input
           value={form.footer_copyright_en}
           onChange={(e) => setForm({ ...form, footer_copyright_en: e.target.value })}
         />
       </div>
       <Button onClick={() => save.mutate()} disabled={save.isPending}>
-        {t("save")}
+        {translate(lang, "save")}
       </Button>
     </div>
   );
