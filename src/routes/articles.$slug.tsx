@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -212,12 +212,12 @@ function InlineRichEditor({
 }
 
 function ArticlePage() {
-  const params = Route.useParams() as Record<string, string>;
+  const params = useParams({ strict: false }) as Record<string, string>;
   const rawSlug = params.slug || params["$slug"] || "";
-  const slug = decodeURIComponent(rawSlug);
+  const slug = decodeURIComponent(rawSlug).trim();
 
   const { t, lang } = usePrefs();
-  const { isAdmin } = useIsAdmin();
+  const { isAdmin, loading: roleLoading } = useIsAdmin();
   const queryClient = useQueryClient();
 
   const [comments, setComments] = useState<CommentItem[]>([]);
@@ -238,20 +238,38 @@ function ArticlePage() {
   const [selectedCatIds, setSelectedCatIds] = useState<string[]>([]);
   const [selectedAuthorId, setSelectedAuthorId] = useState<string>("");
 
+  // ১. সম্পূর্ণ নিরাপদ আর্টিক্যাল কুয়েরি
   const article = useQuery({
-    queryKey: ["article", slug],
+    queryKey: ["article-single", slug],
     queryFn: async () => {
       if (!slug) return null;
-      const { data, error } = await supabase
+
+      // সরাসরি আর্টিকেল বের করা
+      const { data: art, error } = await supabase
         .from("articles")
-        .select(
-          "*, authors(id, name_bn, name_en, bio_bn, bio_en, avatar_url), article_categories(category_id, categories(id, name_bn, name_en, slug))",
-        )
+        .select("*")
         .eq("slug", slug)
         .maybeSingle();
 
       if (error) throw error;
-      return data;
+      if (!art) return null;
+
+      // ক্যাটাগরি ও লেখক আলাদা ফেচ করা যাতে জয়েন ফেইল না করে
+      const [catsRes, authorRes] = await Promise.all([
+        supabase
+          .from("article_categories")
+          .select("category_id, categories(id, name_bn, name_en, slug)")
+          .eq("article_id", art.id),
+        art.author_id
+          ? supabase.from("authors").select("*").eq("id", art.author_id).maybeSingle()
+          : Promise.resolve({ data: null }),
+      ]);
+
+      return {
+        ...art,
+        article_categories: catsRes.data || [],
+        authors: authorRes.data || null,
+      };
     },
     enabled: Boolean(slug),
   });
@@ -274,22 +292,9 @@ function ArticlePage() {
     },
   });
 
-  const siblings = useQuery({
-    queryKey: ["articles", "nav-list"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("articles")
-        .select("slug, title_bn, title_en, published_at, article_categories(categories(slug, name_bn))")
-        .eq("published", true)
-        .order("published_at", { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
   const a = article.data;
   const isDraftPost = (a?.article_categories || []).some(
-    (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া",
+    (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া"
   );
 
   useEffect(() => {
@@ -306,7 +311,7 @@ function ArticlePage() {
       });
       setSelectedAuthorId(a.author_id || "");
       setSelectedCatIds(
-        (a.article_categories || []).map((ac: any) => ac.category_id).filter(Boolean),
+        (a.article_categories || []).map((ac: any) => ac.category_id).filter(Boolean)
       );
     }
   }, [a]);
@@ -316,7 +321,7 @@ function ArticlePage() {
       if (!a) return;
 
       const draftCat = categoriesQuery.data?.find(
-        (c) => c.slug === "draft" || c.name_bn === "খসড়া",
+        (c) => c.slug === "draft" || c.name_bn === "খসড়া"
       );
 
       let finalCatIds = [...selectedCatIds];
@@ -352,12 +357,12 @@ function ArticlePage() {
           finalCatIds.map((category_id) => ({
             article_id: a.id,
             category_id,
-          })),
+          }))
         );
       }
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["article", slug] });
+      queryClient.invalidateQueries({ queryKey: ["article-single", slug] });
       queryClient.invalidateQueries({ queryKey: ["articles"] });
       queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
       setIsEditing(false);
@@ -377,7 +382,7 @@ function ArticlePage() {
     mutationFn: async (makePublic: boolean) => {
       if (!a) return;
       const draftCat = categoriesQuery.data?.find(
-        (c) => c.slug === "draft" || c.name_bn === "খসড়া",
+        (c) => c.slug === "draft" || c.name_bn === "খসড়া"
       );
       if (!draftCat) return;
 
@@ -394,29 +399,30 @@ function ArticlePage() {
       }
     },
     onSuccess: (_, makePublic) => {
-      queryClient.invalidateQueries({ queryKey: ["article", slug] });
+      queryClient.invalidateQueries({ queryKey: ["article-single", slug] });
       queryClient.invalidateQueries({ queryKey: ["articles"] });
       queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
       toast.success(
         makePublic
           ? "পোস্টটি সবার জন্য উন্মুক্ত (Public) করা হয়েছে!"
-          : "পোস্টটি খসড়া (Draft) করা হয়েছে!",
+          : "পোস্টটি খসড়া (Draft) করা হয়েছে!"
       );
     },
     onError: (err: any) => toast.error(err.message),
   });
 
-  if (article.isLoading) {
+  if (article.isLoading || roleLoading) {
     return <p className="mx-auto max-w-3xl px-4 py-16 text-sm text-muted-foreground">{t("loading")}</p>;
   }
 
+  // পোস্ট না পাওয়া গেলে অথবা ভিজিটর অবস্থায় ড্রাফট পোস্ট খোলার চেষ্টা করলে গার্ড
   if (!a || (!isAdmin && isDraftPost)) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-16">
-        <p className="text-sm text-muted-foreground">
-          {lang === "bn" ? "পোস্টটি পাওয়া যায়নি বা এটি খসড়া অবস্থায় রয়েছে।" : t("noArticles")}
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <p className="text-base text-muted-foreground">
+          {lang === "bn" ? "পোস্টটি পাওয়া যায়নি বা এটি খসড়া অবস্থায় রয়েছে।" : "Article not found or is in draft mode."}
         </p>
-        <Link to="/articles" className="mt-4 inline-flex items-center gap-1 text-sm text-primary">
+        <Link to="/articles" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
           <ArrowLeft className="size-4" /> {t("backToArticles")}
         </Link>
       </div>
@@ -425,21 +431,6 @@ function ArticlePage() {
 
   const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
   const content = lang === "en" && a.content_en ? a.content_en : a.content_bn;
-
-  const rawList = siblings.data ?? [];
-  const list = rawList.filter(
-    (art: any) =>
-      isAdmin ||
-      !(art.article_categories || []).some(
-        (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া",
-      ),
-  );
-
-  const idx = list.findIndex((s: any) => s.slug === slug);
-  const newer = idx > 0 ? list[idx - 1] : null;
-  const older = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
-  const label = (s: { title_bn: string; title_en: string | null }) =>
-    lang === "en" && s.title_en ? s.title_en : s.title_bn;
 
   const categoriesList = (a.article_categories ?? [])
     .map((ac: any) => ac.categories)
@@ -474,6 +465,7 @@ function ArticlePage() {
 
   return (
     <article className="mx-auto w-full max-w-3xl px-4 py-12">
+      {/* ---------------- অ্যাডমিন কন্ট্রোল বার ---------------- */}
       {isAdmin && (
         <div className="mb-8 rounded-2xl border-2 border-primary/30 bg-primary/5 p-4 shadow-sm backdrop-blur-sm sm:p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -539,6 +531,7 @@ function ArticlePage() {
         </div>
       )}
 
+      {/* ---------------- ইনলাইন এডিটর ফর্ম ---------------- */}
       {isAdmin && isEditing ? (
         <form
           className="card-soft mb-12 space-y-6 rounded-2xl border border-primary/40 p-6 shadow-md"
@@ -790,52 +783,6 @@ function ArticlePage() {
           </Link>
         )}
       </div>
-
-      {(newer || older) && (
-        <nav className="mt-10 grid gap-4 sm:grid-cols-2">
-          {newer ? (
-            <Link
-              to="/articles/$slug"
-              params={{ slug: newer.slug }}
-              className="card-soft group relative flex flex-col justify-between rounded-xl border border-input bg-background/50 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-accent/40"
-            >
-              <div className="flex items-center gap-2 text-primary">
-                <div className="flex size-7 items-center justify-center rounded-full bg-primary/10 transition-transform group-hover:-translate-x-1">
-                  <ArrowLeft className="size-4 text-primary" />
-                </div>
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {lang === "bn" ? "পূর্ববর্তী পোস্ট" : "Previous Post"}
-                </span>
-              </div>
-              <span className="mt-3 line-clamp-2 text-sm font-semibold text-foreground transition-colors group-hover:text-primary">
-                {label(newer)}
-              </span>
-            </Link>
-          ) : (
-            <div />
-          )}
-
-          {older && (
-            <Link
-              to="/articles/$slug"
-              params={{ slug: older.slug }}
-              className="card-soft group relative flex flex-col items-end justify-between rounded-xl border border-input bg-background/50 p-5 text-right shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-accent/40"
-            >
-              <div className="flex items-center gap-2 text-primary">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  {lang === "bn" ? "পরবর্তী পোস্ট" : "Next Post"}
-                </span>
-                <div className="flex size-7 items-center justify-center rounded-full bg-primary/10 transition-transform group-hover:translate-x-1">
-                  <ArrowRight className="size-4 text-primary" />
-                </div>
-              </div>
-              <span className="mt-3 line-clamp-2 text-sm font-semibold text-foreground transition-colors group-hover:text-primary">
-                {label(older)}
-              </span>
-            </Link>
-          )}
-        </nav>
-      )}
 
       {a.author_id && (
         <div className="mt-10">
