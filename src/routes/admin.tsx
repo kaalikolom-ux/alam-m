@@ -210,7 +210,6 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
 
     setIsImporting(true);
     try {
-      // খসড়া/Draft ক্যাটাগরি আইডি নেওয়া
       const { data: draftCat } = await supabase
         .from("categories")
         .select("id")
@@ -273,7 +272,6 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
 
         if (error) throw error;
 
-        // সকল ইমপোর্ট হওয়া পোস্টকে 'খসড়া' ক্যাটাগরিতে অ্যাসাইন করা
         if (draftCat && insertedArticles && insertedArticles.length > 0) {
           const catMappings = insertedArticles.map((art) => ({
             article_id: art.id,
@@ -284,7 +282,7 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
 
         toast.success(
           lang === "bn"
-            ? `সফলভাবে ${payloads.length} টি পোস্ট 'খসড়া' ক্যাটাগরিতে ইমপোর্ট হয়েছে!`
+            ? `সফলভাবে ${payloads.length} টি পোস্ট 'খসড়া' ক্যাটাগরিতে ইমপোর্ট হয়েছে!`
             : `Successfully imported ${payloads.length} posts into 'Draft' category!`
         );
         queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
@@ -309,7 +307,7 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
           {platform === "wordpress" ? "ওয়ার্ডপ্রেস (WordPress) থেকে ইমপোর্ট" : "ব্লগার (Blogger) থেকে ইমপোর্ট"}
         </h2>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          আপনার {platform === "wordpress" ? "WordPress WXR (.xml)" : "Blogger Atom (.xml)"} ফাইল আপলোড করুন। সকল পোস্ট স্বয়ংক্রিয়ভাবে <strong>খসড়া (Draft)</strong> ক্যাটাগরিতে জমা হবে যা ভিজিটররা দেখতে পাবে না।
+          আপনার {platform === "wordpress" ? "WordPress WXR (.xml)" : "Blogger Atom (.xml)"} ফাইল আপলোড করুন। সকল পোস্ট স্বয়ংক্রিয়ভাবে <strong>খসড়া (Draft)</strong> ক্যাটাগরিতে জমা হবে যা ভিজিটররা দেখতে পাবে না।
         </p>
       </div>
 
@@ -366,6 +364,16 @@ function RichTextEditor({ label, value, onChange }: { label: string; value: stri
     }
   };
 
+  // ফেসবুক বা অন্যান্য সাইট থেকে পেস্ট করার সময় ইনলাইন ব্যাকগ্রাউন্ড মুছে ক্লিন টেক্সট ইনসার্ট করার হ্যান্ডলার
+  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData("text/plain");
+    document.execCommand("insertText", false, text);
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -411,7 +419,17 @@ function RichTextEditor({ label, value, onChange }: { label: string; value: stri
         {isHtmlMode ? (
           <Textarea rows={10} value={value} onChange={(e) => onChange(e.target.value)} placeholder="এখানে সরাসরি কাস্টম HTML কোড লিখুন বা পেস্ট করুন..." className="w-full rounded-b-lg border-0 bg-background font-mono text-xs text-foreground focus-visible:ring-0 p-3" />
         ) : (
-          <div ref={editorRef} contentEditable onInput={() => { if (editorRef.current) { onChange(editorRef.current.innerHTML); } }} className="min-h-[220px] p-3 text-sm text-foreground focus:outline-none [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5" />
+          <div
+            ref={editorRef}
+            contentEditable
+            onPaste={handlePaste}
+            onInput={() => {
+              if (editorRef.current) {
+                onChange(editorRef.current.innerHTML);
+              }
+            }}
+            className="min-h-[220px] p-3 text-sm text-foreground focus:outline-none [&_*]:!bg-transparent [&_*]:!text-inherit [&_span]:!bg-transparent [&_p]:!bg-transparent [&_div]:!bg-transparent [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+          />
         )}
       </div>
     </div>
@@ -419,7 +437,7 @@ function RichTextEditor({ label, value, onChange }: { label: string; value: stri
 }
 
 const articleSchema = z.object({
-  slug: z.string().trim().min(1).max(120).regex(/^[a-z0-9-]+$/, "slug: lowercase letters, numbers and dashes only"),
+  slug: z.string().trim().min(1).max(120),
   title_bn: z.string().trim().min(1).max(200),
   title_en: z.string().trim().max(200),
   excerpt_bn: z.string().trim().max(500),
@@ -652,7 +670,7 @@ function ArticlesAdmin() {
                   <p className="truncate text-sm font-medium">{a.title_bn}</p>
                   {isDraft && (
                     <span className="rounded bg-amber-500/20 px-2 py-0.5 text-[11px] font-semibold text-amber-600 dark:text-amber-400">
-                      খসড়া / গোপন
+                      খসড়া / গোপন
                     </span>
                   )}
                 </div>
