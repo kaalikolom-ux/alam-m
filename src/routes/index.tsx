@@ -225,6 +225,13 @@ function HomePage() {
       ? "শব্দ আমার ক্যানভাস, গল্প আমার রঙ; লেখার তুলিতে আঁকি ভাবনা"
       : "Words are my canvas, stories my colors; painting thoughts with the pencil";
 
+  const bioText =
+    lang === "bn"
+      ? "শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। আমার লেখার মাধ্যমে আমি ক্ষণিকের ভাবনাগুলোকে এমন বাক্যে রূপ দিতে চাই, যা পাঠের অনেক পরেও মনে রয়ে যায়।"
+      : "A wordsmith and an explorer of stories hidden in everyday moments. Through my craft, I transform fleeting thoughts into sentences that echo long after the reading ends.";
+
+  const heroName = lang === "bn" ? "আমি" : "I am";
+
   const articles = useQuery({
     queryKey: ["articles", "published", "home"],
     staleTime: 1000 * 60 * 10,
@@ -265,7 +272,7 @@ function HomePage() {
           </p>
 
           <h1 className="mt-6 text-3xl font-bold leading-tight sm:text-5xl text-white">
-            আমি <span className="gold-text">আলম —</span>
+            {heroName} <span className="gold-text">Alam —</span>
           </h1>
 
           <div className="mt-4 flex justify-center">
@@ -273,9 +280,7 @@ function HomePage() {
           </div>
 
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/75 sm:text-base">
-            শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। আমার
-            লেখার মাধ্যমে আমি ক্ষণিকের ভাবনাগুলোকে এমন বাক্যে রূপ দিতে চাই, যা পাঠের অনেক পরেও
-            মনে রয়ে যায়।
+            {bioText}
           </p>
 
           <div className="mt-8 flex flex-wrap justify-center gap-3">
