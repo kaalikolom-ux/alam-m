@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { supabase } from "@/integrations/supabase/client";
 import { usePrefs } from "@/lib/prefs";
+import { translate } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,7 +37,7 @@ const EMPTY: FormState = {
 };
 
 export function MenuAdmin() {
-  const { t } = usePrefs();
+  const { lang } = usePrefs();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<FormState>({ ...EMPTY });
   const [visible, setVisible] = useState(true);
@@ -94,7 +95,7 @@ export function MenuAdmin() {
       setForm({ ...EMPTY });
       setEditingId(null);
       setVisible(true);
-      toast.success(t("saved") || "সফলভাবে সংরক্ষিত হয়েছে");
+      toast.success(translate(lang, "saved"));
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -108,12 +109,11 @@ export function MenuAdmin() {
       queryClient.invalidateQueries({ queryKey: ["admin-menu"] });
       queryClient.invalidateQueries({ queryKey: ["menu"] });
       queryClient.invalidateQueries({ queryKey: ["menu_items"] });
-      toast.success(t("delete") || "মুছে ফেলা হয়েছে");
+      toast.success(translate(lang, "delete"));
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
-  // আনপাবলিশ/পাবলিশ টগল মিউটেশন
   const toggleVisibility = useMutation({
     mutationFn: async ({ id, currentVisible }: { id: string; currentVisible: boolean }) => {
       const { error } = await supabase
@@ -126,12 +126,11 @@ export function MenuAdmin() {
       queryClient.invalidateQueries({ queryKey: ["admin-menu"] });
       queryClient.invalidateQueries({ queryKey: ["menu"] });
       queryClient.invalidateQueries({ queryKey: ["menu_items"] });
-      toast.success("মেনুর দৃশ্যমানতা পরিবর্তিত হয়েছে");
+      toast.success(lang === "bn" ? "মেনুর দৃশ্যমানতা পরিবর্তিত হয়েছে" : "Menu visibility updated");
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
-  // ড্র্যাগ অ্যান্ড ড্রপ পজিশনিং হ্যান্ডলার
   const handleDrop = async (targetId: string) => {
     if (!draggedItemId || draggedItemId === targetId || !list.data) return;
 
@@ -156,12 +155,12 @@ export function MenuAdmin() {
 
     const { error } = await supabase.from("menu_items").upsert(updates);
     if (error) {
-      toast.error("ক্রম সংরক্ষণ করা যায়নি");
+      toast.error(lang === "bn" ? "ক্রম সংরক্ষণ করা যায়নি" : "Could not save order");
     } else {
       queryClient.invalidateQueries({ queryKey: ["admin-menu"] });
       queryClient.invalidateQueries({ queryKey: ["menu"] });
       queryClient.invalidateQueries({ queryKey: ["menu_items"] });
-      toast.success("মেনুর ক্রম পরিবর্তিত হয়েছে");
+      toast.success(lang === "bn" ? "মেনুর ক্রম পরিবর্তিত হয়েছে" : "Menu order updated");
     }
 
     setDraggedItemId(null);
@@ -178,11 +177,11 @@ export function MenuAdmin() {
       >
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">
-            {editingId ? (t("edit") || "সম্পাদনা") : (t("newMenuItem") || "নতুন মেন্যু আইটেম")}
+            {editingId ? translate(lang, "edit") : translate(lang, "newMenuItem")}
           </h2>
           <div className="flex items-center gap-2 text-sm">
             <span className="text-muted-foreground">
-              {visible ? (t("visible") || "দৃশ্যমান") : (t("hidden") || "লুকায়িত")}
+              {visible ? translate(lang, "visible") : translate(lang, "hidden")}
             </span>
             <Switch checked={visible} onCheckedChange={setVisible} />
           </div>
@@ -190,7 +189,7 @@ export function MenuAdmin() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="menu-label-bn">{t("labelBn") || "লেবেল (বাংলা)"}</Label>
+            <Label htmlFor="menu-label-bn">{translate(lang, "labelBn")}</Label>
             <Input
               id="menu-label-bn"
               required
@@ -199,7 +198,7 @@ export function MenuAdmin() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="menu-label-en">{t("labelEn") || "লেবেল (ইংরেজি)"}</Label>
+            <Label htmlFor="menu-label-en">{translate(lang, "labelEn")}</Label>
             <Input
               id="menu-label-en"
               value={form.label_en}
@@ -209,7 +208,7 @@ export function MenuAdmin() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="menu-url">{t("linkUrl") || "লিংক (URL)"}</Label>
+          <Label htmlFor="menu-url">{translate(lang, "linkUrl")}</Label>
           <Input
             id="menu-url"
             required
@@ -221,7 +220,7 @@ export function MenuAdmin() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="menu-location">{t("menuLocation") || "অবস্থান"}</Label>
+            <Label htmlFor="menu-location">{translate(lang, "menuLocation")}</Label>
             <select
               id="menu-location"
               value={form.location}
@@ -233,12 +232,12 @@ export function MenuAdmin() {
               }
               className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
-              <option value="header">{t("header") || "হেডার"}</option>
-              <option value="footer">{t("footer") || "ফুটার"}</option>
+              <option value="header">{translate(lang, "header")}</option>
+              <option value="footer">{translate(lang, "footer")}</option>
             </select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="menu-order">{t("sortOrder") || "ক্রম"}</Label>
+            <Label htmlFor="menu-order">{translate(lang, "sortOrder")}</Label>
             <Input
               id="menu-order"
               type="number"
@@ -255,11 +254,11 @@ export function MenuAdmin() {
           <Button type="submit" disabled={save.isPending}>
             {editingId ? (
               <>
-                <Check className="size-4" /> {t("update") || "আপডেট করুন"}
+                <Check className="size-4 mr-1" /> {lang === "bn" ? "আপডেট করুন" : "Update"}
               </>
             ) : (
               <>
-                <Plus className="size-4" /> {t("save") || "সংরক্ষণ"}
+                <Plus className="size-4 mr-1" /> {translate(lang, "save")}
               </>
             )}
           </Button>
@@ -273,7 +272,7 @@ export function MenuAdmin() {
                 setVisible(true);
               }}
             >
-              {t("cancel") || "বাতিল"}
+              {translate(lang, "cancel")}
             </Button>
           )}
         </div>
@@ -281,7 +280,9 @@ export function MenuAdmin() {
 
       <div className="space-y-3">
         <p className="text-xs text-muted-foreground">
-          * ড্র্যাগ আইকন ধরে টেনে আগে-পিছে নিন অথবা সরাসরি স্যুইচ দিয়ে প্রকাশ/লুকিয়ে রাখুন।
+          {lang === "bn" 
+            ? "* ড্র্যাগ আইকন ধরে টেনে আগে-পিছে নিন অথবা সরাসরি স্যুইচ দিয়ে প্রকাশ/লুকিয়ে রাখুন।"
+            : "* Drag items to reorder or use the switch to publish/unpublish."}
         </p>
 
         {list.data?.map((m) => (
@@ -309,7 +310,7 @@ export function MenuAdmin() {
                 )}
               </div>
               <p className="text-xs text-muted-foreground">
-                {m.url} · {m.location === "footer" ? (t("footer") || "ফুটার") : (t("header") || "হেডার")} · #{m.sort_order}
+                {m.url} · {m.location === "footer" ? translate(lang, "footer") : translate(lang, "header")} · #{m.sort_order}
               </p>
             </div>
 
@@ -319,14 +320,14 @@ export function MenuAdmin() {
                 onCheckedChange={() =>
                   toggleVisibility.mutate({ id: m.id, currentVisible: m.visible })
                 }
-                title={m.visible ? "লুকিয়ে রাখুন (Unpublish)" : "প্রকাশ করুন (Publish)"}
+                title={m.visible ? "লুকিয়ে রাখুন" : "প্রকাশ করুন"}
               />
             </div>
 
             <Button
               variant="ghost"
               size="icon"
-              aria-label={t("edit") || "Edit"}
+              aria-label={translate(lang, "edit")}
               onClick={() => {
                 setEditingId(m.id);
                 setVisible(m.visible);
@@ -346,7 +347,7 @@ export function MenuAdmin() {
             <Button
               variant="ghost"
               size="icon"
-              aria-label={t("delete") || "Delete"}
+              aria-label={translate(lang, "delete")}
               onClick={() => remove.mutate(m.id)}
             >
               <Trash2 className="size-4 text-destructive" />
