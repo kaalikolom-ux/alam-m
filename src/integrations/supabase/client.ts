@@ -1,6 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
+// সরাসরি আপনার নতুন Supabase প্রজেক্টের মানগুলো এখানে বসিয়ে দিন
+const PROJECT_URL = "https://qehupsubyhemzmscoiig.supabase.co"; // <--- আপনার নতুন Project URL
+const PROJECT_ANON_KEY = "sb_publishable_qBP_JYLoYwMDE3ikPXUmbQ_ghibepTw";               // <--- আপনার নতুন Publishable/Anon Key
+
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith('sb_publishable_') || value.startsWith('sb_secret_');
 }
@@ -25,26 +29,17 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 }
 
 function createSupabaseClient() {
-  // Vite client-side, Vite SSR, Node/Cloudflare process fallback
   const SUPABASE_URL =
-    (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_URL || import.meta.env.SUPABASE_URL : undefined) ||
-    (typeof process !== 'undefined' && process.env ? process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL : undefined) ||
-    '';
+    (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_URL : undefined) ||
+    PROJECT_URL;
 
   const SUPABASE_PUBLISHABLE_KEY =
-    (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.env.SUPABASE_PUBLISHABLE_KEY : undefined) ||
-    (typeof process !== 'undefined' && process.env ? process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY : undefined) ||
-    '';
+    (typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY : undefined) ||
+    PROJECT_ANON_KEY;
 
-  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    console.warn(
-      '[Supabase] Warning: Supabase URL or Publishable Key is missing in environment variables. Check Cloudflare/Vite configuration.'
-    );
-  }
-
-  return createClient<Database>(SUPABASE_URL || 'https://placeholder.supabase.co', SUPABASE_PUBLISHABLE_KEY || 'placeholder-key', {
+  return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     global: {
-      fetch: SUPABASE_PUBLISHABLE_KEY ? createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY) : undefined,
+      fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
     },
     auth: {
       storage: typeof window !== 'undefined' ? localStorage : undefined,
