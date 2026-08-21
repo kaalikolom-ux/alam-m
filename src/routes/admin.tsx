@@ -236,7 +236,7 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
 
             payloads.push({
               title_bn: title,
-              content_bn: content,
+              content_bn: content || " ",
               slug: `import-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
               published: true,
               author_id: authorId,
@@ -254,7 +254,7 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
 
             payloads.push({
               title_bn: title,
-              content_bn: content,
+              content_bn: content || " ",
               slug: `import-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
               published: true,
               author_id: authorId,
@@ -364,7 +364,6 @@ function RichTextEditor({ label, value, onChange }: { label: string; value: stri
     }
   };
 
-  // ফেসবুক বা অন্যান্য সাইট থেকে পেস্ট করার সময় ইনলাইন ব্যাকগ্রাউন্ড মুছে ক্লিন টেক্সট ইনসার্ট করার হ্যান্ডলার
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
     const text = e.clipboardData.getData("text/plain");
@@ -437,14 +436,14 @@ function RichTextEditor({ label, value, onChange }: { label: string; value: stri
 }
 
 const articleSchema = z.object({
-  slug: z.string().trim().min(1).max(120),
-  title_bn: z.string().trim().min(1).max(200),
-  title_en: z.string().trim().max(200),
-  excerpt_bn: z.string().trim().max(500),
-  excerpt_en: z.string().trim().max(500),
-  content_bn: z.string().trim().max(60000),
-  content_en: z.string().trim().max(60000),
-  cover_image_url: z.string().trim().max(500),
+  slug: z.string().trim().min(1, "Slug is required").max(120),
+  title_bn: z.string().trim().min(1, "Title is required").max(200),
+  title_en: z.string().trim().max(200).optional().or(z.literal("")),
+  excerpt_bn: z.string().trim().max(500).optional().or(z.literal("")),
+  excerpt_en: z.string().trim().max(500).optional().or(z.literal("")),
+  content_bn: z.string().trim().min(1, "বাংলা মূল বিষয়বস্তু খালি রাখা যাবে না").max(60000),
+  content_en: z.string().trim().max(60000).optional().or(z.literal("")),
+  cover_image_url: z.string().trim().max(500).optional().or(z.literal("")),
 });
 
 const EMPTY = {
@@ -494,13 +493,25 @@ function ArticlesAdmin() {
   const save = useMutation({
     mutationFn: async () => {
       const parsed = articleSchema.safeParse(form);
-      if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Invalid input");
+      if (!parsed.success) {
+        throw new Error(parsed.error.issues[0]?.message ?? "Invalid input");
+      }
+      
       const payload = {
-        ...parsed.data,
-        title_en: parsed.data.title_en || null, excerpt_bn: parsed.data.excerpt_bn || null, excerpt_en: parsed.data.excerpt_en || null,
-        content_bn: parsed.data.content_bn || null, content_en: parsed.data.content_en || null, cover_image_url: parsed.data.cover_image_url || null,
-        published, author_id: authorId || null, published_at: published ? new Date().toISOString() : null, created_by: user!.id,
+        slug: parsed.data.slug,
+        title_bn: parsed.data.title_bn,
+        title_en: parsed.data.title_en || null,
+        excerpt_bn: parsed.data.excerpt_bn || null,
+        excerpt_en: parsed.data.excerpt_en || null,
+        content_bn: parsed.data.content_bn, // নিশ্চিত করা হলো যাতে null না যায়
+        content_en: parsed.data.content_en || null,
+        cover_image_url: parsed.data.cover_image_url || null,
+        published,
+        author_id: authorId || null,
+        published_at: published ? new Date().toISOString() : null,
+        created_by: user!.id,
       };
+
       let articleId = editingId;
       if (editingId) {
         const { error } = await supabase.from("articles").update(payload).eq("id", editingId);
@@ -510,6 +521,7 @@ function ArticlesAdmin() {
         if (error) throw error;
         articleId = data.id;
       }
+
       if (articleId) {
         const { error: delError } = await supabase.from("article_categories").delete().eq("article_id", articleId);
         if (delError) throw delError;
@@ -540,10 +552,15 @@ function ArticlesAdmin() {
         slug: newSlug,
         title_bn: `${article.title_bn} (কপি)`,
         title_en: article.title_en ? `${article.title_en} (Copy)` : null,
-        excerpt_bn: article.excerpt_bn || null, excerpt_en: article.excerpt_en || null,
-        content_bn: article.content_bn || null, content_en: article.content_en || null, cover_image_url: article.cover_image_url || null,
+        excerpt_bn: article.excerpt_bn || null,
+        excerpt_en: article.excerpt_en || null,
+        content_bn: article.content_bn || " ",
+        content_en: article.content_en || null,
+        cover_image_url: article.cover_image_url || null,
         published: true,
-        author_id: article.author_id || null, published_at: new Date().toISOString(), created_by: user!.id,
+        author_id: article.author_id || null,
+        published_at: new Date().toISOString(),
+        created_by: user!.id,
       };
 
       const { data, error } = await supabase.from("articles").insert(payload).select("id").single();
@@ -564,8 +581,14 @@ function ArticlesAdmin() {
       setAuthorId(data.author_id ?? "");
       setCatIds(data.catIds || []);
       setForm({
-        slug: data.slug, title_bn: data.title_bn, title_en: data.title_en ?? "", excerpt_bn: data.excerpt_bn ?? "",
-        excerpt_en: data.excerpt_en ?? "", content_bn: data.content_bn ?? "", content_en: data.content_en ?? "", cover_image_url: data.cover_image_url ?? "",
+        slug: data.slug,
+        title_bn: data.title_bn,
+        title_en: data.title_en ?? "",
+        excerpt_bn: data.excerpt_bn ?? "",
+        excerpt_en: data.excerpt_en ?? "",
+        content_bn: data.content_bn ?? "",
+        content_en: data.content_en ?? "",
+        cover_image_url: data.cover_image_url ?? "",
       });
       window.scrollTo({ top: 0, behavior: "smooth" });
       toast.success(lang === "bn" ? "পোস্ট সফলভাবে ডুপ্লিকেট করা হয়েছে!" : "Post duplicated successfully!");
@@ -683,8 +706,20 @@ function ArticlesAdmin() {
                 <Copy className="size-4 text-muted-foreground hover:text-foreground" />
               </Button>
               <Button variant="ghost" size="icon" title={t("edit")} onClick={() => {
-                  setEditingId(a.id); setPublished(a.published); setAuthorId(a.author_id ?? ""); setCatIds((a.article_categories ?? []).map((ac: any) => ac.category_id));
-                  setForm({ slug: a.slug, title_bn: a.title_bn, title_en: a.title_en ?? "", excerpt_bn: a.excerpt_bn ?? "", excerpt_en: a.excerpt_en ?? "", content_bn: a.content_bn ?? "", content_en: a.content_en ?? "", cover_image_url: a.cover_image_url ?? "" });
+                  setEditingId(a.id);
+                  setPublished(a.published);
+                  setAuthorId(a.author_id ?? "");
+                  setCatIds((a.article_categories ?? []).map((ac: any) => ac.category_id));
+                  setForm({
+                    slug: a.slug,
+                    title_bn: a.title_bn,
+                    title_en: a.title_en ?? "",
+                    excerpt_bn: a.excerpt_bn ?? "",
+                    excerpt_en: a.excerpt_en ?? "",
+                    content_bn: a.content_bn ?? "",
+                    content_en: a.content_en ?? "",
+                    cover_image_url: a.cover_image_url ?? ""
+                  });
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}>
                 <Pencil className="size-4" />
