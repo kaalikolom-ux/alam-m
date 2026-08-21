@@ -238,13 +238,11 @@ function ArticlePage() {
   const [selectedCatIds, setSelectedCatIds] = useState<string[]>([]);
   const [selectedAuthorId, setSelectedAuthorId] = useState<string>("");
 
-  // ১. সম্পূর্ণ নিরাপদ আর্টিক্যাল কুয়েরি
   const article = useQuery({
     queryKey: ["article-single", slug],
     queryFn: async () => {
       if (!slug) return null;
 
-      // সরাসরি আর্টিকেল বের করা
       const { data: art, error } = await supabase
         .from("articles")
         .select("*")
@@ -254,7 +252,6 @@ function ArticlePage() {
       if (error) throw error;
       if (!art) return null;
 
-      // ক্যাটাগরি ও লেখক আলাদা ফেচ করা যাতে জয়েন ফেইল না করে
       const [catsRes, authorRes] = await Promise.all([
         supabase
           .from("article_categories")
@@ -378,6 +375,35 @@ function ArticlePage() {
     onError: (err: any) => toast.error(err.message),
   });
 
+  // বার থেকে সরাসরি ক্যাটাগরি যুক্ত বা বাদ দেওয়ার মিউটেশন
+  const toggleCategory = useMutation({
+    mutationFn: async (catId: string) => {
+      if (!a) return;
+      const isSelected = selectedCatIds.includes(catId);
+      const updated = isSelected
+        ? selectedCatIds.filter((id) => id !== catId)
+        : [...selectedCatIds, catId];
+
+      setSelectedCatIds(updated);
+
+      await supabase.from("article_categories").delete().eq("article_id", a.id);
+      if (updated.length > 0) {
+        await supabase.from("article_categories").insert(
+          updated.map((category_id) => ({
+            article_id: a.id,
+            category_id,
+          }))
+        );
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["article-single", slug] });
+      queryClient.invalidateQueries({ queryKey: ["articles"] });
+      toast.success(lang === "bn" ? "ক্যাটাগরি আপডেট হয়েছে" : "Category updated");
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
   const togglePublishStatus = useMutation({
     mutationFn: async (makePublic: boolean) => {
       if (!a) return;
@@ -415,7 +441,6 @@ function ArticlePage() {
     return <p className="mx-auto max-w-3xl px-4 py-16 text-sm text-muted-foreground">{t("loading")}</p>;
   }
 
-  // পোস্ট না পাওয়া গেলে অথবা ভিজিটর অবস্থায় ড্রাফট পোস্ট খোলার চেষ্টা করলে গার্ড
   if (!a || (!isAdmin && isDraftPost)) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
@@ -465,12 +490,12 @@ function ArticlePage() {
 
   return (
     <article className="mx-auto w-full max-w-3xl px-4 py-12">
-      {/* ---------------- অ্যাডমিন কন্ট্রোল বার ---------------- */}
+      {/* ---------------- অ্যাডমিন প্রিভিউ ও ক্যাটাগরি সিলেকশন কন্ট্রোল বার ---------------- */}
       {isAdmin && (
-        <div className="mb-8 rounded-2xl border-2 border-primary/30 bg-primary/5 p-4 shadow-sm backdrop-blur-sm sm:p-5">
+        <div className="mb-8 rounded-2xl border-2 border-primary/30 bg-primary/5 p-4 shadow-sm backdrop-blur-sm sm:p-5 space-y-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2.5">
-              <span className={`flex size-3 rounded-full ${isDraftPost ? "bg-amber-500 animate-pulse" : "bg-emerald-500"}`} />
+              <span className={`flex size-3 rounded-full shrink-0 ${isDraftPost ? "bg-amber-500 animate-pulse" : "bg-emerald-500"}`} />
               <div>
                 <h4 className="text-sm font-semibold text-foreground">অ্যাডমিন প্রিভিউ মোড</h4>
                 <p className="text-xs text-muted-foreground">
@@ -492,7 +517,7 @@ function ArticlePage() {
               {isDraftPost ? (
                 <Button
                   size="sm"
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-sm font-medium"
                   disabled={togglePublishStatus.isPending}
                   onClick={() => togglePublishStatus.mutate(true)}
                 >
@@ -527,6 +552,35 @@ function ArticlePage() {
                 )}
               </Button>
             </div>
+          </div>
+
+          {/* দ্রুত ক্যাটাগরি সিলেক্ট করার বার */}
+          <div className="pt-3 border-t border-border/50 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1">
+              <Folder className="size-3 text-primary" /> ক্যাটাগরি নির্বাচন:
+            </span>
+            {categoriesQuery.data?.map((c) => {
+              const active = selectedCatIds.includes(c.id);
+              const isDraft = c.slug === "draft" || c.name_bn === "খসড়া";
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  disabled={toggleCategory.isPending}
+                  onClick={() => toggleCategory.mutate(c.id)}
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-all ${
+                    active
+                      ? isDraft
+                        ? "bg-amber-500 text-white border border-amber-600"
+                        : "bg-primary text-primary-foreground border border-primary shadow-sm"
+                      : "bg-background border border-border text-muted-foreground hover:border-primary/60 hover:text-foreground"
+                  }`}
+                >
+                  {active && <Check className="size-3" />}
+                  {isDraft ? `⚠️ ${c.name_bn}` : c.name_bn}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -626,38 +680,6 @@ function ArticlePage() {
                   </option>
                 ))}
               </select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>ক্যাটাগরি নির্বাচন করুন</Label>
-            <div className="flex flex-wrap gap-2">
-              {categoriesQuery.data?.map((c) => {
-                const active = selectedCatIds.includes(c.id);
-                const isDraft = c.slug === "draft" || c.name_bn === "খসড়া";
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() =>
-                      setSelectedCatIds(
-                        active
-                          ? selectedCatIds.filter((id) => id !== c.id)
-                          : [...selectedCatIds, c.id],
-                      )
-                    }
-                    className={
-                      active
-                        ? isDraft
-                          ? "rounded-full border border-amber-500 bg-amber-500 px-3 py-1 text-xs font-semibold text-white"
-                          : "rounded-full border border-primary bg-primary px-3 py-1 text-xs font-medium text-primary-foreground"
-                        : "rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:border-primary"
-                    }
-                  >
-                    {isDraft ? `⚠️ ${c.name_bn} (গোপন)` : c.name_bn}
-                  </button>
-                );
-              })}
             </div>
           </div>
 
