@@ -80,7 +80,7 @@ function AdminPage() {
     { value: "categories", label: t("categoriesTab") },
     { value: "pages", label: t("pagesTab") },
     { value: "menus", label: t("menusTab") },
-    { value: "authors", label: lang === "bn" ? "লেখক/Author" : "Authors" },
+    { value: "authors", label: lang === "bn" ? "লেখক / Author" : "Authors" },
     { value: "footer", label: t("footerTab") },
     { value: "messages", label: t("messagesTab") },
     { value: "subs", label: t("subscribersTab") },
@@ -124,7 +124,7 @@ function AdminPage() {
 
           <div className="w-1/2 md:w-64">
             <label className="mb-1.5 block text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground md:text-left">
-              {lang === "bn" ? "পোষ্ট ইমপোর্ট / Post Import" : "Post Import"}
+              {lang === "bn" ? "পোস্ট ইমপোর্ট / Post Import" : "Post Import"}
             </label>
             <div className="relative">
               <select
@@ -307,7 +307,7 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
           {platform === "wordpress" ? "ওয়ার্ডপ্রেস (WordPress) থেকে ইমপোর্ট" : "ব্লগার (Blogger) থেকে ইমপোর্ট"}
         </h2>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          আপনার {platform === "wordpress" ? "WordPress WXR (.xml)" : "Blogger Atom (.xml)"} ফাইল আপলোড করুন। সকল পোস্ট স্বয়ংক্রিয়ভাবে <strong>খসড়া (Draft)</strong> ক্যাটাগরিতে জমা হবে যা ভিজিটররা দেখতে পাবে না।
+          আপনার {platform === "wordpress" ? "WordPress WXR (.xml)" : "Blogger Atom (.xml)"} ফাইল আপলোড করুন। সকল পোস্ট স্বয়ংক্রিয়ভাবে <strong>খসড়া (Draft)</strong> ক্যাটাগরিতে জমা হবে যা পাঠকরা দেখতে পাবে না।
         </p>
       </div>
 
@@ -364,12 +364,10 @@ function RichTextEditor({ label, value, onChange }: { label: string; value: stri
     }
   };
 
-  // প্যারার গ্যাপ ঠিক রেখে ক্লিন HTML ইনসার্ট করার হ্যান্ডলার
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
     const text = e.clipboardData.getData("text/plain");
     
-    // লাইন ব্রেক ভেঙে ক্লিন প্যারাগ্রাফ তৈরি
     const formattedHtml = text
       .split(/\r\n|\r|\n/)
       .map((line) => line.trim())
@@ -450,7 +448,7 @@ const articleSchema = z.object({
   title_en: z.string().trim().max(200).optional().or(z.literal("")),
   excerpt_bn: z.string().trim().max(500).optional().or(z.literal("")),
   excerpt_en: z.string().trim().max(500).optional().or(z.literal("")),
-  content_bn: z.string().trim().min(1, "বাংলা মূল বিষয়বস্তু খালি রাখা যাবে না").max(60000),
+  content_bn: z.string().trim().min(1, "বাংলা মূল বিষয়বস্তু খালি রাখা যাবে না").max(60000),
   content_en: z.string().trim().max(60000).optional().or(z.literal("")),
   cover_image_url: z.string().trim().max(500).optional().or(z.literal("")),
 });
@@ -746,7 +744,14 @@ function ArticlesAdmin() {
 
 function SubscribersAdmin() {
   const { t } = usePrefs();
-  const list = useQuery({ queryKey: ["admin-subscribers"], queryFn: async () => { const { data, error } = await supabase.from("newsletter_subscribers").select("*").order("created_at", { ascending: false }); if (error) throw error; return data; } });
+  const list = useQuery({ 
+    queryKey: ["admin-subscribers"], 
+    queryFn: async () => { 
+      const { data, error } = await supabase.from("newsletter_subscribers").select("*").order("created_at", { ascending: false }); 
+      if (error) throw error; 
+      return data; 
+    } 
+  });
   return (
     <div className="card-soft divide-y divide-border p-2">
       {list.data?.length === 0 && <p className="p-4 text-sm text-muted-foreground">{t("noArticles")}</p>}
