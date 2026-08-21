@@ -364,10 +364,19 @@ function RichTextEditor({ label, value, onChange }: { label: string; value: stri
     }
   };
 
+  // প্যারার গ্যাপ ঠিক রেখে ক্লিন HTML ইনসার্ট করার হ্যান্ডলার
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
     const text = e.clipboardData.getData("text/plain");
-    document.execCommand("insertText", false, text);
+    
+    // লাইন ব্রেক ভেঙে ক্লিন প্যারাগ্রাফ তৈরি
+    const formattedHtml = text
+      .split(/\r\n|\r|\n/)
+      .map((line) => line.trim())
+      .map((line) => (line ? `<p>${line}</p>` : `<p><br></p>`))
+      .join("");
+
+    document.execCommand("insertHTML", false, formattedHtml);
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML);
     }
@@ -427,7 +436,7 @@ function RichTextEditor({ label, value, onChange }: { label: string; value: stri
                 onChange(editorRef.current.innerHTML);
               }
             }}
-            className="min-h-[220px] p-3 text-sm text-foreground focus:outline-none [&_*]:!bg-transparent [&_*]:!text-inherit [&_span]:!bg-transparent [&_p]:!bg-transparent [&_div]:!bg-transparent [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+            className="min-h-[220px] p-3 text-sm text-foreground focus:outline-none [&_*]:!bg-transparent [&_*]:!text-inherit [&_span]:!bg-transparent [&_div]:!bg-transparent [&_p]:mb-3 [&_p]:!bg-transparent [&_p:empty]:h-4 [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
           />
         )}
       </div>
@@ -503,7 +512,7 @@ function ArticlesAdmin() {
         title_en: parsed.data.title_en || null,
         excerpt_bn: parsed.data.excerpt_bn || null,
         excerpt_en: parsed.data.excerpt_en || null,
-        content_bn: parsed.data.content_bn, // নিশ্চিত করা হলো যাতে null না যায়
+        content_bn: parsed.data.content_bn,
         content_en: parsed.data.content_en || null,
         cover_image_url: parsed.data.cover_image_url || null,
         published,

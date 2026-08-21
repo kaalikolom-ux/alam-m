@@ -77,11 +77,17 @@ function InlineRichEditor({
     }
   };
 
-  // ফেসবুক/বাহিরের টেক্সটের ব্যাকগ্রাউন্ড স্টাইল মুছে ক্লিন টেক্সট পেস্ট করার হ্যান্ডলার
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
     const text = e.clipboardData.getData("text/plain");
-    document.execCommand("insertText", false, text);
+    
+    const formattedHtml = text
+      .split(/\r\n|\r|\n/)
+      .map((line) => line.trim())
+      .map((line) => (line ? `<p>${line}</p>` : `<p><br></p>`))
+      .join("");
+
+    document.execCommand("insertHTML", false, formattedHtml);
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML);
     }
@@ -214,7 +220,7 @@ function InlineRichEditor({
                 onChange(editorRef.current.innerHTML);
               }
             }}
-            className="min-h-[260px] p-3 text-sm text-foreground focus:outline-none [&_*]:!bg-transparent [&_*]:!text-inherit [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+            className="min-h-[260px] p-3 text-sm text-foreground focus:outline-none [&_*]:!bg-transparent [&_*]:!text-inherit [&_p]:mb-3 [&_p]:!bg-transparent [&_p:empty]:h-4 [&_div]:!bg-transparent [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
           />
         )}
       </div>
@@ -347,7 +353,7 @@ function ArticlePage() {
         slug: formData.slug,
         excerpt_bn: formData.excerpt_bn || null,
         excerpt_en: formData.excerpt_en || null,
-        content_bn: formData.content_bn || null,
+        content_bn: formData.content_bn,
         content_en: formData.content_en || null,
         cover_image_url: formData.cover_image_url || null,
         author_id: selectedAuthorId || null,
@@ -500,7 +506,6 @@ function ArticlePage() {
 
   return (
     <article className="mx-auto w-full max-w-3xl px-4 py-12">
-      {/* ---------------- অ্যাডমিন প্রিভিউ ও ক্যাটাগরি সিলেকশন কন্ট্রোল বার ---------------- */}
       {isAdmin && (
         <div className="mb-8 rounded-2xl border-2 border-primary/30 bg-primary/5 p-4 shadow-sm backdrop-blur-sm sm:p-5 space-y-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -564,7 +569,6 @@ function ArticlePage() {
             </div>
           </div>
 
-          {/* দ্রুত ক্যাটাগরি সিলেক্ট করার বার */}
           <div className="pt-3 border-t border-border/50 flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold text-foreground flex items-center gap-1">
               <Folder className="size-3 text-primary" /> ক্যাটাগরি নির্বাচন:
@@ -595,7 +599,6 @@ function ArticlePage() {
         </div>
       )}
 
-      {/* ---------------- ইনলাইন এডিটর ফর্ম ---------------- */}
       {isAdmin && isEditing ? (
         <form
           className="card-soft mb-12 space-y-6 rounded-2xl border border-primary/40 p-6 shadow-md"
@@ -764,7 +767,7 @@ function ArticlePage() {
         {isHtml ? (
           <div
             dangerouslySetInnerHTML={{ __html: content || "" }}
-            className="[&_*]:!bg-transparent [&_*]:!text-inherit [&_p]:mb-2 [&_p:empty]:h-3 [&_div]:mb-1 [&_blockquote]:!border-l-4 [&_blockquote]:!border-primary [&_blockquote]:!pl-4 [&_blockquote]:italic [&_blockquote]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"
+            className="[&_*]:!bg-transparent [&_*]:!text-inherit [&_p]:mb-3 [&_p:empty]:h-4 [&_div]:mb-2 [&_blockquote]:!border-l-4 [&_blockquote]:!border-primary [&_blockquote]:!pl-4 [&_blockquote]:italic [&_blockquote]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"
           />
         ) : (
           <div>
