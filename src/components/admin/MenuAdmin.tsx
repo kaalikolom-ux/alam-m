@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Check, Pencil, Plus, Trash2 } from "lucide-react";
+import { Check, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -41,6 +41,7 @@ export function MenuAdmin() {
   const [form, setForm] = useState<FormState>({ ...EMPTY });
   const [visible, setVisible] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
 
   const list = useQuery({
     queryKey: ["admin-menu"],
@@ -82,9 +83,7 @@ export function MenuAdmin() {
           .eq("id", editingId);
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from("menu_items")
-          .insert(payload);
+        const { error } = await supabase.from("menu_items").insert(payload);
         if (error) throw error;
       }
     },
@@ -102,10 +101,7 @@ export function MenuAdmin() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from("menu_items")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("menu_items").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -116,6 +112,60 @@ export function MenuAdmin() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  // আনপাবলিশ/পাবলিশ টগল মিউটেশন
+  const toggleVisibility = useMutation({
+    mutationFn: async ({ id, currentVisible }: { id: string; currentVisible: boolean }) => {
+      const { error } = await supabase
+        .from("menu_items")
+        .update({ visible: !currentVisible })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-menu"] });
+      queryClient.invalidateQueries({ queryKey: ["menu"] });
+      queryClient.invalidateQueries({ queryKey: ["menu_items"] });
+      toast.success("মেনুর দৃশ্যমানতা পরিবর্তিত হয়েছে");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  // ড্র্যাগ অ্যান্ড ড্রপ পজিশনিং হ্যান্ডলার
+  const handleDrop = async (targetId: string) => {
+    if (!draggedItemId || draggedItemId === targetId || !list.data) return;
+
+    const items = [...list.data];
+    const fromIndex = items.findIndex((item) => item.id === draggedItemId);
+    const toIndex = items.findIndex((item) => item.id === targetId);
+
+    if (fromIndex === -1 || toIndex === -1) return;
+
+    const [movedItem] = items.splice(fromIndex, 1);
+    items.splice(toIndex, 0, movedItem);
+
+    const updates = items.map((item, index) => ({
+      id: item.id,
+      label_bn: item.label_bn,
+      label_en: item.label_en,
+      url: item.url,
+      location: item.location,
+      visible: item.visible,
+      sort_order: index + 1,
+    }));
+
+    const { error } = await supabase.from("menu_items").upsert(updates);
+    if (error) {
+      toast.error("ক্রম সংরক্ষণ করা যায়নি");
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["admin-menu"] });
+      queryClient.invalidateQueries({ queryKey: ["menu"] });
+      queryClient.invalidateQueries({ queryKey: ["menu_items"] });
+      toast.success("মেনুর ক্রম পরিবর্তিত হয়েছে");
+    }
+
+    setDraggedItemId(null);
+  };
 
   return (
     <div className="space-y-8">
@@ -230,15 +280,49 @@ export function MenuAdmin() {
       </form>
 
       <div className="space-y-3">
+        <p className="text-xs text-muted-foreground">
+          * ড্র্যাগ আইকন ধরে টেনে আগে-পিছে নিন অথবা সরাসরি স্যুইচ দিয়ে প্রকাশ/লুকিয়ে রাখুন।
+        </p>
+
         {list.data?.map((m) => (
-          <div key={m.id} className="card-soft flex items-center gap-3 p-4">
+          <div
+            key={m.id}
+            draggable
+            onDragStart={() => setDraggedItemId(m.id)}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => handleDrop(m.id)}
+            className={`card-soft flex items-center gap-3 p-4 transition-all duration-200 ${
+              draggedItemId === m.id ? "opacity-40 border-dashed border-primary" : ""
+            } ${!m.visible ? "opacity-60 bg-muted/20" : ""}`}
+          >
+            <div className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground">
+              <GripVertical className="size-5" />
+            </div>
+
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{m.label_bn}</p>
+              <div className="flex items-center gap-2">
+                <p className={`truncate text-sm font-medium ${!m.visible ? "line-through text-muted-foreground" : ""}`}>
+                  {m.label_bn}
+                </p>
+                {m.label_en && (
+                  <span className="text-xs text-muted-foreground">({m.label_en})</span>
+                )}
+              </div>
               <p className="text-xs text-muted-foreground">
-                {m.url} · {m.location === "footer" ? (t("footer") || "ফুটার") : (t("header") || "হেডার")} · #{m.sort_order} ·{" "}
-                {m.visible ? (t("visible") || "দৃশ্যমান") : (t("hidden") || "লুকায়িত")}
+                {m.url} · {m.location === "footer" ? (t("footer") || "ফুটার") : (t("header") || "হেডার")} · #{m.sort_order}
               </p>
             </div>
+
+            <div className="flex items-center gap-1">
+              <Switch
+                checked={m.visible}
+                onCheckedChange={() =>
+                  toggleVisibility.mutate({ id: m.id, currentVisible: m.visible })
+                }
+                title={m.visible ? "লুকিয়ে রাখুন (Unpublish)" : "প্রকাশ করুন (Publish)"}
+              />
+            </div>
+
             <Button
               variant="ghost"
               size="icon"
@@ -258,6 +342,7 @@ export function MenuAdmin() {
             >
               <Pencil className="size-4" />
             </Button>
+
             <Button
               variant="ghost"
               size="icon"
