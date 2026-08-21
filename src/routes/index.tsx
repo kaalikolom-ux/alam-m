@@ -4,6 +4,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { useEffect, useState, memo, useRef } from "react";
 
 import { usePrefs } from "@/lib/prefs";
+import { useIsAdmin } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { NewsletterForm } from "@/components/NewsletterForm";
@@ -105,7 +106,7 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden select-none bg-[#182635]">
-      {/* স্টিল ব্লু গ্রেডিয়েন্ট */}
+      {/* স্টিল ব্লু গ্রেডিয়েন্ট */}
       <div 
         className="absolute inset-0"
         style={{
@@ -140,7 +141,7 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
       />
 
       {/* হিরো ও পরের সেকশনের মসৃণ ব্লেন্ডিং ফেড */}
-      <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent via-[#070d14]/70 to-[#070d14]" />
+      <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent to-background" />
 
       <style>{`
         @keyframes cloudDriftOne {
@@ -217,6 +218,7 @@ function CenterTypingText({ fullText }: { fullText: string }) {
 
 function HomePage() {
   const { t, lang } = usePrefs();
+  const { isAdmin } = useIsAdmin();
 
   const taglineText =
     lang === "bn"
@@ -230,24 +232,35 @@ function HomePage() {
       const { data, error } = await supabase
         .from("articles")
         .select(
-          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en))",
+          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en, slug))",
         )
         .eq("published", true)
         .order("published_at", { ascending: false })
-        .limit(3);
+        .limit(10);
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
+  // সাধারণ ভিজিটরদের জন্য ড্রাফট পোস্ট ফিল্টার
+  const visibleArticles = (articles.data || [])
+    .filter((art: any) => {
+      if (isAdmin) return true;
+      const isDraft = (art.article_categories || []).some(
+        (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া"
+      );
+      return !isDraft;
+    })
+    .slice(0, 3);
+
   return (
-    <div className="bg-[#070d14]">
+    <div className="bg-background text-foreground transition-colors duration-300">
       {/* হিরো সেকশন */}
       <section className="relative overflow-hidden">
         <WaterDropletCloudBackground />
 
         <div className="relative z-10 mx-auto w-full max-w-3xl px-4 py-16 text-center sm:py-24">
-          <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/25 px-3.5 py-1 text-xs font-medium tracking-wide backdrop-blur-sm">
+          <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/25 px-3.5 py-1 text-xs font-medium tracking-wide text-white backdrop-blur-sm">
             <Sparkles className="size-3.5" /> {t("tagline")}
           </p>
 
@@ -279,7 +292,7 @@ function HomePage() {
       </section>
 
       {/* সাম্প্রতিক লেখা সেকশন */}
-      <section className="border-t border-border bg-secondary/40">
+      <section className="border-t border-border bg-muted/30">
         <div className="mx-auto w-full max-w-6xl px-4 py-14">
           <div className="flex items-end justify-between gap-4">
             <h2 className="text-2xl font-semibold">
@@ -293,9 +306,9 @@ function HomePage() {
             </Link>
           </div>
 
-          {articles.data && articles.data.length > 0 ? (
+          {visibleArticles.length > 0 ? (
             <div className="mt-6 grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {articles.data.map((a) => {
+              {visibleArticles.map((a: any) => {
                 const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
                 const rawExcerpt = lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn;
                 const rawContent = lang === "en" && a.content_en ? a.content_en : a.content_bn;
@@ -330,19 +343,21 @@ function HomePage() {
 
                     <div className="flex min-w-0 flex-1 flex-col p-5">
                       <div className="mb-2.5 flex flex-wrap items-center gap-2">
-                        {a.article_categories?.map(
-                          (ac) =>
-                            ac.categories && (
-                              <span
-                                key={ac.categories.id}
-                                className="rounded-full border border-primary/30 bg-primary/5 px-2.5 py-0.5 text-[11px] font-medium text-primary"
-                              >
-                                {lang === "en" && ac.categories.name_en
-                                  ? ac.categories.name_en
-                                  : ac.categories.name_bn}
-                              </span>
-                            ),
-                        )}
+                        {a.article_categories
+                          ?.filter((ac: any) => isAdmin || (ac.categories?.slug !== "draft" && ac.categories?.name_bn !== "খসড়া"))
+                          .map(
+                            (ac: any) =>
+                              ac.categories && (
+                                <span
+                                  key={ac.categories.id}
+                                  className="rounded-full border border-primary/30 bg-primary/5 px-2.5 py-0.5 text-[11px] font-medium text-primary"
+                                >
+                                  {lang === "en" && ac.categories.name_en
+                                    ? ac.categories.name_en
+                                    : ac.categories.name_bn}
+                                </span>
+                              ),
+                          )}
                         {a.published_at && (
                           <span className="text-xs text-muted-foreground">
                             {new Date(a.published_at).toLocaleDateString(
