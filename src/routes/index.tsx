@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, FileText, Sparkles } from "lucide-react";
+import { ArrowRight, FileText, Sparkles, Image as ImageIcon } from "lucide-react";
 import { useEffect, useState, memo, useRef } from "react";
 
 import { usePrefs } from "@/lib/prefs";
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Alam M — শব্দ আমার ক্যানভাস" },
       {
         property: "og:description",
-        content: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।",
+        content: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।",
       },
       { property: "og:image", content: "/android-chrome-512x512.png" },
     ],
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-function getAutoExcerpt(content?: string | null, maxLength = 160) {
+function getAutoExcerpt(content?: string | null, maxLength = 140) {
   if (!content) return "";
   const plainText = content.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
   return plainText.length > maxLength ? `${plainText.slice(0, maxLength)}...` : plainText;
@@ -106,21 +106,16 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden select-none bg-[#182635]">
-      {/* স্টিল ব্লু গ্রেডিয়েন্ট */}
       <div 
         className="absolute inset-0"
         style={{
           background: "linear-gradient(180deg, #324757 0%, #20313f 50%, #101c27 100%)",
         }}
       />
-
-      {/* ড্রপলেট ক্যানভাস */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 size-full opacity-80 mix-blend-multiply"
       />
-
-      {/* ভাসমান ট্রান্সপারেন্ট মেঘ লেয়ার ১ */}
       <div
         className="absolute inset-x-[-20%] bottom-0 h-64 opacity-35 blur-2xl"
         style={{
@@ -129,8 +124,6 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
           animation: "cloudDriftOne 20s ease-in-out infinite alternate",
         }}
       />
-
-      {/* ভাসমান ট্রান্সপারেন্ট মেঘ লেয়ার ২ */}
       <div
         className="absolute inset-x-[-25%] -bottom-8 h-52 opacity-30 blur-3xl"
         style={{
@@ -139,8 +132,6 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
           animation: "cloudDriftTwo 28s linear infinite",
         }}
       />
-
-      {/* হিরো ও পরের সেকশনের মসৃণ ব্লেন্ডিং ফেড */}
       <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent to-background" />
 
       <style>{`
@@ -159,7 +150,6 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
   );
 });
 
-// লাইটহাউস-ফ্রেন্ডলি টাইপিং কম্পোনেন্ট
 function CenterTypingText({ fullText }: { fullText: string }) {
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -234,27 +224,26 @@ function HomePage() {
 
   const articles = useQuery({
     queryKey: ["articles", "published", "home"],
-    staleTime: 1000 * 60 * 10,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
         .select(
-          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en, slug))",
+          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, created_at, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en, slug))",
         )
         .eq("published", true)
-        .order("published_at", { ascending: false })
-        .limit(10);
+        .order("created_at", { ascending: false })
+        .limit(12);
       if (error) throw error;
       return data || [];
     },
   });
 
-  // সাধারণ ভিজিটরদের জন্য ড্রাফট পোস্ট ফিল্টার
+  // ড্রাফট ব্যতীত প্রথম ৩টি প্রকাশিত পোস্ট
   const visibleArticles = (articles.data || [])
     .filter((art: any) => {
       if (isAdmin) return true;
       const isDraft = (art.article_categories || []).some(
-        (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া"
+        (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া"
       );
       return !isDraft;
     })
@@ -283,7 +272,6 @@ function HomePage() {
             {bioText}
           </p>
 
-          {/* CTA বাটন গ্রুপ */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Button
               asChild
@@ -294,7 +282,6 @@ function HomePage() {
               <Link to="/articles">{lang === "bn" ? "সকল লেখা" : "All Posts"}</Link>
             </Button>
 
-            {/* শুধুমাত্র অ্যাডমিনের জন্য খসড়া পোস্ট বাটন */}
             {isAdmin && (
               <Button
                 asChild
@@ -302,9 +289,9 @@ function HomePage() {
                 variant="outline"
                 className="border-amber-500/60 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 hover:text-amber-200 gap-1.5 shadow-sm"
               >
-                <Link to="/articles" search={{ q: "খসড়া" } as any}>
+                <Link to="/articles" search={{ q: "খসড়া" } as any}>
                   <FileText className="size-4" />
-                  {lang === "bn" ? "খসড়া পোস্ট" : "Draft Posts"}
+                  {lang === "bn" ? "খসড়া পোস্ট" : "Draft Posts"}
                 </Link>
               </Button>
             )}
@@ -313,65 +300,76 @@ function HomePage() {
       </section>
 
       {/* সাম্প্রতিক লেখা সেকশন */}
-      <section className="border-t border-border bg-muted/30">
-        <div className="mx-auto w-full max-w-6xl px-4 py-14">
+      <section className="border-t border-border bg-muted/20">
+        <div className="mx-auto w-full max-w-6xl px-4 py-16">
           <div className="flex items-end justify-between gap-4">
-            <h2 className="text-2xl font-semibold">
-              {lang === "bn" ? "সাম্প্রতিক লেখা" : "Latest Articles"}
-            </h2>
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+                {lang === "bn" ? "সাম্প্রতিক লেখা" : "Latest Articles"}
+              </h2>
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+                {lang === "bn" ? "সর্বশেষ প্রকাশিত চিন্তা ও গল্পসমূহ" : "Latest published thoughts and stories"}
+              </p>
+            </div>
             <Link
               to="/articles"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline group"
             >
-              {lang === "bn" ? "সকল লেখা" : "All Posts"} <ArrowRight className="size-4" />
+              {lang === "bn" ? "সকল লেখা" : "All Posts"} 
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
 
           {visibleArticles.length > 0 ? (
-            <div className="mt-6 grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {visibleArticles.map((a: any) => {
                 const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
                 const rawExcerpt = lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn;
                 const rawContent = lang === "en" && a.content_en ? a.content_en : a.content_bn;
                 const excerpt = rawExcerpt || getAutoExcerpt(rawContent);
+                const postDate = a.published_at || a.created_at;
 
                 return (
                   <Link
                     key={a.id}
                     to="/articles/$slug"
                     params={{ slug: a.slug }}
-                    className="card-soft group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]"
+                    className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-card transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/60 hover:shadow-xl dark:hover:shadow-primary/5"
                   >
-                    <div className="aspect-[16/10] w-full shrink-0 overflow-hidden bg-accent/40 relative">
+                    {/* ফটোকার্ড হেডার / ইমেজ কনটেইনার */}
+                    <div className="aspect-[16/10] w-full shrink-0 overflow-hidden bg-muted relative">
                       {a.cover_image_url ? (
                         <img
                           src={a.cover_image_url}
                           alt={title}
                           loading="lazy"
                           decoding="async"
-                          width={400}
-                          height={250}
-                          className="block size-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                          className="size-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
                         />
                       ) : (
-                        <div className="flex size-full items-center justify-center p-6 text-center bg-gradient-to-br from-primary/5 via-accent/20 to-primary/10 transition-colors group-hover:from-primary/10 group-hover:to-primary/20">
-                          <h3 className="line-clamp-3 text-lg font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">
+                        <div className="flex size-full flex-col items-center justify-center bg-gradient-to-br from-primary/10 via-accent/30 to-background p-6 text-center transition-colors group-hover:from-primary/20 group-hover:to-accent/40">
+                          <ImageIcon className="size-8 text-muted-foreground/40 mb-2" />
+                          <h3 className="line-clamp-2 text-base font-semibold text-foreground/80 group-hover:text-primary transition-colors">
                             {title}
                           </h3>
                         </div>
                       )}
+
+                      {/* ইমেজ ওভারলে শ্যাডো */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     </div>
 
-                    <div className="flex min-w-0 flex-1 flex-col p-5">
-                      <div className="mb-2.5 flex flex-wrap items-center gap-2">
+                    {/* কার্ড বডি */}
+                    <div className="flex min-w-0 flex-1 flex-col p-6">
+                      <div className="mb-3 flex flex-wrap items-center gap-2">
                         {a.article_categories
-                          ?.filter((ac: any) => isAdmin || (ac.categories?.slug !== "draft" && ac.categories?.name_bn !== "খসড়া"))
+                          ?.filter((ac: any) => isAdmin || (ac.categories?.slug !== "draft" && ac.categories?.name_bn !== "খসড়া"))
                           .map(
                             (ac: any) =>
                               ac.categories && (
                                 <span
                                   key={ac.categories.id}
-                                  className="rounded-full border border-primary/30 bg-primary/5 px-2.5 py-0.5 text-[11px] font-medium text-primary"
+                                  className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary"
                                 >
                                   {lang === "en" && ac.categories.name_en
                                     ? ac.categories.name_en
@@ -379,29 +377,37 @@ function HomePage() {
                                 </span>
                               ),
                           )}
-                        {a.published_at && (
+                        {postDate && (
                           <span className="text-xs text-muted-foreground">
-                            {new Date(a.published_at).toLocaleDateString(
+                            {new Date(postDate).toLocaleDateString(
                               lang === "bn" ? "bn-BD" : "en-GB",
                             )}
                           </span>
                         )}
                       </div>
 
-                      <p className="line-clamp-4 text-sm leading-relaxed text-muted-foreground">
+                      <h3 className="line-clamp-2 text-lg font-bold tracking-tight text-foreground transition-colors duration-200 group-hover:text-primary">
+                        {title}
+                      </h3>
+
+                      <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
                         {excerpt}
                       </p>
 
-                      <span className="mt-auto pt-4 text-xs font-semibold uppercase tracking-wider text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                        {t("readMore")} →
-                      </span>
+                      <div className="mt-auto pt-5 flex items-center text-xs font-semibold text-primary">
+                        <span className="relative inline-flex items-center gap-1.5 transition-transform duration-200 group-hover:translate-x-1">
+                          {t("readMore")} <ArrowRight className="size-3.5" />
+                        </span>
+                      </div>
                     </div>
                   </Link>
                 );
               })}
             </div>
           ) : (
-            <p className="mt-6 text-sm text-muted-foreground">{t("noArticles")}</p>
+            <div className="mt-8 rounded-2xl border border-dashed border-border p-12 text-center">
+              <p className="text-sm text-muted-foreground">{t("noArticles")}</p>
+            </div>
           )}
         </div>
       </section>
