@@ -222,7 +222,7 @@ function InlineRichEditor({
 function ArticlePage() {
   const { slug } = Route.useParams();
   const { t, lang } = usePrefs();
-  const { isAdmin } = useIsAdmin();
+  const { isAdmin, loading: roleLoading } = useIsAdmin();
   const queryClient = useQueryClient();
 
   const [comments, setComments] = useState<CommentItem[]>([]);
@@ -244,13 +244,16 @@ function ArticlePage() {
   const [selectedAuthorId, setSelectedAuthorId] = useState<string>("");
 
   const article = useQuery({
-    queryKey: ["article", slug, isAdmin],
+    queryKey: ["article", slug],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
-        .select("*, authors(id, name_bn, name_en, bio_bn, bio_en, avatar_url), article_categories(category_id, categories(id, name_bn, name_en, slug))")
+        .select(
+          "*, authors(id, name_bn, name_en, bio_bn, bio_en, avatar_url), article_categories(category_id, categories(id, name_bn, name_en, slug))",
+        )
         .eq("slug", slug)
         .maybeSingle();
+
       if (error) throw error;
       return data;
     },
@@ -275,7 +278,7 @@ function ArticlePage() {
   });
 
   const siblings = useQuery({
-    queryKey: ["articles", "nav-list", isAdmin],
+    queryKey: ["articles", "nav-list"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
@@ -283,20 +286,13 @@ function ArticlePage() {
         .eq("published", true)
         .order("published_at", { ascending: false });
       if (error) throw error;
-
-      if (isAdmin) return data || [];
-      return (data || []).filter(
-        (art: any) =>
-          !(art.article_categories || []).some(
-            (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া"
-          )
-      );
+      return data || [];
     },
   });
 
   const a = article.data;
   const isDraftPost = (a?.article_categories || []).some(
-    (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া"
+    (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া",
   );
 
   useEffect(() => {
@@ -313,7 +309,7 @@ function ArticlePage() {
       });
       setSelectedAuthorId(a.author_id || "");
       setSelectedCatIds(
-        (a.article_categories || []).map((ac: any) => ac.category_id).filter(Boolean)
+        (a.article_categories || []).map((ac: any) => ac.category_id).filter(Boolean),
       );
     }
   }, [a]);
@@ -323,7 +319,7 @@ function ArticlePage() {
       if (!a) return;
 
       const draftCat = categoriesQuery.data?.find(
-        (c) => c.slug === "draft" || c.name_bn === "খসড়া"
+        (c) => c.slug === "draft" || c.name_bn === "খসড়া",
       );
 
       let finalCatIds = [...selectedCatIds];
@@ -359,7 +355,7 @@ function ArticlePage() {
           finalCatIds.map((category_id) => ({
             article_id: a.id,
             category_id,
-          }))
+          })),
         );
       }
     },
@@ -384,7 +380,7 @@ function ArticlePage() {
     mutationFn: async (makePublic: boolean) => {
       if (!a) return;
       const draftCat = categoriesQuery.data?.find(
-        (c) => c.slug === "draft" || c.name_bn === "খসড়া"
+        (c) => c.slug === "draft" || c.name_bn === "খসড়া",
       );
       if (!draftCat) return;
 
@@ -407,20 +403,23 @@ function ArticlePage() {
       toast.success(
         makePublic
           ? "পোস্টটি সবার জন্য উন্মুক্ত (Public) করা হয়েছে!"
-          : "পোস্টটি খসড়া (Draft) করা হয়েছে!"
+          : "পোস্টটি খসড়া (Draft) করা হয়েছে!",
       );
     },
     onError: (err: any) => toast.error(err.message),
   });
 
-  if (article.isLoading) {
+  if (article.isLoading || roleLoading) {
     return <p className="mx-auto max-w-3xl px-4 py-16 text-sm text-muted-foreground">{t("loading")}</p>;
   }
 
+  // সাধারণ ভিজিটরদের জন্য ড্রাফট পোস্ট রেস্ট্রিক্ট
   if (!a || (!isAdmin && isDraftPost)) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16">
-        <p className="text-sm text-muted-foreground">{t("noArticles")}</p>
+        <p className="text-sm text-muted-foreground">
+          {lang === "bn" ? "পোস্টটি পাওয়া যায়নি বা এটি খসড়া অবস্থায় রয়েছে।" : t("noArticles")}
+        </p>
         <Link to="/articles" className="mt-4 inline-flex items-center gap-1 text-sm text-primary">
           <ArrowLeft className="size-4" /> {t("backToArticles")}
         </Link>
@@ -431,7 +430,15 @@ function ArticlePage() {
   const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
   const content = lang === "en" && a.content_en ? a.content_en : a.content_bn;
 
-  const list = siblings.data ?? [];
+  const rawList = siblings.data ?? [];
+  const list = rawList.filter(
+    (art: any) =>
+      isAdmin ||
+      !(art.article_categories || []).some(
+        (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া",
+      ),
+  );
+
   const idx = list.findIndex((s: any) => s.slug === slug);
   const newer = idx > 0 ? list[idx - 1] : null;
   const older = idx >= 0 && idx < list.length - 1 ? list[idx + 1] : null;
@@ -647,7 +654,7 @@ function ArticlePage() {
                       setSelectedCatIds(
                         active
                           ? selectedCatIds.filter((id) => id !== c.id)
-                          : [...selectedCatIds, c.id]
+                          : [...selectedCatIds, c.id],
                       )
                     }
                     className={
