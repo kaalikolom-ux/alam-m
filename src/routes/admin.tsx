@@ -62,21 +62,15 @@ function AdminPage() {
     return <p className="mx-auto max-w-3xl px-4 py-16 text-sm text-muted-foreground">{t("loading")}</p>;
   }
 
-  if (!user) {
+  if (!user || !isAdmin) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
         <p className="text-sm text-muted-foreground">{t("adminOnly")}</p>
-        <Button asChild className="mt-4">
-          <Link to="/auth">{t("signIn")}</Link>
-        </Button>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <p className="text-sm text-muted-foreground">{t("adminOnly")}</p>
+        {!user && (
+          <Button asChild className="mt-4">
+            <Link to="/auth">{t("signIn")}</Link>
+          </Button>
+        )}
       </div>
     );
   }
@@ -97,10 +91,7 @@ function AdminPage() {
       <h1 className="text-3xl font-semibold">{t("dashboard")}</h1>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
-        {/* ড্রপডাউন নেভিগেশন (মোবাইলে ৫০/৫০ পাশাপাশি, ডেস্কে দুই প্রান্তে) */}
         <div className="flex w-full flex-row items-end justify-between gap-3 md:gap-4">
-          
-          {/* বামের ড্রপডাউন (সাধারণ / General) */}
           <div className="w-1/2 md:w-64">
             <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {lang === "bn" ? "সাধারণ / General" : "General"}
@@ -131,7 +122,6 @@ function AdminPage() {
             </div>
           </div>
 
-          {/* ডানের ড্রপডাউন (পোষ্ট ইমপোর্ট / Post Import) */}
           <div className="w-1/2 md:w-64">
             <label className="mb-1.5 block text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground md:text-left">
               {lang === "bn" ? "পোষ্ট ইমপোর্ট / Post Import" : "Post Import"}
@@ -157,7 +147,6 @@ function AdminPage() {
           </div>
         </div>
 
-        {/* ট্যাব কন্টেন্টসমূহ */}
         <TabsContent value="articles" className="mt-6">
           <ArticlesAdmin />
         </TabsContent>
@@ -188,7 +177,6 @@ function AdminPage() {
           <SubscribersAdmin />
         </TabsContent>
 
-        {/* ইমপোর্ট কন্টেন্ট */}
         <TabsContent value="import" className="mt-6">
           <ImportAdmin platform={importPlatform} user={user} />
         </TabsContent>
@@ -197,9 +185,6 @@ function AdminPage() {
   );
 }
 
-// ----------------------------------------
-// কার্যকরী XML ইমপোর্ট কম্পোনেন্ট
-// ----------------------------------------
 function ImportAdmin({ platform, user }: { platform: string; user: any }) {
   const { lang } = usePrefs();
   const queryClient = useQueryClient();
@@ -225,6 +210,13 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
 
     setIsImporting(true);
     try {
+      // খসড়া/Draft ক্যাটাগরি আইডি নেওয়া
+      const { data: draftCat } = await supabase
+        .from("categories")
+        .select("id")
+        .eq("slug", "draft")
+        .maybeSingle();
+
       const text = await file.text();
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(text, "text/xml");
@@ -238,8 +230,6 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
 
           if (postType === "post" && status === "publish") {
             const title = item.querySelector("title")?.textContent || "Untitled";
-            
-            // WordPress-এর content:encoded ট্যাগ হ্যান্ডলিং
             const contentNodes = item.getElementsByTagName("content:encoded");
             const content = contentNodes.length > 0 
               ? contentNodes[0].textContent 
@@ -276,18 +266,35 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
       }
 
       if (payloads.length > 0) {
-         // বাল্ক ইনসার্ট
-         const { error } = await supabase.from("articles").insert(payloads);
-         if (error) throw error;
-         toast.success(lang === "bn" ? `সফলভাবে ${payloads.length} টি পোস্ট ইমপোর্ট হয়েছে!` : `Successfully imported ${payloads.length} posts!`);
-         queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
-         queryClient.invalidateQueries({ queryKey: ["articles"] });
-         setFile(null);
+        const { data: insertedArticles, error } = await supabase
+          .from("articles")
+          .insert(payloads)
+          .select("id");
+
+        if (error) throw error;
+
+        // সকল ইমপোর্ট হওয়া পোস্টকে 'খসড়া' ক্যাটাগরিতে অ্যাসাইন করা
+        if (draftCat && insertedArticles && insertedArticles.length > 0) {
+          const catMappings = insertedArticles.map((art) => ({
+            article_id: art.id,
+            category_id: draftCat.id,
+          }));
+          await supabase.from("article_categories").insert(catMappings);
+        }
+
+        toast.success(
+          lang === "bn"
+            ? `সফলভাবে ${payloads.length} টি পোস্ট 'খসড়া' ক্যাটাগরিতে ইমপোর্ট হয়েছে!`
+            : `Successfully imported ${payloads.length} posts into 'Draft' category!`
+        );
+        queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
+        queryClient.invalidateQueries({ queryKey: ["articles"] });
+        setFile(null);
       } else {
-         toast.error(lang === "bn" ? "কোনো ভ্যালিড পোস্ট পাওয়া যায়নি।" : "No valid posts found in the file.");
+        toast.error(lang === "bn" ? "কোনো ভ্যালিড পোস্ট পাওয়া যায়নি।" : "No valid posts found in the file.");
       }
     } catch (err: any) {
-      toast.error(lang === "bn" ? "ইমপোর্ট ফেইল হয়েছে: " + err.message : "Import failed: " + err.message);
+      toast.error(lang === "bn" ? "ইমপোর্ট ফেইল হয়েছে: " + err.message : "Import failed: " + err.message);
     } finally {
       setIsImporting(false);
     }
@@ -302,7 +309,7 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
           {platform === "wordpress" ? "ওয়ার্ডপ্রেস (WordPress) থেকে ইমপোর্ট" : "ব্লগার (Blogger) থেকে ইমপোর্ট"}
         </h2>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          আপনার {platform === "wordpress" ? "WordPress WXR (.xml)" : "Blogger Atom (.xml)"} ফাইলটি আপলোড করুন। ফাইল থেকে সকল প্রকাশনা এক্সট্র্যাক্ট করে স্বয়ংক্রিয়ভাবে নিচে নির্বাচিত লেখকের নামে পাবলিশ করা হবে।
+          আপনার {platform === "wordpress" ? "WordPress WXR (.xml)" : "Blogger Atom (.xml)"} ফাইল আপলোড করুন। সকল পোস্ট স্বয়ংক্রিয়ভাবে <strong>খসড়া (Draft)</strong> ক্যাটাগরিতে জমা হবে যা ভিজিটররা দেখতে পাবে না।
         </p>
       </div>
 
@@ -339,10 +346,6 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
   );
 }
 
-
-// ----------------------------------------
-// বাকি রেগুলার এডমিন কম্পোনেন্টসমূহ
-// ----------------------------------------
 function RichTextEditor({ label, value, onChange }: { label: string; value: string; onChange: (val: string) => void; }) {
   const [isHtmlMode, setIsHtmlMode] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -461,7 +464,10 @@ function ArticlesAdmin() {
   const list = useQuery({
     queryKey: ["admin-articles"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("articles").select("*, article_categories(category_id)").order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("articles")
+        .select("*, article_categories(category_id, categories(id, name_bn, slug))")
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -518,8 +524,8 @@ function ArticlesAdmin() {
         title_en: article.title_en ? `${article.title_en} (Copy)` : null,
         excerpt_bn: article.excerpt_bn || null, excerpt_en: article.excerpt_en || null,
         content_bn: article.content_bn || null, content_en: article.content_en || null, cover_image_url: article.cover_image_url || null,
-        published: false,
-        author_id: article.author_id || null, published_at: null, created_by: user!.id,
+        published: true,
+        author_id: article.author_id || null, published_at: new Date().toISOString(), created_by: user!.id,
       };
 
       const { data, error } = await supabase.from("articles").insert(payload).select("id").single();
@@ -536,7 +542,7 @@ function ArticlesAdmin() {
       queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
       queryClient.invalidateQueries({ queryKey: ["articles"] });
       setEditingId(data.newId);
-      setPublished(false);
+      setPublished(true);
       setAuthorId(data.author_id ?? "");
       setCatIds(data.catIds || []);
       setForm({
@@ -544,7 +550,7 @@ function ArticlesAdmin() {
         excerpt_en: data.excerpt_en ?? "", content_bn: data.content_bn ?? "", content_en: data.content_en ?? "", cover_image_url: data.cover_image_url ?? "",
       });
       window.scrollTo({ top: 0, behavior: "smooth" });
-      toast.success(lang === "bn" ? "পোস্ট সফলভাবে ডুপ্লিকেট করা হয়েছে!" : "Post duplicated successfully!");
+      toast.success(lang === "bn" ? "পোস্ট সফলভাবে ডুপ্লিকেট করা হয়েছে!" : "Post duplicated successfully!");
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -610,9 +616,21 @@ function ArticlesAdmin() {
           <div className="flex flex-wrap gap-2">
             {categories.data?.map((c) => {
               const active = catIds.includes(c.id);
+              const isDraftCategory = c.slug === "draft";
               return (
-                <button key={c.id} type="button" onClick={() => setCatIds(active ? catIds.filter((id) => id !== c.id) : [...catIds, c.id])} className={active ? "rounded-full border border-primary bg-primary px-3 py-1 text-xs font-medium text-primary-foreground" : "rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:border-primary"}>
-                  {c.name_bn}
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setCatIds(active ? catIds.filter((id) => id !== c.id) : [...catIds, c.id])}
+                  className={
+                    active
+                      ? isDraftCategory 
+                        ? "rounded-full border border-amber-500 bg-amber-500 px-3 py-1 text-xs font-semibold text-white shadow-sm"
+                        : "rounded-full border border-primary bg-primary px-3 py-1 text-xs font-medium text-primary-foreground"
+                      : "rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:border-primary"
+                  }
+                >
+                  {isDraftCategory ? `⚠️ ${c.name_bn} (গোপন)` : c.name_bn}
                 </button>
               );
             })}
@@ -625,28 +643,40 @@ function ArticlesAdmin() {
       </form>
 
       <div className="space-y-3">
-        {list.data?.map((a) => (
-          <div key={a.id} className="card-soft flex items-center gap-3 p-4">
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{a.title_bn}</p>
-              <p className="text-xs text-muted-foreground">/{a.slug} · {a.published ? t("published") : t("draft")}</p>
+        {list.data?.map((a) => {
+          const isDraft = (a.article_categories || []).some((ac: any) => ac.categories?.slug === "draft");
+          return (
+            <div key={a.id} className={`card-soft flex items-center gap-3 p-4 ${isDraft ? "border-amber-500/40 bg-amber-500/5" : ""}`}>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="truncate text-sm font-medium">{a.title_bn}</p>
+                  {isDraft && (
+                    <span className="rounded bg-amber-500/20 px-2 py-0.5 text-[11px] font-semibold text-amber-600 dark:text-amber-400">
+                      খসড়া / গোপন
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  /{a.slug} · {a.published ? t("published") : t("draft")}
+                </p>
+              </div>
+              
+              <Button variant="ghost" size="icon" title="ডুপ্লিকেট করুন" onClick={() => duplicate.mutate(a)}>
+                <Copy className="size-4 text-muted-foreground hover:text-foreground" />
+              </Button>
+              <Button variant="ghost" size="icon" title={t("edit")} onClick={() => {
+                  setEditingId(a.id); setPublished(a.published); setAuthorId(a.author_id ?? ""); setCatIds((a.article_categories ?? []).map((ac: any) => ac.category_id));
+                  setForm({ slug: a.slug, title_bn: a.title_bn, title_en: a.title_en ?? "", excerpt_bn: a.excerpt_bn ?? "", excerpt_en: a.excerpt_en ?? "", content_bn: a.content_bn ?? "", content_en: a.content_en ?? "", cover_image_url: a.cover_image_url ?? "" });
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}>
+                <Pencil className="size-4" />
+              </Button>
+              <Button variant="ghost" size="icon" title={t("delete")} onClick={() => remove.mutate(a.id)}>
+                <Trash2 className="size-4 text-destructive" />
+              </Button>
             </div>
-            
-            <Button variant="ghost" size="icon" title="ডুপ্লিকেট করুন" onClick={() => duplicate.mutate(a)}>
-              <Copy className="size-4 text-muted-foreground hover:text-foreground" />
-            </Button>
-            <Button variant="ghost" size="icon" title={t("edit")} onClick={() => {
-                setEditingId(a.id); setPublished(a.published); setAuthorId(a.author_id ?? ""); setCatIds((a.article_categories ?? []).map((ac: any) => ac.category_id));
-                setForm({ slug: a.slug, title_bn: a.title_bn, title_en: a.title_en ?? "", excerpt_bn: a.excerpt_bn ?? "", excerpt_en: a.excerpt_en ?? "", content_bn: a.content_bn ?? "", content_en: a.content_en ?? "", cover_image_url: a.cover_image_url ?? "" });
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}>
-              <Pencil className="size-4" />
-            </Button>
-            <Button variant="ghost" size="icon" title={t("delete")} onClick={() => remove.mutate(a.id)}>
-              <Trash2 className="size-4 text-destructive" />
-            </Button>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
