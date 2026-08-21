@@ -77,6 +77,16 @@ function InlineRichEditor({
     }
   };
 
+  // ফেসবুক/বাহিরের টেক্সটের ব্যাকগ্রাউন্ড স্টাইল মুছে ক্লিন টেক্সট পেস্ট করার হ্যান্ডলার
+  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData("text/plain");
+    document.execCommand("insertText", false, text);
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+  };
+
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -198,12 +208,13 @@ function InlineRichEditor({
           <div
             ref={editorRef}
             contentEditable
+            onPaste={handlePaste}
             onInput={() => {
               if (editorRef.current) {
                 onChange(editorRef.current.innerHTML);
               }
             }}
-            className="min-h-[260px] p-3 text-sm text-foreground focus:outline-none [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+            className="min-h-[260px] p-3 text-sm text-foreground focus:outline-none [&_*]:!bg-transparent [&_*]:!text-inherit [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
           />
         )}
       </div>
@@ -375,7 +386,6 @@ function ArticlePage() {
     onError: (err: any) => toast.error(err.message),
   });
 
-  // বার থেকে সরাসরি ক্যাটাগরি যুক্ত বা বাদ দেওয়ার মিউটেশন
   const toggleCategory = useMutation({
     mutationFn: async (catId: string) => {
       if (!a) return;
