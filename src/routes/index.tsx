@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, FileText, Sparkles } from "lucide-react";
 import { useEffect, useState, memo, useRef } from "react";
 
 import { usePrefs } from "@/lib/prefs";
@@ -283,7 +283,8 @@ function HomePage() {
             {bioText}
           </p>
 
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          {/* CTA বাটন গ্রুপ */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Button
               asChild
               size="lg"
@@ -292,6 +293,21 @@ function HomePage() {
             >
               <Link to="/articles">{lang === "bn" ? "সকল লেখা" : "All Posts"}</Link>
             </Button>
+
+            {/* শুধুমাত্র অ্যাডমিনের জন্য খসড়া পোস্ট বাটন */}
+            {isAdmin && (
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-amber-500/60 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 hover:text-amber-200 gap-1.5 shadow-sm"
+              >
+                <Link to="/articles" search={{ q: "খসড়া" } as any}>
+                  <FileText className="size-4" />
+                  {lang === "bn" ? "খসড়া পোস্ট" : "Draft Posts"}
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </section>
