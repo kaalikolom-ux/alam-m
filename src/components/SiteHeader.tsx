@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Bookmark, Languages, LogIn, LogOut, Moon, Shield, Sun, Menu } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import { usePrefs } from "@/lib/prefs";
 import { useMenu } from "@/lib/menu";
@@ -19,42 +19,61 @@ const FALLBACK = [
 ];
 
 function sanitizeNavUrl(url: string, labelBn: string): string {
-  if (url === "/" || url.startsWith("/about") || url.startsWith("/contact") || url.startsWith("/p/")) {
+  if (!url) return "/";
+  
+  // কাস্টম পেইজ, রুট লিংক, এক্সটার্নাল লিংক বা কোয়েরি প্যারামিটার অক্ষত রাখা
+  if (
+    url.startsWith("/") || 
+    url.startsWith("http://") || 
+    url.startsWith("https://") ||
+    url.startsWith("#")
+  ) {
     return url;
-  }
-  if (url.startsWith("/articles?q=")) {
-    return url;
-  }
-  if (url === "/articles" || url === "/articles/") {
-    return "/articles";
   }
   
-  const cleanParam = labelBn || url.replace(/^\/(c\/|articles\?q=)?/, "");
+  // ক্যাটাগরি প্যারামিটার হ্যান্ডলিং
+  const cleanParam = labelBn || url;
   return `/articles?q=${encodeURIComponent(cleanParam)}`;
 }
 
 function NavLinks({ onNavigate, mobile }: { onNavigate?: () => void; mobile?: boolean }) {
   const { lang } = usePrefs();
   const menu = useMenu("header");
-  const rawItems = menu.data && menu.data.length > 0 ? menu.data : FALLBACK;
 
-  // ১. "আর্টিকেল" ফিল্টার করে বাদ দেওয়া এবং ইউআরএল স্যানিটাইজ করা
-  const filteredItems = rawItems
-    .filter((item) => item.label_bn !== "আর্টিকেল" && item.label_en?.toLowerCase() !== "articles")
-    .map((item) => ({
-      ...item,
-      url: sanitizeNavUrl(item.url, item.label_bn),
-    }));
+  const items = useMemo(() => {
+    const dbItems = menu.data || [];
 
-  // ২. "হোম" মেনু আইটেমটিকে খুঁজে সবার প্রথমে সেট করা
-  const homeItem = filteredItems.find(
-    (item) => item.url === "/" || item.label_bn === "হোম" || item.label_en?.toLowerCase() === "home"
-  );
-  const otherItems = filteredItems.filter(
-    (item) => item !== homeItem
-  );
+    // ১. ডাটাবেজ আইটেমস থাকলে সেগুলোকে অগ্রাধিকার দেওয়া এবং মিসিং ফলব্যাকগুলো মার্জ করা
+    let combined = [...dbItems];
 
-  const items = homeItem ? [homeItem, ...otherItems] : otherItems;
+    if (combined.length === 0) {
+      combined = [...FALLBACK];
+    } else {
+      // যদি ডাটাবেজে হোম না থাকে তবে ফলব্যাক থেকে হোম যুক্ত করা
+      const hasHome = combined.some(
+        (i) => i.url === "/" || i.label_bn === "হোম" || i.label_en?.toLowerCase() === "home"
+      );
+      if (!hasHome) {
+        combined.unshift(FALLBACK[0]);
+      }
+    }
+
+    // ২. ফিল্টারিং এবং লিঙ্ক স্যানিটাইজেশন
+    const filtered = combined
+      .filter((item) => item.label_bn !== "আর্টিকেল" && item.label_en?.toLowerCase() !== "articles")
+      .map((item) => ({
+        ...item,
+        url: sanitizeNavUrl(item.url, item.label_bn),
+      }));
+
+    // ৩. 'হোম' সর্বদা প্রথমে রাখা
+    const homeItem = filtered.find(
+      (item) => item.url === "/" || item.label_bn === "হোম" || item.label_en?.toLowerCase() === "home"
+    );
+    const otherItems = filtered.filter((item) => item !== homeItem);
+
+    return homeItem ? [homeItem, ...otherItems] : otherItems;
+  }, [menu.data]);
 
   return (
     <>
@@ -95,7 +114,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        {/* হেডার মেনু বাটনসমূহ (হোম সর্বদা প্রথমে) */}
+        {/* হেডার মেনু বাটনসমূহ */}
         <nav className="ml-6 hidden items-center gap-1.5 md:flex">
           <NavLinks />
         </nav>
