@@ -106,7 +106,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Hind+Siliguri:wght@400;500;600;700&display=swap",
       },
-      // মাল্টি-রেজ্যুলিউশন কাস্টম ফ্যাভিকন
       { rel: "icon", href: "/favicon.ico?v=2" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png?v=2" },
       { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png?v=2" },
@@ -122,7 +121,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="bn" className="dark scroll-smooth">
+    <html lang="bn" className="scroll-smooth">
       <head>
         <HeadContent />
       </head>

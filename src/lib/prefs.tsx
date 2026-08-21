@@ -1,129 +1,116 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
-import { translate, type Lang } from "./i18n";
+type Theme = "light" | "dark";
+type Lang = "bn" | "en";
 
-export type LayerKey =
-  | "arabic"
-  | "translation"
-  | "words"
-  | "transliteration"
-  | "bn"
-  | "en"
-  | "sciBn"
-  | "sciEn"
-  | "lexicon";
-
-export type Layers = Record<LayerKey, boolean>;
-
-const DEFAULT_LAYERS: Layers = {
-  arabic: true,
-  translation: true,
-  words: true,
-  transliteration: false,
-  bn: true,
-  en: true,
-  sciBn: true,
-  sciEn: false,
-  lexicon: true,
-};
-
-type PrefsValue = {
+interface PrefsContextType {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
   lang: Lang;
   setLang: (lang: Lang) => void;
   toggleLang: () => void;
   t: (key: string) => string;
-  dark: boolean;
-  setDark: (dark: boolean) => void;
-  layers: Layers;
-  toggleLayer: (key: LayerKey) => void;
-  ready: boolean;
+}
+
+const translations: Record<string, Record<Lang, string>> = {
+  home: { bn: "হোম", en: "Home" },
+  articles: { bn: "লেখালেখি", en: "Articles" },
+  contact: { bn: "যোগাযোগ", en: "Contact" },
+  dashboard: { bn: "ড্যাশবোর্ড", en: "Dashboard" },
+  categoriesTab: { bn: "ক্যাটাগরি", en: "Categories" },
+  pagesTab: { bn: "পাতা", en: "Pages" },
+  menusTab: { bn: "মেন্যু", en: "Menus" },
+  footerTab: { bn: "ফুটার", en: "Footer" },
+  messagesTab: { bn: "বার্তা", en: "Messages" },
+  subscribersTab: { bn: "সাবস্ক্রাইবার", en: "Subscribers" },
+  loading: { bn: "লোড হচ্ছে...", en: "Loading..." },
+  adminOnly: { bn: "এই পেজটি শুধুমাত্র অ্যাডমিনের জন্য।", en: "This page is restricted to administrators." },
+  signIn: { bn: "লগইন করুন", en: "Sign In" },
+  saved: { bn: "সফলভাবে সংরক্ষিত হয়েছে!", en: "Saved successfully!" },
+  delete: { bn: "মুছে ফেলা হয়েছে!", en: "Deleted!" },
+  newArticle: { bn: "নতুন লেখা", en: "New Article" },
+  edit: { bn: "সম্পাদনা", en: "Edit" },
+  published: { bn: "প্রকাশিত", en: "Published" },
+  draft: { bn: "খসড়া", en: "Draft" },
+  slug: { bn: "স্লাগ (URL)", en: "Slug (URL)" },
+  titleBn: { bn: "শিরোনাম (বাংলা)", en: "Title (Bengali)" },
+  titleEn: { bn: "শিরোনাম (ইংরেজি)", en: "Title (English)" },
+  excerptBn: { bn: "সারসংক্ষেপ (বাংলা)", en: "Excerpt (Bengali)" },
+  excerptEn: { bn: "সারসংক্ষেপ (ইংরেজি)", en: "Excerpt (English)" },
+  contentBn: { bn: "মূল বিষয়বস্তু (বাংলা)", en: "Content (Bengali)" },
+  contentEn: { bn: "মূল বিষয়বস্তু (ইংরেজি)", en: "Content (English)" },
+  coverImage: { bn: "কভার ছবির URL", en: "Cover Image URL" },
+  author: { bn: "লেখক", en: "Author" },
+  noAuthor: { bn: "কোনো লেখক ছাড়া", en: "No Author" },
+  categories: { bn: "ক্যাটাগরি সমূহ", en: "Categories" },
+  noCategories: { bn: "কোনো ক্যাটাগরি তৈরি করা হয়নি", en: "No categories created" },
+  save: { bn: "সংরক্ষণ করুন", en: "Save" },
+  cancel: { bn: "বাতিল", en: "Cancel" },
+  noArticles: { bn: "এখনো কোনো আর্টিকেল প্রকাশিত হয়নি।", en: "No articles published yet." },
+  backToArticles: { bn: "সকল লেখায় ফিরে যান", en: "Back to Articles" },
+  readMore: { bn: "বিস্তারিত পড়ুন", en: "Read More" },
+  newsletter: { bn: "যুক্ত থাকুন", en: "Stay Connected" },
+  newsletterSub: { bn: "নতুন লেখার নোটিফিকেশন সরাসরি পেতে ইমেইল দিয়ে সাবস্ক্রাইব করুন।", en: "Subscribe with your email to get latest posts directly." },
+  tagline: { bn: "সাহিত্য ও চিন্তন", en: "Literature & Thoughts" },
 };
 
-const PrefsContext = createContext<PrefsValue | null>(null);
-
-const STORAGE_KEY = "quran-onbesha-prefs";
+const PrefsContext = createContext<PrefsContextType | undefined>(undefined);
 
 export function PrefsProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("bn");
-  const [dark, setDarkState] = useState(false);
-  const [layers, setLayers] = useState<Layers>(DEFAULT_LAYERS);
-  const [ready, setReady] = useState(false);
-
-  // Read stored prefs after hydration so server and client markup match.
-  useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Partial<{
-          lang: Lang;
-          dark: boolean;
-          layers: Partial<Layers>;
-        }>;
-        if (parsed.lang === "bn" || parsed.lang === "en") setLangState(parsed.lang);
-        if (typeof parsed.dark === "boolean") setDarkState(parsed.dark);
-        if (parsed.layers) setLayers({ ...DEFAULT_LAYERS, ...parsed.layers });
-      } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        setDarkState(true);
-      }
-    } catch {
-      // ignore malformed storage
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("theme") as Theme;
+      if (saved === "light" || saved === "dark") return saved;
+      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     }
-    setReady(true);
-  }, []);
+    return "dark";
+  });
 
-  useEffect(() => {
-    if (!ready) return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ lang, dark, layers }));
-    } catch {
-      // storage may be unavailable
+  const [lang, setLangState] = useState<Lang>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("lang") as Lang;
+      if (saved === "bn" || saved === "en") return saved;
     }
-  }, [lang, dark, layers, ready]);
+    return "bn";
+  });
 
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.toggle("dark", dark);
-    root.style.colorScheme = dark ? "dark" : "light";
-  }, [dark]);
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     document.documentElement.lang = lang;
+    localStorage.setItem("lang", lang);
   }, [lang]);
 
-  const value = useMemo<PrefsValue>(
-    () => ({
-      lang,
-      setLang: setLangState,
-      toggleLang: () => setLangState((prev) => (prev === "bn" ? "en" : "bn")),
-      t: (key: string) => translate(lang, key),
-      dark,
-      setDark: setDarkState,
-      layers,
-      toggleLayer: (key: LayerKey) =>
-        setLayers((prev) => ({ ...prev, [key]: !prev[key] })),
-      ready,
-    }),
-    [lang, dark, layers, ready],
-  );
+  const setTheme = (t: Theme) => setThemeState(t);
+  const toggleTheme = () => setThemeState((prev) => (prev === "dark" ? "light" : "dark"));
 
-  return <PrefsContext.Provider value={value}>{children}</PrefsContext.Provider>;
+  const setLang = (l: Lang) => setLangState(l);
+  const toggleLang = () => setLangState((prev) => (prev === "bn" ? "en" : "bn"));
+
+  const t = (key: string): string => {
+    return translations[key]?.[lang] || key;
+  };
+
+  return (
+    <PrefsContext.Provider value={{ theme, setTheme, toggleTheme, lang, setLang, toggleLang, t }}>
+      {children}
+    </PrefsContext.Provider>
+  );
 }
 
 export function usePrefs() {
-  const ctx = useContext(PrefsContext);
-  if (!ctx) throw new Error("usePrefs must be used inside PrefsProvider");
-  return ctx;
-}
-
-export function useT() {
-  const { lang } = usePrefs();
-  return useCallback((key: string) => translate(lang, key), [lang]);
+  const context = useContext(PrefsContext);
+  if (!context) {
+    throw new Error("usePrefs must be used within a PrefsProvider");
+  }
+  return context;
 }
