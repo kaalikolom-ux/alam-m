@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { usePrefs } from "@/lib/prefs";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsAdmin } from "@/lib/auth";
 
 export const Route = createFileRoute("/articles/")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -16,12 +17,12 @@ export const Route = createFileRoute("/articles/")({
       { title: "লেখালেখি — Alam M" },
       {
         name: "description",
-        content: "গল্প, কবিতা, স্মৃতিকথা ও ভাবনা নিয়ে নিয়মিত প্রকাশনা।",
+        content: "গল্প, কবিতা, স্মৃতিকথা ও ভাবনা নিয়ে নিয়মিত প্রকাশনা।",
       },
       { property: "og:title", content: "লেখালেখি — Alam M" },
       {
         property: "og:description",
-        content: "গল্প, কবিতা, স্মৃতিকথা ও ভাবনা নিয়ে নিয়মিত প্রকাশনা।",
+        content: "গল্প, কবিতা, স্মৃতিকথা ও ভাবনা নিয়ে নিয়মিত প্রকাশনা।",
       },
     ],
   }),
@@ -70,23 +71,34 @@ function formatDisplayTitle(raw: string, lang: string): string {
 
 function ArticlesPage() {
   const { t, lang } = usePrefs();
+  const { isAdmin } = useIsAdmin();
   const search = useSearch({ from: "/articles/" });
   
   const rawQuery = search.q?.trim() || "";
   const cleanFilter = rawQuery.replace(/^.*\?q=/, "").replace(/^\//, "").trim();
 
-  // ক্যাটাগরি তালিকা আনা
+  // ক্যাটাগরি তালিকা আনা (অ্যাডমিন না হলে 'খসড়া'/'draft' বাদ দেওয়া হবে)
   const categoriesQuery = useQuery({
-    queryKey: ["all-categories-list"],
+    queryKey: ["all-categories-list", isAdmin],
     queryFn: async () => {
-      const { data, error } = await supabase.from("categories").select("id, name_bn, name_en, slug").order("name_bn");
+      let query = supabase
+        .from("categories")
+        .select("id, name_bn, name_en, slug")
+        .order("name_bn");
+
+      if (!isAdmin) {
+        query = query.neq("slug", "draft");
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
-      return data || [];
+      return (data || []).filter((c) => isAdmin || (c.slug !== "draft" && c.name_bn !== "খসড়া"));
     },
   });
 
+  // আর্টিকেল তালিকা আনা
   const articles = useQuery({
-    queryKey: ["articles", "published"],
+    queryKey: ["articles", "published", isAdmin],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("articles")
@@ -100,7 +112,15 @@ function ArticlesPage() {
     },
   });
 
-  const allArticles = articles.data ?? [];
+  // অ্যাডমিন ছাড়া সাধারণ ভিজিটরের ক্ষেত্রে 'খসড়া' ক্যাটাগরির পোস্টগুলো সম্পূর্ণ ফিল্টার করা
+  const allArticles = (articles.data ?? []).filter((a: any) => {
+    if (isAdmin) return true;
+    const hasDraftCategory = (a.article_categories ?? []).some(
+      (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া"
+    );
+    return !hasDraftCategory;
+  });
+
   const filteredArticles = cleanFilter
     ? allArticles.filter((a) => {
         const matchesCategory = (a.article_categories ?? []).some((ac: any) => {
@@ -233,19 +253,21 @@ function ArticlesPage() {
 
               <div className="flex min-w-0 flex-1 flex-col p-5">
                 <div className="mb-2.5 flex flex-wrap items-center gap-2">
-                  {a.article_categories?.map(
-                    (ac: any) =>
-                      ac.categories && (
-                        <span
-                          key={ac.categories.id}
-                          className="rounded-full border border-primary/30 bg-primary/5 px-2.5 py-0.5 text-[11px] font-medium text-primary"
-                        >
-                          {lang === "en" && ac.categories.name_en
-                            ? ac.categories.name_en
-                            : ac.categories.name_bn}
-                        </span>
-                      ),
-                  )}
+                  {a.article_categories
+                    ?.filter((ac: any) => isAdmin || (ac.categories?.slug !== "draft" && ac.categories?.name_bn !== "খসড়া"))
+                    .map(
+                      (ac: any) =>
+                        ac.categories && (
+                          <span
+                            key={ac.categories.id}
+                            className="rounded-full border border-primary/30 bg-primary/5 px-2.5 py-0.5 text-[11px] font-medium text-primary"
+                          >
+                            {lang === "en" && ac.categories.name_en
+                              ? ac.categories.name_en
+                              : ac.categories.name_bn}
+                          </span>
+                        ),
+                    )}
                   {a.published_at && (
                     <span className="text-xs text-muted-foreground">
                       {new Date(a.published_at).toLocaleDateString(lang === "bn" ? "bn-BD" : "en-GB")}
