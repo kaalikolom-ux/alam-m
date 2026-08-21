@@ -39,14 +39,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/articles/$slug")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.slug} — Alam M` },
-      { name: "description", content: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা — Alam M।" },
-      { property: "og:title", content: `${params.slug} — Alam M` },
-      { property: "og:description", content: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা।" },
-    ],
-  }),
   component: ArticlePage,
 });
 
@@ -220,9 +212,12 @@ function InlineRichEditor({
 }
 
 function ArticlePage() {
-  const { slug } = Route.useParams();
+  const params = Route.useParams() as Record<string, string>;
+  const rawSlug = params.slug || params["$slug"] || "";
+  const slug = decodeURIComponent(rawSlug);
+
   const { t, lang } = usePrefs();
-  const { isAdmin, loading: roleLoading } = useIsAdmin();
+  const { isAdmin } = useIsAdmin();
   const queryClient = useQueryClient();
 
   const [comments, setComments] = useState<CommentItem[]>([]);
@@ -246,6 +241,7 @@ function ArticlePage() {
   const article = useQuery({
     queryKey: ["article", slug],
     queryFn: async () => {
+      if (!slug) return null;
       const { data, error } = await supabase
         .from("articles")
         .select(
@@ -257,6 +253,7 @@ function ArticlePage() {
       if (error) throw error;
       return data;
     },
+    enabled: Boolean(slug),
   });
 
   const categoriesQuery = useQuery({
@@ -409,11 +406,10 @@ function ArticlePage() {
     onError: (err: any) => toast.error(err.message),
   });
 
-  if (article.isLoading || roleLoading) {
+  if (article.isLoading) {
     return <p className="mx-auto max-w-3xl px-4 py-16 text-sm text-muted-foreground">{t("loading")}</p>;
   }
 
-  // সাধারণ ভিজিটরদের জন্য ড্রাফট পোস্ট রেস্ট্রিক্ট
   if (!a || (!isAdmin && isDraftPost)) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16">
