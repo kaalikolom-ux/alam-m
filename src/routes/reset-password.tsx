@@ -12,13 +12,13 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "পাসওয়ার্ড রিসেট — কুরআন অন্বেষা" },
+      { title: "পাসওয়ার্ড রিসেট — Alam M" },
       {
         name: "description",
-        content: "নতুন পাসওয়ার্ড দিয়ে আপনার কুরআন অন্বেষা অ্যাকাউন্টে আবার প্রবেশ করুন।",
+        content: "নতুন পাসওয়ার্ড দিয়ে আপনার Alam M অ্যাকাউন্টে আবার প্রবেশ করুন।",
       },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "পাসওয়ার্ড রিসেট — কুরআন অন্বেষা" },
+      { property: "og:title", content: "পাসওয়ার্ড রিসেট — Alam M" },
       { property: "og:description", content: "নতুন পাসওয়ার্ড সেট করুন।" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

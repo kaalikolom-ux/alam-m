@@ -1,6 +1,6 @@
-# Alam M
+# Alam M — শব্দ আমার ক্যানভাস
 
-import completely https://github.com/notabeneinc/quran-explore-pro
+ব্যক্তিগত সাহিত্যিক ব্লগ — গল্প, কবিতা, স্মৃতিকথা ও ভাবনা।
 
 This project was built with [Lovable](https://lovable.dev).
 

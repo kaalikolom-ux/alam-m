@@ -31,18 +31,18 @@ export default defineConfig({
               // HTML navigations must stay network-first so deploys are picked up.
               urlPattern: ({ request }) => request.mode === "navigate",
               handler: "NetworkFirst",
-              options: { cacheName: "quran-pages" },
+              options: { cacheName: "alam-pages" },
             },
             {
               urlPattern: ({ url, sameOrigin }) =>
                 sameOrigin && url.pathname.startsWith("/assets/"),
               handler: "CacheFirst",
-              options: { cacheName: "quran-assets" },
+              options: { cacheName: "alam-assets" },
             },
             {
               urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\//,
               handler: "StaleWhileRevalidate",
-              options: { cacheName: "quran-fonts" },
+              options: { cacheName: "alam-fonts" },
             },
           ],
         },

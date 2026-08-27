@@ -20,7 +20,6 @@ import { Route as ArticlesIndexRouteImport } from './routes/articles.index'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
-import { Route as SurahIdRouteImport } from './routes/surah.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -77,11 +76,6 @@ const PSlugRoute = PSlugRouteImport.update({
   path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SurahIdRoute = SurahIdRouteImport.update({
-  id: '/surah/$id',
-  path: '/surah/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -94,7 +88,6 @@ export interface FileRoutesByFullPath {
   '/articles/$slug': typeof ArticlesSlugRoute
   '/c/$slug': typeof CSlugRoute
   '/p/$slug': typeof PSlugRoute
-  '/surah/$id': typeof SurahIdRoute
   '/articles/': typeof ArticlesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -108,7 +101,6 @@ export interface FileRoutesByTo {
   '/articles/$slug': typeof ArticlesSlugRoute
   '/c/$slug': typeof CSlugRoute
   '/p/$slug': typeof PSlugRoute
-  '/surah/$id': typeof SurahIdRoute
   '/articles': typeof ArticlesIndexRoute
 }
 export interface FileRoutesById {
@@ -123,7 +115,6 @@ export interface FileRoutesById {
   '/articles/$slug': typeof ArticlesSlugRoute
   '/c/$slug': typeof CSlugRoute
   '/p/$slug': typeof PSlugRoute
-  '/surah/$id': typeof SurahIdRoute
   '/articles/': typeof ArticlesIndexRoute
 }
 export interface FileRouteTypes {
@@ -139,7 +130,6 @@ export interface FileRouteTypes {
     | '/articles/$slug'
     | '/c/$slug'
     | '/p/$slug'
-    | '/surah/$id'
     | '/articles/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -153,7 +143,6 @@ export interface FileRouteTypes {
     | '/articles/$slug'
     | '/c/$slug'
     | '/p/$slug'
-    | '/surah/$id'
     | '/articles'
   id:
     | '__root__'
@@ -167,7 +156,6 @@ export interface FileRouteTypes {
     | '/articles/$slug'
     | '/c/$slug'
     | '/p/$slug'
-    | '/surah/$id'
     | '/articles/'
   fileRoutesById: FileRoutesById
 }
@@ -182,7 +170,6 @@ export interface RootRouteChildren {
   ArticlesSlugRoute: typeof ArticlesSlugRoute
   CSlugRoute: typeof CSlugRoute
   PSlugRoute: typeof PSlugRoute
-  SurahIdRoute: typeof SurahIdRoute
   ArticlesIndexRoute: typeof ArticlesIndexRoute
 }
 
@@ -265,13 +252,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/surah/$id': {
-      id: '/surah/$id'
-      path: '/surah/$id'
-      fullPath: '/surah/$id'
-      preLoaderRoute: typeof SurahIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -286,7 +266,6 @@ const rootRouteChildren: RootRouteChildren = {
   ArticlesSlugRoute: ArticlesSlugRoute,
   CSlugRoute: CSlugRoute,
   PSlugRoute: PSlugRoute,
-  SurahIdRoute: SurahIdRoute,
   ArticlesIndexRoute: ArticlesIndexRoute,
 }
 export const routeTree = rootRouteImport

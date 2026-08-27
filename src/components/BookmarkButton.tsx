@@ -9,9 +9,7 @@ import { usePrefs } from "@/lib/prefs";
 import { Button } from "@/components/ui/button";
 
 type Target = {
-  kind: "surah" | "ayah" | "article";
-  surah?: number;
-  ayah?: number;
+  kind?: "article";
   articleId?: string;
   label: string;
 };
@@ -41,11 +39,7 @@ export function BookmarkButton({
   });
 
   const existing = bookmarks?.find(
-    (b) =>
-      b.kind === target.kind &&
-      (b.surah ?? null) === (target.surah ?? null) &&
-      (b.ayah ?? null) === (target.ayah ?? null) &&
-      (b.article_id ?? null) === (target.articleId ?? null),
+    (b) => (b.article_id ?? null) === (target.articleId ?? null),
   );
 
   const mutation = useMutation({
@@ -57,9 +51,7 @@ export function BookmarkButton({
       }
       const { error } = await supabase.from("bookmarks").insert({
         user_id: user!.id,
-        kind: target.kind,
-        surah: target.surah ?? null,
-        ayah: target.ayah ?? null,
+        kind: target.kind || "article",
         article_id: target.articleId ?? null,
         label: target.label,
       });

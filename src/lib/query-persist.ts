@@ -5,7 +5,7 @@ import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persi
 import { get, set, del } from "idb-keyval";
 
 /**
- * Keeps the Quran query cache in IndexedDB so already-read surahs render
+ * Keeps the application query cache in IndexedDB so already-read articles render
  * without a network connection.
  */
 export function useQueryPersistence() {
@@ -18,7 +18,7 @@ export function useQueryPersistence() {
         setItem: (key, value) => set(key, value),
         removeItem: (key) => del(key),
       },
-      key: "quran-onbesha-query-cache",
+      key: "alam-m-query-cache",
       throttleTime: 2000,
     });
 
@@ -31,7 +31,7 @@ export function useQueryPersistence() {
           const key = query.queryKey[0];
           return (
             query.state.status === "success" &&
-            (key === "quran" || key === "verse-translations")
+            (key === "articles" || key === "categories" || key === "page" || key === "menu")
           );
         },
       },

@@ -12,12 +12,12 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "সাইন ইন / সাবস্ক্রাইব — কুরআন অন্বেষা" },
+      { title: "সাইন ইন / সাবস্ক্রাইব — Alam M" },
       {
         name: "description",
-        content: "অ্যাকাউন্ট খুলে পছন্দের সুরা, আয়াত ও আর্টিকেল বুকমার্ক করুন।",
+        content: "অ্যাকাউন্ট খুলে পছন্দের আর্টিকেল ও লেখা বুকমার্ক করুন।",
       },
-      { property: "og:title", content: "সাইন ইন / সাবস্ক্রাইব — কুরআন অন্বেষা" },
+      { property: "og:title", content: "সাইন ইন / সাবস্ক্রাইব — Alam M" },
       { property: "og:description", content: "বুকমার্ক করতে অ্যাকাউন্ট খুলুন।" },
     ],
   }),

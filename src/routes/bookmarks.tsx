@@ -1,21 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Trash2 } from "lucide-react";
+import { BookOpen, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/lib/auth";
 import { usePrefs } from "@/lib/prefs";
-import { localNumber } from "@/lib/quran";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/bookmarks")({
   head: () => ({
     meta: [
-      { title: "আমার বুকমার্ক — কুরআন অন্বেষা" },
-      { name: "description", content: "আপনার সংরক্ষিত সুরা, আয়াত ও আর্টিকেল এক জায়গায়।" },
-      { property: "og:title", content: "আমার বুকমার্ক — কুরআন অন্বেষা" },
-      { property: "og:description", content: "সংরক্ষিত সুরা, আয়াত ও আর্টিকেল।" },
+      { title: "আমার বুকমার্ক — Alam M" },
+      { name: "description", content: "আপনার সংরক্ষিত আর্টিকেল ও প্রিয় লেখা এক জায়গায়।" },
+      { property: "og:title", content: "আমার বুকমার্ক — Alam M" },
+      { property: "og:description", content: "সংরক্ষিত আর্টিকেল ও প্রিয় লেখা।" },
     ],
   }),
   component: BookmarksPage,
@@ -32,7 +31,7 @@ function BookmarksPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookmarks")
-        .select("*")
+        .select("*, articles(id, slug, title_bn, title_en)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -75,41 +74,40 @@ function BookmarksPage() {
       )}
 
       <div className="mt-8 space-y-3">
-        {bookmarks.data?.map((b) => (
-          <div key={b.id} className="card-soft flex items-center gap-3 p-4">
-            <span className="rounded-full bg-accent px-2.5 py-1 text-xs text-accent-foreground">
-              {b.kind === "article" ? t("article") : b.kind === "ayah" ? t("ayah") : t("surahs")}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{b.label}</p>
-              {b.surah && (
-                <p className="text-xs text-muted-foreground">
-                  {localNumber(b.surah, lang)}
-                  {b.ayah ? `:${localNumber(b.ayah, lang)}` : ""}
-                </p>
-              )}
-            </div>
-            {b.surah ? (
-              <Button asChild variant="outline" size="sm">
-                <Link
-                  to="/surah/$id"
-                  params={{ id: String(b.surah) }}
-                  {...(b.ayah ? { hash: `ayah-${b.ayah}` } : {})}
-                >
-                  {t("readMore")}
-                </Link>
+        {bookmarks.data?.map((b: any) => {
+          const articleSlug = b.articles?.slug;
+          const title =
+            lang === "en" && b.articles?.title_en
+              ? b.articles.title_en
+              : b.articles?.title_bn || b.label;
+
+          return (
+            <div key={b.id} className="card-soft flex items-center gap-3 p-4">
+              <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+                {t("article")}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{title}</p>
+              </div>
+              {articleSlug ? (
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/articles/$slug" params={{ slug: articleSlug }}>
+                    <BookOpen className="size-3.5 mr-1" />
+                    {t("readMore")}
+                  </Link>
+                </Button>
+              ) : null}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => remove.mutate(b.id)}
+                aria-label={t("delete")}
+              >
+                <Trash2 className="size-4 text-destructive" />
               </Button>
-            ) : null}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => remove.mutate(b.id)}
-              aria-label={t("delete")}
-            >
-              <Trash2 className="size-4 text-destructive" />
-            </Button>
-          </div>
-        ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
