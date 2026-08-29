@@ -542,8 +542,75 @@ function ArticlePage() {
 
   const isHtml = /<[a-z][\s\S]*>/i.test(content || "");
 
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://a.wooniche.com";
+  const currentUrl = `${origin}/articles/${encodeURIComponent(slug)}`;
+  const postExcerpt = (lang === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_bn) || title;
+
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": title,
+    "description": postExcerpt,
+    "image": a.cover_image_url ? [a.cover_image_url] : [`${origin}/favicon-512x512.png`],
+    "datePublished": a.published_at || a.created_at,
+    "dateModified": a.updated_at || a.published_at || a.created_at,
+    "inLanguage": lang,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": currentUrl,
+    },
+    "author": {
+      "@type": "Person",
+      "name": authorName || "Alam M",
+      "url": `${origin}/about`,
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Alam M",
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${origin}/favicon-512x512.png`,
+      },
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": lang === "en" ? "Home" : "হোম",
+        "item": origin,
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": lang === "en" ? "Articles" : "লেখালেখি",
+        "item": `${origin}/articles`,
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": title,
+        "item": currentUrl,
+      },
+    ],
+  };
+
   return (
     <article className="mx-auto w-full max-w-3xl px-4 py-12">
+      {/* Schema.org BlogPosting & Breadcrumb Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
       {isAdmin && (
         <div className="mb-8 rounded-2xl border-2 border-primary/30 bg-primary/5 p-4 shadow-sm backdrop-blur-sm sm:p-5 space-y-4">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

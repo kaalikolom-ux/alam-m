@@ -120,10 +120,42 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const globalJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://a.wooniche.com/#website",
+        "name": "Alam M",
+        "url": "https://a.wooniche.com/",
+        "description": "শব্দ আমার ক্যানভাস — গল্প, কবিতা ও স্মৃতিকথা।",
+        "inLanguage": ["bn", "en"],
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://a.wooniche.com/articles?q={search_term_string}",
+          "query-input": "required name=search_term_string",
+        },
+      },
+      {
+        "@type": "Person",
+        "@id": "https://a.wooniche.com/#author",
+        "name": "Alam M",
+        "url": "https://a.wooniche.com/about",
+        "jobTitle": "Writer & Essayist",
+        "description": "আমি আলম। শব্দের একজন লেখক এবং গল্পের পথিক।",
+        "sameAs": ["https://www.upwork.com/freelancers/~01e6f18d96f1c7294f"],
+      },
+    ],
+  };
+
   return (
     <html lang="bn" className="scroll-smooth">
       <head>
         <HeadContent />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(globalJsonLd) }}
+        />
       </head>
       <body className="min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20 selection:text-primary">
         {children}

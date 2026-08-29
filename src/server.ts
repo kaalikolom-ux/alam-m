@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { generateSitemapXml } from "./lib/sitemap";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -46,6 +47,36 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const url = new URL(request.url);
+
+    // Dynamic Sitemap endpoint
+    if (url.pathname === "/sitemap.xml") {
+      try {
+        const sitemapXml = await generateSitemapXml(url.origin);
+        return new Response(sitemapXml, {
+          status: 200,
+          headers: {
+            "content-type": "application/xml; charset=utf-8",
+            "cache-control": "public, max-age=3600, s-maxage=3600",
+          },
+        });
+      } catch (err) {
+        console.error("Error generating dynamic sitemap:", err);
+      }
+    }
+
+    // Dynamic Robots.txt endpoint
+    if (url.pathname === "/robots.txt") {
+      const robotsContent = `User-agent: *\nAllow: /\n\nSitemap: ${url.origin}/sitemap.xml\n`;
+      return new Response(robotsContent, {
+        status: 200,
+        headers: {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "public, max-age=86400",
+        },
+      });
+    }
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
