@@ -34,8 +34,8 @@ function getAutoExcerpt(content?: string | null, maxLength = 140) {
   return plainText.length > maxLength ? `${plainText.slice(0, maxLength)}...` : plainText;
 }
 
-// স্টিল-ব্লু ড্রপলেট ও ভাসমান মেঘের লাইভ ব্যাকগ্রাউন্ড
-const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() {
+// হিরো সেকশনের রেসপনসিভ ব্যাকগ্রাউন্ড ইমেজ ও সিনেমেটিক ওভারলে (ডেস্কটপ, অ্যান্ড্রয়েড, আইওএস)
+const HeroImageBackground = memo(function HeroImageBackground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -55,14 +55,14 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
     };
     window.addEventListener("resize", onResize);
 
-    const droplets = Array.from({ length: 90 }).map(() => ({
+    const droplets = Array.from({ length: 45 }).map(() => ({
       x: Math.random() * w,
       y: Math.random() * h,
-      r: Math.random() * 2.8 + 1.2,
-      stretch: Math.random() * 1.8 + 1,
-      angle: (Math.random() - 0.5) * 0.4,
-      alpha: Math.random() * 0.5 + 0.2,
-      speedY: Math.random() * 0.08 + 0.02,
+      r: Math.random() * 2.2 + 0.8,
+      stretch: Math.random() * 1.5 + 1,
+      angle: (Math.random() - 0.5) * 0.3,
+      alpha: Math.random() * 0.35 + 0.1,
+      speedY: Math.random() * 0.06 + 0.02,
     }));
 
     const draw = () => {
@@ -83,12 +83,7 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
 
         ctx.beginPath();
         ctx.ellipse(0, 0, d.r * d.stretch, d.r, 0, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(10, 20, 32, ${d.alpha * 0.85})`;
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(-d.r * 0.3, -d.r * 0.3, d.r * 0.4, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(235, 245, 255, ${d.alpha * 0.7})`;
+        ctx.fillStyle = `rgba(220, 238, 255, ${d.alpha * 0.75})`;
         ctx.fill();
 
         ctx.restore();
@@ -106,45 +101,60 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
   }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden select-none bg-[#182635]">
-      <div 
+    <div className="pointer-events-none absolute inset-0 overflow-hidden select-none bg-[#09111b]">
+      {/* রেসপনসিভ ব্যাকগ্রাউন্ড ইমেজ (মোবাইল ও ডেস্কটপ ভিউপোর্টের জন্য অপ্টিমাইজড ফোকাস) */}
+      <img
+        src="/hero-image.webp"
+        alt="Author typing on laptop"
+        fetchPriority="high"
+        loading="eager"
+        decoding="async"
+        className="absolute inset-0 size-full object-cover object-[center_60%] sm:object-[center_45%] md:object-center brightness-[0.72] contrast-[1.08] saturate-[0.85] transition-transform duration-1000 ease-out will-change-transform"
+      />
+
+      {/* স্তর ১: ডার্ক স্লেট ও সিনেমেটিক ভিগনেট ওভারলে */}
+      <div
         className="absolute inset-0"
         style={{
-          background: "linear-gradient(180deg, #324757 0%, #20313f 50%, #101c27 100%)",
+          background: `
+            linear-gradient(180deg, rgba(8, 15, 25, 0.88) 0%, rgba(12, 22, 36, 0.72) 40%, rgba(6, 12, 20, 0.94) 100%),
+            radial-gradient(ellipse 90% 70% at 50% 35%, rgba(14, 25, 42, 0.45) 0%, rgba(5, 9, 15, 0.88) 100%)
+          `,
         }}
       />
+
+      {/* স্তর ২: লেখাগুলোকে স্পষ্ট করতে কেন্দ্রীয় নরম গোল্ডেন ও অজুর আভা */}
+      <div
+        className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[600px] h-[260px] sm:h-[360px] rounded-full opacity-20 blur-3xl pointer-events-none"
+        style={{
+          background: "radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, rgba(56, 114, 180, 0.25) 60%, transparent 80%)",
+        }}
+      />
+
+      {/* স্তর ৩: সূক্ষ্ম ভাসমান কণা ও ড্রপলেট ক্যানভাস */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 size-full opacity-80 mix-blend-multiply"
+        className="absolute inset-0 size-full opacity-60 mix-blend-screen"
       />
+
+      {/* স্তর ৪: নরম ভাসমান মেঘমালা */}
       <div
-        className="absolute inset-x-[-20%] bottom-0 h-64 opacity-35 blur-2xl"
+        className="absolute inset-x-[-20%] bottom-0 h-48 opacity-25 blur-2xl"
         style={{
           background:
-            "radial-gradient(ellipse 75% 45% at 35% 95%, rgba(255, 255, 255, 0.45), transparent 70%), radial-gradient(ellipse 65% 55% at 75% 85%, rgba(195, 220, 240, 0.35), transparent 65%)",
+            "radial-gradient(ellipse 75% 45% at 35% 95%, rgba(255, 255, 255, 0.3), transparent 70%), radial-gradient(ellipse 65% 55% at 75% 85%, rgba(195, 220, 240, 0.2), transparent 65%)",
           animation: "cloudDriftOne 20s ease-in-out infinite alternate",
         }}
       />
-      <div
-        className="absolute inset-x-[-25%] -bottom-8 h-52 opacity-30 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 50% at 65% 95%, rgba(255, 255, 255, 0.45), transparent 70%), radial-gradient(ellipse 55% 45% at 20% 80%, rgba(180, 210, 235, 0.3), transparent 60%)",
-          animation: "cloudDriftTwo 28s linear infinite",
-        }}
-      />
-      <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-b from-transparent to-background" />
+
+      {/* স্তর ৫: নিচের সেকশনের সাথে মসৃণ ফেড ট্রানজিশন */}
+      <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-gradient-to-b from-transparent via-background/40 to-background" />
 
       <style>{`
         @keyframes cloudDriftOne {
           0% { transform: translate3d(0, 0, 0) scale(1); }
-          50% { transform: translate3d(-40px, -12px, 0) scale(1.04); }
-          100% { transform: translate3d(30px, 6px, 0) scale(0.97); }
-        }
-        @keyframes cloudDriftTwo {
-          0% { transform: translate3d(0, 0, 0); }
-          50% { transform: translate3d(50px, -8px, 0); }
-          100% { transform: translate3d(0, 0, 0); }
+          50% { transform: translate3d(-30px, -8px, 0) scale(1.03); }
+          100% { transform: translate3d(20px, 4px, 0) scale(0.98); }
         }
       `}</style>
     </div>
@@ -253,15 +263,15 @@ function HomePage() {
   return (
     <div className="bg-background text-foreground transition-colors duration-300">
       {/* হিরো সেকশন */}
-      <section className="relative overflow-hidden">
-        <WaterDropletCloudBackground />
+      <section className="relative overflow-hidden min-h-[520px] sm:min-h-[580px] md:min-h-[620px] flex items-center justify-center">
+        <HeroImageBackground />
 
-        <div className="relative z-10 mx-auto w-full max-w-3xl px-4 py-16 text-center sm:py-24">
-          <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/25 px-3.5 py-1 text-xs font-medium tracking-wide text-white backdrop-blur-sm">
-            <Sparkles className="size-3.5" /> {t("tagline")}
+        <div className="relative z-10 mx-auto w-full max-w-3xl px-4 py-16 text-center sm:py-24 md:py-28">
+          <p className="mx-auto inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium tracking-wide text-white backdrop-blur-md shadow-sm">
+            <Sparkles className="size-3.5 text-amber-300" /> {t("tagline")}
           </p>
 
-          <h1 className="mt-6 text-3xl font-bold leading-tight sm:text-5xl text-white">
+          <h1 className="mt-6 text-3xl font-bold leading-tight sm:text-5xl md:text-6xl text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)]">
             {heroName} <span className="gold-text">Alam —</span>
           </h1>
 
@@ -269,18 +279,26 @@ function HomePage() {
             <CenterTypingText fullText={taglineText} />
           </div>
 
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/75 sm:text-base">
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base sm:leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] font-normal">
             {bioText}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
+            <Button
+              asChild
+              size="lg"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 border border-primary/40 font-medium px-6"
+            >
+              <Link to="/articles" search={{ q: undefined }}>{lang === "bn" ? "সকল লেখা" : "All Posts"}</Link>
+            </Button>
+
             <Button
               asChild
               size="lg"
               variant="outline"
-              className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              className="border-white/35 bg-black/25 text-white hover:bg-white/15 hover:text-white backdrop-blur-md px-6 shadow-sm"
             >
-              <Link to="/articles" search={{ q: undefined }}>{lang === "bn" ? "সকল লেখা" : "All Posts"}</Link>
+              <Link to="/about">{lang === "bn" ? "আমার পাতা" : "About Me"}</Link>
             </Button>
 
             {isAdmin && (
@@ -288,7 +306,7 @@ function HomePage() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="border-amber-500/60 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 hover:text-amber-200 gap-1.5 shadow-sm"
+                className="border-amber-500/60 bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 hover:text-amber-200 gap-1.5 shadow-sm backdrop-blur-md"
               >
                 <Link to="/articles" search={{ q: "খসড়া" }}>
                   <FileText className="size-4" />
