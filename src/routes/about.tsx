@@ -88,15 +88,12 @@ function AboutPage() {
               <div className="my-8 relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-background to-amber-500/5 p-6 sm:p-8 shadow-sm">
                 <Quote className="absolute -top-2 -left-2 size-16 text-amber-500/15 pointer-events-none" />
                 <p className="relative z-10 text-base sm:text-lg italic font-medium text-foreground/95 leading-relaxed">
-                  "শব্দেরও প্রাণ আছে, আলম। তুই যদি ঠিকমতো ডাক দিতে শিখিস, তারা নিজেরাই গল্প বলতে আসবে।"
+                  ছোটবেলায় আমার দাদা বলতেন, "শব্দেরও প্রাণ আছে, আলম। তুই যদি ঠিকমতো ডাক দিতে শিখিস, তারা নিজেরাই গল্প বলতে আসবে।"
                 </p>
-                <span className="mt-3 block text-xs sm:text-sm font-semibold text-amber-500/90 tracking-wide">
-                  — আমার দাদার স্মৃতি থেকে
-                </span>
               </div>
 
               <p>
-                তখন বুঝিনি। এখন বুঝি। প্রতিটি লেখাই যেন এক অজানা আত্মার সঙ্গে কথোপকথন। আমি লিখি একা বসে, কিন্তু লেখা শেষে মনে হয়, পুরো বিশ্বটা জুড়ে বসে আছে আমার পাশে।
+                প্রতিটি লেখাই যেন এক অজানা আত্মার সঙ্গে কথোপকথন। আমি লিখি একা বসে, কিন্তু লেখা শেষে মনে হয়, পুরো বিশ্বটা জুড়ে বসে আছে আমার পাশে।
               </p>
 
               <p>
@@ -136,15 +133,12 @@ function AboutPage() {
               <div className="my-8 relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-background to-amber-500/5 p-6 sm:p-8 shadow-sm">
                 <Quote className="absolute -top-2 -left-2 size-16 text-amber-500/15 pointer-events-none" />
                 <p className="relative z-10 text-base sm:text-lg italic font-medium text-foreground/95 leading-relaxed">
-                  "Words have a soul of their own, Alam. If you learn how to call upon them gently, they will come forward to tell their own tales."
+                  When I was a child, my grandfather used to say, "Words have a soul of their own, Alam. If you learn how to call upon them gently, they will come forward to tell their own tales."
                 </p>
-                <span className="mt-3 block text-xs sm:text-sm font-semibold text-amber-500/90 tracking-wide">
-                  — From my grandfather's memories
-                </span>
               </div>
 
               <p>
-                I didn't comprehend it back then. I understand it now. Every piece of writing is like a quiet conversation with an unseen soul. I write alone, yet when the ink dries, it feels as if the entire universe is seated right beside me.
+                Every piece of writing is like a quiet conversation with an unseen soul. I write alone, yet when the ink dries, it feels as if the entire universe is seated right beside me.
               </p>
 
               <p>
