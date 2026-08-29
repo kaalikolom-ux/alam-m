@@ -37,6 +37,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AntiSpamCaptcha,
+  generateMathCaptcha,
+  convertBengaliToEnglishDigits,
+  type MathCaptcha,
+} from "@/components/AntiSpamCaptcha";
 
 export const Route = createFileRoute("/articles/$slug")({
   component: ArticlePage,
@@ -240,6 +246,13 @@ function ArticlePage() {
   const [comments, setComments] = useState<CommentItem[]>([]);
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
+  const [captchaProblem, setCaptchaProblem] = useState<MathCaptcha>(() => generateMathCaptcha());
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+
+  const refreshCaptcha = () => {
+    setCaptchaProblem(generateMathCaptcha());
+    setCaptchaAnswer("");
+  };
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -490,6 +503,29 @@ function ArticlePage() {
       toast.error(lang === "bn" ? "নাম এবং মন্তব্য উভয়ই পূরণ করুন" : "Please enter both name and comment");
       return;
     }
+
+    if (!captchaAnswer.trim()) {
+      toast.error(
+        lang === "bn"
+          ? "স্প্যাম সুরক্ষার জন্য ক্যাপচা সংখ্যাটি পূরণ করুন"
+          : "Please answer the anti-spam question"
+      );
+      return;
+    }
+
+    const normalizedInput = convertBengaliToEnglishDigits(captchaAnswer.trim());
+    const parsedNum = parseInt(normalizedInput, 10);
+
+    if (isNaN(parsedNum) || parsedNum !== captchaProblem.answer) {
+      toast.error(
+        lang === "bn"
+          ? "ক্যাপচা উত্তরটি সঠিক হয়নি! নতুন প্রশ্ন চেষ্টা করুন।"
+          : "Incorrect captcha answer! Please try the new question."
+      );
+      refreshCaptcha();
+      return;
+    }
+
     const newEntry: CommentItem = {
       id: Date.now().toString(),
       name: commentName.trim(),
@@ -499,6 +535,8 @@ function ArticlePage() {
     setComments([newEntry, ...comments]);
     setCommentName("");
     setCommentText("");
+    setCaptchaAnswer("");
+    refreshCaptcha();
     toast.success(lang === "bn" ? "মন্তব্য যোগ করা হয়েছে!" : "Comment added successfully!");
   };
 
@@ -833,7 +871,7 @@ function ArticlePage() {
           </h2>
         </div>
 
-        <form onSubmit={handleCommentSubmit} className="mt-5 space-y-3">
+        <form onSubmit={handleCommentSubmit} className="mt-5 space-y-3.5">
           <div>
             <Input
               type="text"
@@ -852,6 +890,16 @@ function ArticlePage() {
               className="bg-background"
             />
           </div>
+
+          {/* স্প্যাম প্রতিরোধে ক্যাপচা নাম্বার বক্স (ফলাফল ০-৯ এর মধ্যে) */}
+          <AntiSpamCaptcha
+            value={captchaAnswer}
+            onChange={setCaptchaAnswer}
+            onRefresh={refreshCaptcha}
+            currentProblem={captchaProblem}
+            lang={lang}
+          />
+
           <Button type="submit" size="sm" className="gap-1.5">
             <Send className="size-3.5" />
             {lang === "bn" ? "মন্তব্য প্রকাশ করুন" : "Post Comment"}
