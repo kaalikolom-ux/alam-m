@@ -41,15 +41,15 @@ const HeroImageBackground = memo(function HeroImageBackground() {
       {/* রেসপনসিভ ব্যাকগ্রাউন্ড ইমেজ */}
       <img
         src="/hero-image.webp"
-        alt="Author typing on laptop"
+        alt="Author Alam in the green field"
         fetchPriority="high"
         loading="eager"
         decoding="async"
-        className="absolute inset-0 size-full object-cover object-[center_60%] sm:object-[center_45%] md:object-center brightness-[0.65] contrast-[1.05]"
+        className="absolute inset-0 size-full object-cover object-[70%_25%] sm:object-[75%_30%] md:object-[center_35%] brightness-[0.70] contrast-[1.05]"
       />
 
-      {/* প্লেইন ও নরমাল সুষম ওভারলে — সম্পূর্ণ হিরো সেকশনে সমান কভারেজ */}
-      <div className="absolute inset-0 bg-slate-950/80 dark:bg-slate-950/85 transition-colors duration-300" />
+      {/* প্লেইন ও নরমাল সুষম ওভারলে — সম্পূর্ণ হিরো সেকশনে সমান কভারেজ ও স্পষ্ট টেক্সট */}
+      <div className="absolute inset-0 bg-slate-950/75 dark:bg-slate-950/80 transition-colors duration-300" />
 
       {/* নিচের সেকশনের সাথে মসৃণ ফেড ট্রানজিশন */}
       <div className="absolute inset-x-0 bottom-0 h-20 sm:h-28 bg-gradient-to-b from-transparent to-background transition-colors duration-300" />
