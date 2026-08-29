@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sparkles, Feather, BookOpen, Mail, Quote } from "lucide-react";
+import { Feather, BookOpen, Mail, Quote } from "lucide-react";
 
 import { usePrefs } from "@/lib/prefs";
 import { usePage } from "@/components/PageBody";
@@ -36,18 +36,18 @@ function AboutPage() {
   return (
     <div className="bg-background text-foreground transition-colors py-10 sm:py-16 md:py-20">
       <div className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-        {/* টপ ব্যাজ */}
-        <div className="text-center">
-          <p className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-medium tracking-wide text-primary backdrop-blur-md shadow-sm">
+        {/* হেডার / টাইটেল সেকশন (Left Aligned) */}
+        <div className="text-left space-y-3">
+          <p className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-medium tracking-wide text-primary shadow-sm">
             <Feather className="size-3.5 text-primary" />
             {isBengali ? "লেখক পরিচিতি ও ভাবনা" : "Author Profile & Reflections"}
           </p>
 
-          <h1 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl font-['Hind_Siliguri',sans-serif]">
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground font-['Kaushan_Script',cursive]">
             {dynamicTitle || (isBengali ? "আমার পাতা" : "About Me")}
           </h1>
 
-          <p className="mt-3 text-sm sm:text-base text-muted-foreground font-['Kaushan_Script'] text-primary/90">
+          <p className="text-base sm:text-lg text-primary/90 font-['Kaushan_Script',cursive]">
             {isBengali ? "শব্দ আমার ক্যানভাস, গল্প আমার পথচলা" : "Words are my canvas, stories my path"}
           </p>
         </div>
@@ -63,8 +63,8 @@ function AboutPage() {
           </div>
         )}
 
-        {/* মূল কনটেন্ট এরিয়া */}
-        <article className="mt-10 space-y-6 text-base sm:text-lg leading-relaxed text-foreground/90 font-normal">
+        {/* মূল কনটেন্ট এরিয়া (Left Aligned) */}
+        <article className="mt-10 space-y-6 text-base sm:text-lg leading-relaxed text-foreground/90 font-normal text-left">
           {dynamicContent ? (
             <div className="space-y-4">
               {dynamicContent.split(/\n{2,}/).map((para: string, i: number) => (
@@ -84,11 +84,11 @@ function AboutPage() {
                 আমি বিশ্বাস করি, প্রতিটি মুহূর্তের গভীরে একটা করে কবিতা লুকিয়ে থাকে। রাস্তার ধারে চায়ের দোকানের ফুটন্ত পানির বুদবুদে, বিকেলবেলায় বাড়ি ফেরা কোনো পাখির ডানার ছোঁয়ায়, কিংবা পুরোনো ডায়েরির পাতায় মিলিয়ে যাওয়া কোনো হাতের লেখায়—সবখানেই আছে একেকটি গল্প। আমি শুধু সেগুলোকে খুঁজে নিই, তুলে আনি আলোয়। শব্দ আমার মাধ্যম, আর আবেগ আমার পথচলা।
               </p>
 
-              {/* দাদার কোটেশন হাইলাইট কার্ড */}
-              <div className="my-8 relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-background to-amber-500/5 p-6 sm:p-8 shadow-sm">
-                <Quote className="absolute -top-2 -left-2 size-16 text-amber-500/15 pointer-events-none" />
+              {/* কোটেশন হাইলাইট কার্ড (Left Aligned) */}
+              <div className="my-8 relative overflow-hidden rounded-2xl border-l-4 border-primary border-y border-r border-border/40 bg-gradient-to-r from-primary/10 via-background to-primary/5 p-6 sm:p-8 shadow-sm text-left">
+                <Quote className="absolute -top-2 -left-2 size-16 text-primary/15 pointer-events-none" />
                 <p className="relative z-10 text-base sm:text-lg italic font-medium text-foreground/95 leading-relaxed">
-                  ছোটবেলায় আমার দাদা বলতেন, "শব্দেরও প্রাণ আছে, আলম। তুই যদি ঠিকমতো ডাক দিতে শিখিস, তারা নিজেরাই গল্প বলতে আসবে।"
+                  "শব্দেরও প্রাণ আছে। তুই যদি ঠিকমতো ডাক দিতে শিখিস, তারা নিজেরাই গল্প বলতে আসবে।"
                 </p>
               </div>
 
@@ -108,12 +108,12 @@ function AboutPage() {
                 এই পৃষ্ঠাটা আমার ডায়েরির প্রথম পাতা। বাকিটা লেখা হবে একদিন, এক শব্দে, এক গল্পে। যদি আপনি পড়তে পড়তে থেমে যান কোথাও, যদি কোনো বাক্য আপনার ভেতরে দাগ কাটে—তাহলে জেনে রাখবেন, আমার লেখা সফল। কারণ শব্দ তখনই সত্যিকারের হয়, যখন তা কারও না কারও মন স্পর্শ করে।
               </p>
 
-              {/* সমাপনী পরিচয় কার্ড */}
-              <div className="my-8 rounded-xl border border-primary/25 bg-card/60 p-6 text-center backdrop-blur-sm shadow-sm">
-                <p className="text-xl sm:text-2xl font-bold text-primary font-['Kaushan_Script'] tracking-wide">
+              {/* সমাপনী পরিচয় কার্ড (Left Aligned) */}
+              <div className="my-8 rounded-xl border border-primary/25 bg-card/60 p-6 text-left backdrop-blur-sm shadow-sm space-y-2">
+                <p className="text-xl sm:text-2xl font-bold text-primary font-['Kaushan_Script',cursive] tracking-wide">
                   আমি আলম। শব্দের লেখক। গল্পের পথিক।
                 </p>
-                <p className="mt-3 text-sm sm:text-base text-muted-foreground">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   আপনার সময় দিয়ে আমার পাতাকে সমৃদ্ধ করার জন্য ধন্যবাদ। চলুন, একসঙ্গে কিছু গল্প বুনি।
                 </p>
               </div>
@@ -129,11 +129,11 @@ function AboutPage() {
                 I believe that deep within every single moment, a poem lies hidden. In the simmering bubbles of a roadside tea stall, in the gentle flutter of a bird returning home at dusk, or in the fading ink of a vintage diary—stories reside everywhere. I simply discover them and bring them into the light. Words are my canvas, and emotions are the path I tread.
               </p>
 
-              {/* Grandfather's Quote Card */}
-              <div className="my-8 relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-background to-amber-500/5 p-6 sm:p-8 shadow-sm">
-                <Quote className="absolute -top-2 -left-2 size-16 text-amber-500/15 pointer-events-none" />
+              {/* Quote Card (Left Aligned) */}
+              <div className="my-8 relative overflow-hidden rounded-2xl border-l-4 border-primary border-y border-r border-border/40 bg-gradient-to-r from-primary/10 via-background to-primary/5 p-6 sm:p-8 shadow-sm text-left">
+                <Quote className="absolute -top-2 -left-2 size-16 text-primary/15 pointer-events-none" />
                 <p className="relative z-10 text-base sm:text-lg italic font-medium text-foreground/95 leading-relaxed">
-                  When I was a child, my grandfather used to say, "Words have a soul of their own, Alam. If you learn how to call upon them gently, they will come forward to tell their own tales."
+                  "Words have a soul of their own, Alam. If you learn how to call upon them gently, they will come forward to tell their own tales."
                 </p>
               </div>
 
@@ -153,12 +153,12 @@ function AboutPage() {
                 This page is the opening leaf of my journal. The rest will be written day by day, word by word, story by story. If you ever pause in the middle of a sentence, if a phrase stirs something deep within you—know that my writing has found its true purpose. Because words only truly come alive when they touch someone’s soul.
               </p>
 
-              {/* Closing Identity Card */}
-              <div className="my-8 rounded-xl border border-primary/25 bg-card/60 p-6 text-center backdrop-blur-sm shadow-sm">
-                <p className="text-xl sm:text-2xl font-bold text-primary font-['Kaushan_Script'] tracking-wide">
+              {/* Closing Identity Card (Left Aligned) */}
+              <div className="my-8 rounded-xl border border-primary/25 bg-card/60 p-6 text-left backdrop-blur-sm shadow-sm space-y-2">
+                <p className="text-xl sm:text-2xl font-bold text-primary font-['Kaushan_Script',cursive] tracking-wide">
                   I am Alam. A writer of words. A wanderer of stories.
                 </p>
-                <p className="mt-3 text-sm sm:text-base text-muted-foreground">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   Thank you for gracing my page with your valuable time. Let us weave some stories together.
                 </p>
               </div>
@@ -166,8 +166,8 @@ function AboutPage() {
           )}
         </article>
 
-        {/* বটম অ্যাকশন লিংক বাটন */}
-        <div className="mt-12 pt-8 border-t border-border/50 flex flex-wrap items-center justify-center gap-4">
+        {/* বটম অ্যাকশন লিংক বাটন (Left Aligned) */}
+        <div className="mt-12 pt-8 border-t border-border/50 flex flex-wrap items-center justify-start gap-4">
           <Button asChild size="lg" className="bg-primary text-primary-foreground font-medium px-6 shadow-md">
             <Link to="/articles" search={{ q: undefined }}>
               <BookOpen className="size-4 mr-2" />
