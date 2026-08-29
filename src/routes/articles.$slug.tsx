@@ -230,7 +230,7 @@ function InlineRichEditor({
 
 function ArticlePage() {
   const params = useParams({ strict: false }) as Record<string, string>;
-  const rawSlug = params.slug || params["$slug"] || "";
+  const rawSlug = params["slug"] || params["$slug"] || "";
   const slug = decodeURIComponent(rawSlug).trim();
 
   const { t, lang } = usePrefs();
@@ -463,7 +463,7 @@ function ArticlePage() {
         <p className="text-base text-muted-foreground">
           {lang === "bn" ? "পোস্টটি পাওয়া যায়নি বা এটি খসড়া অবস্থায় রয়েছে।" : "Article not found or is in draft mode."}
         </p>
-        <Link to="/articles" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+        <Link to="/articles" search={{ q: undefined }} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
           <ArrowLeft className="size-4" /> {t("backToArticles")}
         </Link>
       </div>
@@ -736,7 +736,7 @@ function ArticlePage() {
         </form>
       ) : null}
 
-      <Link to="/articles" className="inline-flex items-center gap-1 text-sm text-primary">
+      <Link to="/articles" search={{ q: undefined }} className="inline-flex items-center gap-1 text-sm text-primary">
         <ArrowLeft className="size-4" /> {t("backToArticles")}
       </Link>
 

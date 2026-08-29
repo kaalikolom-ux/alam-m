@@ -10,7 +10,7 @@ import { useIsAdmin } from "@/lib/auth";
 
 export const Route = createFileRoute("/articles/")({
   validateSearch: (search: Record<string, unknown>) => ({
-    q: typeof search.q === "string" ? search.q : undefined,
+    q: typeof search["q"] === "string" ? (search["q"] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -132,10 +132,11 @@ function ArticlesPage() {
             catBn.includes(cleanFilter) ||
             catEn.toLowerCase().includes(cleanFilter.toLowerCase()) ||
             catSlug.toLowerCase().includes(cleanFilter.toLowerCase()) ||
-            (CATEGORY_MAP[cleanFilter.toLowerCase()] && (
-              catBn.includes(CATEGORY_MAP[cleanFilter.toLowerCase()].bn) ||
-              catEn.toLowerCase().includes(CATEGORY_MAP[cleanFilter.toLowerCase()].en.toLowerCase())
-            ))
+            (() => {
+              const mapped = CATEGORY_MAP[cleanFilter.toLowerCase()];
+              if (!mapped) return false;
+              return catBn.includes(mapped.bn) || catEn.toLowerCase().includes(mapped.en.toLowerCase());
+            })()
           );
         });
 
@@ -177,6 +178,7 @@ function ArticlesPage() {
       <div className="mt-6 flex flex-wrap items-center gap-2 border-b border-border/50 pb-6">
         <Link
           to="/articles"
+          search={{ q: undefined }}
           className={`inline-flex items-center rounded-lg px-3.5 py-1.5 text-xs font-medium border transition-all duration-200 ${
             !cleanFilter
               ? "border-primary/40 bg-primary/15 text-primary shadow-sm font-semibold"
