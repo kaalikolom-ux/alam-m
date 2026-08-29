@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
+import { brokeredPreviewStorage } from './previewAuthStorage';
 
 // সরাসরি আপনার নতুন Supabase প্রজেক্টের মানগুলো এখানে বসিয়ে দিন
 const PROJECT_URL = "https://qehupsubyhemzmscoiig.supabase.co"; // <--- আপনার নতুন Project URL
@@ -42,7 +43,7 @@ function createSupabaseClient() {
       fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
     },
     auth: {
-      storage: typeof window !== 'undefined' ? localStorage : undefined,
+      storage: brokeredPreviewStorage(),
       persistSession: true,
       autoRefreshToken: true,
     },
