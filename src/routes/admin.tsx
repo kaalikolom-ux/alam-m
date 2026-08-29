@@ -231,7 +231,7 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
             const title = item.querySelector("title")?.textContent || "Untitled";
             const contentNodes = item.getElementsByTagName("content:encoded");
             const content = contentNodes.length > 0 
-              ? contentNodes[0].textContent 
+              ? contentNodes[0]?.textContent 
               : (item.querySelector("description")?.textContent || "");
 
             payloads.push({

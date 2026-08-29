@@ -141,6 +141,7 @@ export function MenuAdmin() {
     if (fromIndex === -1 || toIndex === -1) return;
 
     const [movedItem] = items.splice(fromIndex, 1);
+    if (!movedItem) return;
     items.splice(toIndex, 0, movedItem);
 
     const updates = items.map((item, index) => ({

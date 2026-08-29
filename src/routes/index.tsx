@@ -70,6 +70,7 @@ const WaterDropletCloudBackground = memo(function WaterDropletCloudBackground() 
 
       for (let i = 0; i < droplets.length; i++) {
         const d = droplets[i];
+        if (!d) continue;
         d.y += d.speedY;
         if (d.y > h + 10) {
           d.y = -10;
@@ -279,7 +280,7 @@ function HomePage() {
               variant="outline"
               className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
             >
-              <Link to="/articles">{lang === "bn" ? "সকল লেখা" : "All Posts"}</Link>
+              <Link to="/articles" search={{ q: undefined }}>{lang === "bn" ? "সকল লেখা" : "All Posts"}</Link>
             </Button>
 
             {isAdmin && (
@@ -289,7 +290,7 @@ function HomePage() {
                 variant="outline"
                 className="border-amber-500/60 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 hover:text-amber-200 gap-1.5 shadow-sm"
               >
-                <Link to="/articles" search={{ q: "খসড়া" } as any}>
+                <Link to="/articles" search={{ q: "খসড়া" }}>
                   <FileText className="size-4" />
                   {lang === "bn" ? "খসড়া পোস্ট" : "Draft Posts"}
                 </Link>
@@ -313,6 +314,7 @@ function HomePage() {
             </div>
             <Link
               to="/articles"
+              search={{ q: undefined }}
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline group"
             >
               {lang === "bn" ? "সকল লেখা" : "All Posts"} 

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { usePrefs } from "@/lib/prefs";
+import { useMenu } from "@/lib/menu";
 import { useSession, useIsAdmin } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -30,13 +31,18 @@ export function SiteHeader() {
     await supabase.auth.signOut();
   };
 
-  const navLinks = [
-    { to: "/", label: lang === "bn" ? "হোম" : "Home" },
-    { to: "/articles", label: lang === "bn" ? "স্মৃতিকথা" : "Memories", search: { q: "স্মৃতিকথা" } },
-    { to: "/articles", label: lang === "bn" ? "কবিতা" : "Poems", search: { q: "কবিতা" } },
-    { to: "/articles", label: lang === "bn" ? "গল্প" : "Stories", search: { q: "গল্প" } },
-    { to: "/contact", label: lang === "bn" ? "যোগাযোগ" : "Contact" },
+  const menu = useMenu("header");
+
+  const fallbackLinks = [
+    { id: "home", url: "/", label_bn: "হোম", label_en: "Home" },
+    { id: "about", url: "/about", label_bn: "আমার পাতা", label_en: "About Me" },
+    { id: "contact", url: "/contact", label_bn: "যোগাযোগ", label_en: "Contact" },
   ];
+  const navLinks = (menu.data && menu.data.length > 0 ? menu.data : fallbackLinks).map((item) => ({
+    id: item.id,
+    url: item.url,
+    label: lang === "en" && item.label_en ? item.label_en : item.label_bn,
+  }));
 
   return (
     <>
@@ -55,16 +61,14 @@ export function SiteHeader() {
 
             {/* ডেস্কটপ নেভিগেশন লিংক */}
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              {navLinks.map((link, idx) => (
-                <Link
-                  key={idx}
-                  to={link.to}
-                  search={link.search as any}
+              {navLinks.map((link) => (
+                <a
+                  key={link.id}
+                  href={link.url}
                   className="text-muted-foreground transition-colors hover:text-primary"
-                  activeProps={{ className: "text-foreground font-semibold" }}
                 >
                   {link.label}
-                </Link>
+                </a>
               ))}
             </nav>
           </div>
@@ -185,16 +189,15 @@ export function SiteHeader() {
         {/* মোবাইল ড্রপডাউন মেনু */}
         {mobileMenuOpen && (
           <div className="md:hidden border-b border-border bg-background/95 backdrop-blur-md px-4 py-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
-            {navLinks.map((link, idx) => (
-              <Link
-                key={idx}
-                to={link.to}
-                search={link.search as any}
+            {navLinks.map((link) => (
+              <a
+                key={link.id}
+                href={link.url}
                 onClick={() => setMobileMenuOpen(false)}
                 className="block py-2 px-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted"
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
             <div className="pt-2 border-t border-border/50">
               <Link
