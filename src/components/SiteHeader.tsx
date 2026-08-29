@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { usePrefs } from "@/lib/prefs";
+import { useMenu } from "@/lib/menu";
 import { useSession, useIsAdmin } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -60,16 +61,14 @@ export function SiteHeader() {
 
             {/* ডেস্কটপ নেভিগেশন লিংক */}
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              {navLinks.map((link, idx) => (
-                <Link
-                  key={idx}
-                  to={link.to}
-                  search={link.search as any}
+              {navLinks.map((link) => (
+                <a
+                  key={link.id}
+                  href={link.url}
                   className="text-muted-foreground transition-colors hover:text-primary"
-                  activeProps={{ className: "text-foreground font-semibold" }}
                 >
                   {link.label}
-                </Link>
+                </a>
               ))}
             </nav>
           </div>
@@ -190,16 +189,15 @@ export function SiteHeader() {
         {/* মোবাইল ড্রপডাউন মেনু */}
         {mobileMenuOpen && (
           <div className="md:hidden border-b border-border bg-background/95 backdrop-blur-md px-4 py-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
-            {navLinks.map((link, idx) => (
-              <Link
-                key={idx}
-                to={link.to}
-                search={link.search as any}
+            {navLinks.map((link) => (
+              <a
+                key={link.id}
+                href={link.url}
                 onClick={() => setMobileMenuOpen(false)}
                 className="block py-2 px-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted"
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
             <div className="pt-2 border-t border-border/50">
               <Link
