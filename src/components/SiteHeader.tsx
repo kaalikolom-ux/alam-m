@@ -30,13 +30,18 @@ export function SiteHeader() {
     await supabase.auth.signOut();
   };
 
-  const navLinks = [
-    { to: "/", label: lang === "bn" ? "হোম" : "Home" },
-    { to: "/articles", label: lang === "bn" ? "স্মৃতিকথা" : "Memories", search: { q: "স্মৃতিকথা" } },
-    { to: "/articles", label: lang === "bn" ? "কবিতা" : "Poems", search: { q: "কবিতা" } },
-    { to: "/articles", label: lang === "bn" ? "গল্প" : "Stories", search: { q: "গল্প" } },
-    { to: "/contact", label: lang === "bn" ? "যোগাযোগ" : "Contact" },
+  const menu = useMenu("header");
+
+  const fallbackLinks = [
+    { id: "home", url: "/", label_bn: "হোম", label_en: "Home" },
+    { id: "about", url: "/about", label_bn: "আমার পাতা", label_en: "About Me" },
+    { id: "contact", url: "/contact", label_bn: "যোগাযোগ", label_en: "Contact" },
   ];
+  const navLinks = (menu.data && menu.data.length > 0 ? menu.data : fallbackLinks).map((item) => ({
+    id: item.id,
+    url: item.url,
+    label: lang === "en" && item.label_en ? item.label_en : item.label_bn,
+  }));
 
   return (
     <>
