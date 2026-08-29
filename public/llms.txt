@@ -1,0 +1,21 @@
+# Alam M (আলম) — শব্দ আমার ক্যানভাস
+
+> Alam M is a Bengali writer, essayist, and story seeker crafting evocative Bengali prose, poetry, and memoirs.
+
+Alam M (https://a.wooniche.com/) is a personal literary website celebrating the nuances of the Bengali language through short stories, poetry, nostalgic memoirs, and philosophical reflections.
+
+## Core Navigation & Pages
+- [Home](https://a.wooniche.com/): Official homepage featuring author intro, highlighted stories, latest articles, and newsletter.
+- [About Me (আমার পাতা)](https://a.wooniche.com/about): The author's literary profile, reflections on writing, philosophy, and personal memoirs.
+- [All Articles (লেখালেখি)](https://a.wooniche.com/articles): Complete categorized collection of stories, poems, and essays with search and filter.
+- [Contact (যোগাযোগ)](https://a.wooniche.com/contact): Direct contact form and email access to author Alam M.
+- [Bookmarks (বুকমার্ক সমূহ)](https://a.wooniche.com/bookmarks): User's saved favorite articles and reading list.
+- [Sitemap](https://a.wooniche.com/sitemap.xml): Dynamic XML sitemap listing all published articles and pages.
+
+## Literary Categories
+- [Stories (গল্প)](https://a.wooniche.com/articles?q=গল্প): Narrative short stories capturing everyday human experiences.
+- [Poems (কবিতা)](https://a.wooniche.com/articles?q=কবিতা): Lyrical Bengali poetry and contemplative rhythmic verses.
+- [Memories (স্মৃতিকথা)](https://a.wooniche.com/articles?q=স্মৃতিকথা): Nostalgic reflections and autobiographical essays.
+
+## Full AI Context
+- [Full LLMs Context (llms-full.txt)](https://a.wooniche.com/llms-full.txt): Comprehensive multi-page content summary for AI systems and research agents.

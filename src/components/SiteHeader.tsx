@@ -106,6 +106,7 @@ export function SiteHeader() {
             {/* ডেস্কটপ সার্চ বাটন (ইনপুট স্টাইল) */}
             <button
               onClick={() => setSearchOpen(true)}
+              aria-label={lang === "bn" ? "খুঁজুন (Ctrl+K)" : "Search (Ctrl+K)"}
               className="hidden md:inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground hover:border-primary/40 hover:text-foreground transition-all shadow-sm"
               title="খুঁজুন (Ctrl+K)"
             >
@@ -120,6 +121,7 @@ export function SiteHeader() {
             <Button
               variant="ghost"
               size="icon"
+              aria-label={lang === "bn" ? "অনুসন্ধান করুন" : "Search"}
               className="md:hidden size-9 rounded-full text-foreground/80 hover:text-primary"
               onClick={() => setSearchOpen(true)}
               title="খুঁজুন"
@@ -131,6 +133,7 @@ export function SiteHeader() {
             <Button
               variant="ghost"
               size="icon"
+              aria-label={lang === "bn" ? "Switch to English" : "বাংলায় পরিবর্তন করুন"}
               onClick={toggleLang}
               className="size-9 rounded-full text-foreground/80 hover:text-primary"
               title={lang === "bn" ? "Switch to English" : "বাংলায় পরিবর্তন করুন"}
@@ -142,6 +145,7 @@ export function SiteHeader() {
             <Button
               variant="ghost"
               size="icon"
+              aria-label={theme === "dark" ? "লাইট মোড চালু করুন" : "ডার্ক মোড চালু করুন"}
               onClick={toggleTheme}
               className="size-9 rounded-full text-foreground/80 hover:text-primary"
               title="থিম পরিবর্তন"
@@ -154,10 +158,11 @@ export function SiteHeader() {
               asChild
               variant="ghost"
               size="icon"
+              aria-label={lang === "bn" ? "বুকমার্ক সমূহ" : "Saved Bookmarks"}
               className="hidden sm:inline-flex size-9 rounded-full text-foreground/80 hover:text-primary"
               title="বুকমার্ক সমূহ"
             >
-              <Link to="/bookmarks">
+              <Link to="/bookmarks" aria-label={lang === "bn" ? "বুকমার্ক সমূহ" : "Saved Bookmarks"}>
                 <Bookmark className="size-4" />
               </Link>
             </Button>
@@ -168,10 +173,11 @@ export function SiteHeader() {
                 asChild
                 variant="outline"
                 size="icon"
+                aria-label="অ্যাডমিন ড্যাশবোর্ড"
                 className="size-9 rounded-full border-primary/40 text-primary hover:bg-primary/10"
                 title="অ্যাডমিন ড্যাশবোর্ড"
               >
-                <Link to="/admin">
+                <Link to="/admin" aria-label="অ্যাডমিন ড্যাশবোর্ড">
                   <Shield className="size-4" />
                 </Link>
               </Button>
@@ -182,6 +188,7 @@ export function SiteHeader() {
               <Button
                 variant="ghost"
                 size="icon"
+                aria-label={lang === "bn" ? "লগআউট" : "Log out"}
                 onClick={handleSignOut}
                 className="size-9 rounded-full text-destructive hover:bg-destructive/10"
                 title="লগআউট"
@@ -193,10 +200,11 @@ export function SiteHeader() {
                 asChild
                 variant="ghost"
                 size="icon"
+                aria-label={lang === "bn" ? "লগইন" : "Log in"}
                 className="size-9 rounded-full text-foreground/80 hover:text-primary"
                 title="লগইন"
               >
-                <Link to="/auth">
+                <Link to="/auth" aria-label={lang === "bn" ? "লগইন" : "Log in"}>
                   <User className="size-4" />
                 </Link>
               </Button>
@@ -206,6 +214,7 @@ export function SiteHeader() {
             <Button
               variant="ghost"
               size="icon"
+              aria-label={mobileMenuOpen ? (lang === "bn" ? "মেনু বন্ধ করুন" : "Close menu") : (lang === "bn" ? "মেনু খুলুন" : "Open menu")}
               className="md:hidden size-9 rounded-full text-foreground/80 hover:text-primary ml-0.5"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >

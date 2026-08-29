@@ -92,7 +92,9 @@ export function GlobalSearchDialog({ open, onOpenChange }: GlobalSearchDialogPro
           />
           {searchTerm && (
             <button
+              type="button"
               onClick={() => setSearchTerm("")}
+              aria-label={lang === "bn" ? "অনুসন্ধান মুছুন" : "Clear search"}
               className="p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted"
             >
               <X className="size-4" />

@@ -77,6 +77,69 @@ export default {
       });
     }
 
+    // Dynamic llms.txt endpoint
+    if (url.pathname === "/llms.txt") {
+      const llmsContent = `# Alam M (আলম) — শব্দ আমার ক্যানভাস
+
+> Alam M is a Bengali writer, essayist, and story seeker crafting evocative Bengali prose, poetry, and memoirs.
+
+Alam M (${url.origin}/) is a personal literary website celebrating the nuances of the Bengali language through short stories, poetry, nostalgic memoirs, and philosophical reflections.
+
+## Core Navigation & Pages
+- [Home](${url.origin}/): Official homepage featuring author intro, highlighted stories, latest articles, and newsletter.
+- [About Me (আমার পাতা)](${url.origin}/about): The author's literary profile, reflections on writing, philosophy, and personal memoirs.
+- [All Articles (লেখালেখি)](${url.origin}/articles): Complete categorized collection of stories, poems, and essays with search and filter.
+- [Contact (যোগাযোগ)](${url.origin}/contact): Direct contact form and email access to author Alam M.
+- [Bookmarks (বুকমার্ক সমূহ)](${url.origin}/bookmarks): User's saved favorite articles and reading list.
+- [Sitemap](${url.origin}/sitemap.xml): Dynamic XML sitemap listing all published articles and pages.
+
+## Literary Categories
+- [Stories (গল্প)](${url.origin}/articles?q=গল্প): Narrative short stories capturing everyday human experiences.
+- [Poems (কবিতা)](${url.origin}/articles?q=কবিতা): Lyrical Bengali poetry and contemplative rhythmic verses.
+- [Memories (স্মৃতিকথা)](${url.origin}/articles?q=স্মৃতিকথা): Nostalgic reflections and autobiographical essays.
+
+## Full AI Context
+- [Full LLMs Context (llms-full.txt)](${url.origin}/llms-full.txt): Comprehensive multi-page content summary for AI systems and research agents.
+`;
+      return new Response(llmsContent, {
+        status: 200,
+        headers: {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "public, max-age=86400",
+        },
+      });
+    }
+
+    // Dynamic llms-full.txt endpoint
+    if (url.pathname === "/llms-full.txt") {
+      const llmsFullContent = `# Alam M (আলম) — Comprehensive AI Context & Literary Corpus
+
+> Official literary archive and context document for AI agents, research crawlers, and large language models.
+
+Website: ${url.origin}/
+Author: Alam M
+Language: Bengali (বাংলা) & English
+Genre: Literary Prose, Short Stories, Poetry, Memoirs, Essays
+
+## Author Bio & Philosophy
+Alam M is a Bengali writer and storyteller who views words as a living canvas. Writing from personal introspection, Alam seeks the quiet poetry hidden in daily life—from the steam rising at roadside tea stalls to the flutter of birds returning at dusk.
+
+## Core Sections & Links
+- [Homepage](${url.origin}/): Primary portal with featured articles, category badges, and quick search.
+- [About Author (আমার পাতা)](${url.origin}/about): Complete author statement, philosophy, and literary journey.
+- [Articles Feed (লেখালেখি)](${url.origin}/articles): Searchable archive of all writings.
+- [Contact Portal (যোগাযোগ)](${url.origin}/contact): Author correspondence channel.
+- [Sitemap](${url.origin}/sitemap.xml): Machine-readable XML sitemap.
+`;
+      return new Response(llmsFullContent, {
+        status: 200,
+        headers: {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "public, max-age=86400",
+        },
+      });
+    }
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

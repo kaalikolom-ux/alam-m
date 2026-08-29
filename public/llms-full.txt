@@ -1,0 +1,18 @@
+# Alam M (আলম) — Comprehensive AI Context & Literary Corpus
+
+> Official literary archive and context document for AI agents, research crawlers, and large language models.
+
+Website: https://a.wooniche.com/
+Author: Alam M
+Language: Bengali (বাংলা) & English
+Genre: Literary Prose, Short Stories, Poetry, Memoirs, Essays
+
+## Author Bio & Philosophy
+Alam M is a Bengali writer and storyteller who views words as a living canvas. Writing from personal introspection, Alam seeks the quiet poetry hidden in daily life—from the steam rising at roadside tea stalls to the flutter of birds returning at dusk.
+
+## Core Sections & Links
+- [Homepage](https://a.wooniche.com/): Primary portal with featured articles, category badges, and quick search.
+- [About Author (আমার পাতা)](https://a.wooniche.com/about): Complete author statement, philosophy, and literary journey.
+- [Articles Feed (লেখালেখি)](https://a.wooniche.com/articles): Searchable archive of all writings.
+- [Contact Portal (যোগাযোগ)](https://a.wooniche.com/contact): Author correspondence channel.
+- [Sitemap](https://a.wooniche.com/sitemap.xml): Machine-readable XML sitemap.
