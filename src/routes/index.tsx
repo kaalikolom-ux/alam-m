@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, FileText, Sparkles, Image as ImageIcon } from "lucide-react";
-import { useEffect, useState, memo, useRef } from "react";
+import { useEffect, useState, memo } from "react";
 
 import { usePrefs } from "@/lib/prefs";
 import { useIsAdmin } from "@/lib/auth";
@@ -34,72 +34,8 @@ function getAutoExcerpt(content?: string | null, maxLength = 140) {
   return plainText.length > maxLength ? `${plainText.slice(0, maxLength)}...` : plainText;
 }
 
-// হিরো সেকশনের রেসপনসিভ ব্যাকগ্রাউন্ড ইমেজ ও সিনেমেটিক ওভারলে (ডেস্কটপ, অ্যান্ড্রয়েড, আইওএস)
+// হিরো সেকশনের রেসপনসিভ ব্যাকগ্রাউন্ড ইমেজ ও থিম কালার সিনেমেটিক ওভারলে (ডেস্কটপ, অ্যান্ড্রয়েড, আইওএস)
 const HeroImageBackground = memo(function HeroImageBackground() {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animId: number;
-    let w = (canvas.width = canvas.offsetWidth);
-    let h = (canvas.height = canvas.offsetHeight);
-
-    const onResize = () => {
-      if (!canvas) return;
-      w = canvas.width = canvas.offsetWidth;
-      h = canvas.height = canvas.offsetHeight;
-    };
-    window.addEventListener("resize", onResize);
-
-    const droplets = Array.from({ length: 45 }).map(() => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      r: Math.random() * 2.2 + 0.8,
-      stretch: Math.random() * 1.5 + 1,
-      angle: (Math.random() - 0.5) * 0.3,
-      alpha: Math.random() * 0.35 + 0.1,
-      speedY: Math.random() * 0.06 + 0.02,
-    }));
-
-    const draw = () => {
-      ctx.clearRect(0, 0, w, h);
-
-      for (let i = 0; i < droplets.length; i++) {
-        const d = droplets[i];
-        if (!d) continue;
-        d.y += d.speedY;
-        if (d.y > h + 10) {
-          d.y = -10;
-          d.x = Math.random() * w;
-        }
-
-        ctx.save();
-        ctx.translate(d.x, d.y);
-        ctx.rotate(d.angle);
-
-        ctx.beginPath();
-        ctx.ellipse(0, 0, d.r * d.stretch, d.r, 0, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(220, 238, 255, ${d.alpha * 0.75})`;
-        ctx.fill();
-
-        ctx.restore();
-      }
-
-      animId = requestAnimationFrame(draw);
-    };
-
-    draw();
-
-    return () => {
-      window.removeEventListener("resize", onResize);
-      cancelAnimationFrame(animId);
-    };
-  }, []);
-
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden select-none bg-background transition-colors duration-500">
       {/* রেসপনসিভ ব্যাকগ্রাউন্ড ইমেজ (মোবাইল ও ডেস্কটপ ভিউপোর্টের জন্য অপ্টিমাইজড ফোকাস) */}
@@ -140,32 +76,8 @@ const HeroImageBackground = memo(function HeroImageBackground() {
         }}
       />
 
-      {/* স্তর ৪: সূক্ষ্ম ভাসমান কণা ও ড্রপলেট ক্যানভাস */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 size-full opacity-50 mix-blend-screen"
-      />
-
-      {/* স্তর ৫: নরম ভাসমান মেঘমালা */}
-      <div
-        className="absolute inset-x-[-20%] bottom-0 h-48 opacity-20 blur-2xl"
-        style={{
-          background:
-            "radial-gradient(ellipse 75% 45% at 35% 95%, var(--primary) 0%, transparent 70%), radial-gradient(ellipse 65% 55% at 75% 85%, var(--gold) 0%, transparent 65%)",
-          animation: "cloudDriftOne 20s ease-in-out infinite alternate",
-        }}
-      />
-
-      {/* স্তর ৬: নিচের সেকশনের সাথে মসৃণ ফেড ট্রানজিশন (থিম ব্যাকগ্রাউন্ডের সাথে সম্পূর্ণ একাত্ম) */}
+      {/* স্তর ৪: নিচের সেকশনের সাথে মসৃণ ফেড ট্রানজিশন (থিম ব্যাকগ্রাউন্ডের সাথে সম্পূর্ণ একাত্ম) */}
       <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-gradient-to-b from-transparent via-background/50 to-background transition-colors duration-500" />
-
-      <style>{`
-        @keyframes cloudDriftOne {
-          0% { transform: translate3d(0, 0, 0) scale(1); }
-          50% { transform: translate3d(-30px, -8px, 0) scale(1.03); }
-          100% { transform: translate3d(20px, 4px, 0) scale(0.98); }
-        }
-      `}</style>
     </div>
   );
 });
