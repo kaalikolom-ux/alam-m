@@ -34,50 +34,25 @@ function getAutoExcerpt(content?: string | null, maxLength = 140) {
   return plainText.length > maxLength ? `${plainText.slice(0, maxLength)}...` : plainText;
 }
 
-// হিরো সেকশনের রেসপনসিভ ব্যাকগ্রাউন্ড ইমেজ ও থিম কালার সিনেমেটিক ওভারলে (ডেস্কটপ, অ্যান্ড্রয়েড, আইওএস)
+// হিরো সেকশনের রেসপনসিভ ব্যাকগ্রাউন্ড ইমেজ ও প্লেইন নরমাল ওভারলে (ডেস্কটপ, অ্যান্ড্রয়েড, আইওএস)
 const HeroImageBackground = memo(function HeroImageBackground() {
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden select-none bg-background transition-colors duration-500">
-      {/* রেসপনসিভ ব্যাকগ্রাউন্ড ইমেজ (মোবাইল ও ডেস্কটপ ভিউপোর্টের জন্য অপ্টিমাইজড ফোকাস) */}
+    <div className="pointer-events-none absolute inset-0 overflow-hidden select-none bg-background">
+      {/* রেসপনসিভ ব্যাকগ্রাউন্ড ইমেজ */}
       <img
         src="/hero-image.webp"
         alt="Author typing on laptop"
         fetchPriority="high"
         loading="eager"
         decoding="async"
-        className="absolute inset-0 size-full object-cover object-[center_60%] sm:object-[center_45%] md:object-center brightness-[0.70] contrast-[1.12] saturate-[0.8] transition-transform duration-1000 ease-out will-change-transform"
+        className="absolute inset-0 size-full object-cover object-[center_60%] sm:object-[center_45%] md:object-center brightness-[0.65] contrast-[1.05]"
       />
 
-      {/* স্তর ১: থিম কালার গ্র্যাডিয়েন্ট ওভারলে (var(--gradient-hero) এবং ব্লেন্ডিং) */}
-      <div
-        className="absolute inset-0 opacity-90 transition-all duration-500"
-        style={{
-          backgroundImage: "var(--gradient-hero)",
-          mixBlendMode: "multiply",
-        }}
-      />
+      {/* প্লেইন ও নরমাল সুষম ওভারলে — সম্পূর্ণ হিরো সেকশনে সমান কভারেজ */}
+      <div className="absolute inset-0 bg-slate-950/80 dark:bg-slate-950/85 transition-colors duration-300" />
 
-      {/* স্তর ২: রেসপনসিভ ভিগনেট ও ডেপথ ওভারলে (থিম ব্যাকগ্রাউন্ডের সাথে সমন্বিত) */}
-      <div
-        className="absolute inset-0 transition-all duration-500"
-        style={{
-          background: `
-            linear-gradient(180deg, rgba(8, 15, 25, 0.85) 0%, rgba(12, 22, 36, 0.65) 40%, rgba(6, 12, 20, 0.92) 100%),
-            radial-gradient(ellipse 90% 70% at 50% 35%, transparent 0%, var(--background) 95%)
-          `,
-        }}
-      />
-
-      {/* স্তর ৩: থিমের গোল্ড ও প্রাইমারি রঙের কেন্দ্রীয় নরম স্পটলাইট আভা */}
-      <div
-        className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[600px] h-[260px] sm:h-[360px] rounded-full opacity-25 blur-3xl pointer-events-none transition-all duration-500"
-        style={{
-          background: "radial-gradient(circle, var(--gold) 0%, var(--primary) 50%, transparent 80%)",
-        }}
-      />
-
-      {/* স্তর ৪: নিচের সেকশনের সাথে মসৃণ ফেড ট্রানজিশন (থিম ব্যাকগ্রাউন্ডের সাথে সম্পূর্ণ একাত্ম) */}
-      <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-gradient-to-b from-transparent via-background/50 to-background transition-colors duration-500" />
+      {/* নিচের সেকশনের সাথে মসৃণ ফেড ট্রানজিশন */}
+      <div className="absolute inset-x-0 bottom-0 h-20 sm:h-28 bg-gradient-to-b from-transparent to-background transition-colors duration-300" />
     </div>
   );
 });
