@@ -101,7 +101,7 @@ const HeroImageBackground = memo(function HeroImageBackground() {
   }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden select-none bg-[#09111b]">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden select-none bg-background transition-colors duration-500">
       {/* রেসপনসিভ ব্যাকগ্রাউন্ড ইমেজ (মোবাইল ও ডেস্কটপ ভিউপোর্টের জন্য অপ্টিমাইজড ফোকাস) */}
       <img
         src="/hero-image.webp"
@@ -109,46 +109,55 @@ const HeroImageBackground = memo(function HeroImageBackground() {
         fetchPriority="high"
         loading="eager"
         decoding="async"
-        className="absolute inset-0 size-full object-cover object-[center_60%] sm:object-[center_45%] md:object-center brightness-[0.72] contrast-[1.08] saturate-[0.85] transition-transform duration-1000 ease-out will-change-transform"
+        className="absolute inset-0 size-full object-cover object-[center_60%] sm:object-[center_45%] md:object-center brightness-[0.70] contrast-[1.12] saturate-[0.8] transition-transform duration-1000 ease-out will-change-transform"
       />
 
-      {/* স্তর ১: ডার্ক স্লেট ও সিনেমেটিক ভিগনেট ওভারলে */}
+      {/* স্তর ১: থিম কালার গ্র্যাডিয়েন্ট ওভারলে (var(--gradient-hero) এবং ব্লেন্ডিং) */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 opacity-90 transition-all duration-500"
+        style={{
+          backgroundImage: "var(--gradient-hero)",
+          mixBlendMode: "multiply",
+        }}
+      />
+
+      {/* স্তর ২: রেসপনসিভ ভিগনেট ও ডেপথ ওভারলে (থিম ব্যাকগ্রাউন্ডের সাথে সমন্বিত) */}
+      <div
+        className="absolute inset-0 transition-all duration-500"
         style={{
           background: `
-            linear-gradient(180deg, rgba(8, 15, 25, 0.88) 0%, rgba(12, 22, 36, 0.72) 40%, rgba(6, 12, 20, 0.94) 100%),
-            radial-gradient(ellipse 90% 70% at 50% 35%, rgba(14, 25, 42, 0.45) 0%, rgba(5, 9, 15, 0.88) 100%)
+            linear-gradient(180deg, rgba(8, 15, 25, 0.85) 0%, rgba(12, 22, 36, 0.65) 40%, rgba(6, 12, 20, 0.92) 100%),
+            radial-gradient(ellipse 90% 70% at 50% 35%, transparent 0%, var(--background) 95%)
           `,
         }}
       />
 
-      {/* স্তর ২: লেখাগুলোকে স্পষ্ট করতে কেন্দ্রীয় নরম গোল্ডেন ও অজুর আভা */}
+      {/* স্তর ৩: থিমের গোল্ড ও প্রাইমারি রঙের কেন্দ্রীয় নরম স্পটলাইট আভা */}
       <div
-        className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[600px] h-[260px] sm:h-[360px] rounded-full opacity-20 blur-3xl pointer-events-none"
+        className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[340px] sm:w-[600px] h-[260px] sm:h-[360px] rounded-full opacity-25 blur-3xl pointer-events-none transition-all duration-500"
         style={{
-          background: "radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, rgba(56, 114, 180, 0.25) 60%, transparent 80%)",
+          background: "radial-gradient(circle, var(--gold) 0%, var(--primary) 50%, transparent 80%)",
         }}
       />
 
-      {/* স্তর ৩: সূক্ষ্ম ভাসমান কণা ও ড্রপলেট ক্যানভাস */}
+      {/* স্তর ৪: সূক্ষ্ম ভাসমান কণা ও ড্রপলেট ক্যানভাস */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 size-full opacity-60 mix-blend-screen"
+        className="absolute inset-0 size-full opacity-50 mix-blend-screen"
       />
 
-      {/* স্তর ৪: নরম ভাসমান মেঘমালা */}
+      {/* স্তর ৫: নরম ভাসমান মেঘমালা */}
       <div
-        className="absolute inset-x-[-20%] bottom-0 h-48 opacity-25 blur-2xl"
+        className="absolute inset-x-[-20%] bottom-0 h-48 opacity-20 blur-2xl"
         style={{
           background:
-            "radial-gradient(ellipse 75% 45% at 35% 95%, rgba(255, 255, 255, 0.3), transparent 70%), radial-gradient(ellipse 65% 55% at 75% 85%, rgba(195, 220, 240, 0.2), transparent 65%)",
+            "radial-gradient(ellipse 75% 45% at 35% 95%, var(--primary) 0%, transparent 70%), radial-gradient(ellipse 65% 55% at 75% 85%, var(--gold) 0%, transparent 65%)",
           animation: "cloudDriftOne 20s ease-in-out infinite alternate",
         }}
       />
 
-      {/* স্তর ৫: নিচের সেকশনের সাথে মসৃণ ফেড ট্রানজিশন */}
-      <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-gradient-to-b from-transparent via-background/40 to-background" />
+      {/* স্তর ৬: নিচের সেকশনের সাথে মসৃণ ফেড ট্রানজিশন (থিম ব্যাকগ্রাউন্ডের সাথে সম্পূর্ণ একাত্ম) */}
+      <div className="absolute inset-x-0 bottom-0 h-28 sm:h-36 bg-gradient-to-b from-transparent via-background/50 to-background transition-colors duration-500" />
 
       <style>{`
         @keyframes cloudDriftOne {
