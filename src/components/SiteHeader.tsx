@@ -35,10 +35,26 @@ export function SiteHeader() {
 
   const fallbackLinks = [
     { id: "home", url: "/", label_bn: "হোম", label_en: "Home" },
+    { id: "articles", url: "/articles", label_bn: "লেখালেখি", label_en: "Articles" },
     { id: "about", url: "/about", label_bn: "আমার পাতা", label_en: "About Me" },
     { id: "contact", url: "/contact", label_bn: "যোগাযোগ", label_en: "Contact" },
   ];
-  const navLinks = (menu.data && menu.data.length > 0 ? menu.data : fallbackLinks).map((item) => ({
+
+  const dbLinks = menu.data || [];
+  let baseItems = dbLinks.length > 0 ? [...dbLinks] : fallbackLinks;
+
+  // Make sure '/about' is always in the header menu
+  if (dbLinks.length > 0 && !baseItems.some((item) => item.url === "/about" || item.url?.includes("about"))) {
+    const contactIdx = baseItems.findIndex((item) => item.url === "/contact" || item.url?.includes("contact"));
+    const aboutItem = { id: "about", url: "/about", label_bn: "আমার পাতা", label_en: "About Me" };
+    if (contactIdx !== -1) {
+      baseItems.splice(contactIdx, 0, aboutItem);
+    } else {
+      baseItems.push(aboutItem);
+    }
+  }
+
+  const navLinks = baseItems.map((item) => ({
     id: item.id,
     url: item.url,
     label: lang === "en" && item.label_en ? item.label_en : item.label_bn,
@@ -61,15 +77,27 @@ export function SiteHeader() {
 
             {/* ডেস্কটপ নেভিগেশন লিংক */}
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              {navLinks.map((link) => (
-                <a
-                  key={link.id}
-                  href={link.url}
-                  className="text-muted-foreground transition-colors hover:text-primary"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {navLinks.map((link) => {
+                const isInternal = link.url.startsWith("/");
+                return isInternal ? (
+                  <Link
+                    key={link.id}
+                    to={link.url}
+                    className="text-muted-foreground transition-colors hover:text-primary"
+                    activeProps={{ className: "text-primary font-semibold" }}
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.id}
+                    href={link.url}
+                    className="text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    {link.label}
+                  </a>
+                );
+              })}
             </nav>
           </div>
 
@@ -189,16 +217,29 @@ export function SiteHeader() {
         {/* মোবাইল ড্রপডাউন মেনু */}
         {mobileMenuOpen && (
           <div className="md:hidden border-b border-border bg-background/95 backdrop-blur-md px-4 py-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
-            {navLinks.map((link) => (
-              <a
-                key={link.id}
-                href={link.url}
-                onClick={() => setMobileMenuOpen(false)}
-                className="block py-2 px-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isInternal = link.url.startsWith("/");
+              return isInternal ? (
+                <Link
+                  key={link.id}
+                  to={link.url}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block py-2 px-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted"
+                  activeProps={{ className: "bg-muted text-primary font-semibold" }}
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.id}
+                  href={link.url}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block py-2 px-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted"
+                >
+                  {link.label}
+                </a>
+              );
+            })}
             <div className="pt-2 border-t border-border/50">
               <Link
                 to="/bookmarks"
