@@ -54,7 +54,50 @@ const translations: Record<string, Record<Lang, string>> = {
   newsletterSub: { bn: "নতুন লেখার নোটিফিকেশন সরাসরি পেতে ইমেইল দিয়ে সাবস্ক্রাইব করুন।", en: "Subscribe with your email to get latest posts directly." },
   tagline: { bn: "সাহিত্য ও চিন্তন", en: "Literature & Thoughts" },
   
-  // ক্যাটাগরি ফর্মের মিসিং অনুবাদ
+  // যোগাযোগ ও ফরমের অনুবাদ
+  pageNotFound: { bn: "পাতাটি পাওয়া যায়নি", en: "Page Not Found" },
+  yourName: { bn: "আপনার নাম", en: "Your Name" },
+  email: { bn: "ইমেইল", en: "Email" },
+  subject: { bn: "বিষয়", en: "Subject" },
+  message: { bn: "বার্তা / বক্তব্য", en: "Message" },
+  sendMessage: { bn: "বার্তা পাঠান", en: "Send Message" },
+  messageSent: { bn: "আপনার বার্তাটি সফলভাবে পাঠানো হয়েছে!", en: "Your message has been sent successfully!" },
+
+  // বুকমার্ক
+  myBookmarks: { bn: "আমার বুকমার্কসমূহ", en: "My Bookmarks" },
+  emptyBookmarks: { bn: "কোনো বুকমার্ক সংরক্ষিত নেই।", en: "No bookmarks saved." },
+  bookmark: { bn: "বুকমার্ক", en: "Bookmark" },
+  bookmarked: { bn: "বুকমার্ক করা হয়েছে", en: "Bookmarked" },
+  removeBookmark: { bn: "বুকমার্ক মুছুন", en: "Remove Bookmark" },
+  article: { bn: "লেখা", en: "Article" },
+  error: { bn: "ত্রুটি ঘটেছে!", en: "An error occurred!" },
+
+  // প্রমাণীকরণ ও লগইন
+  backToSignIn: { bn: "লগইনে ফিরে যান", en: "Back to Sign In" },
+  createAccount: { bn: "অ্যাকাউন্ট তৈরি করুন", en: "Create Account" },
+  haveAccount: { bn: "ইতিমধ্যে অ্যাকাউন্ট আছে? লগইন করুন", en: "Already have an account? Sign In" },
+  noAccount: { bn: "অ্যাকাউন্ট নেই? তৈরি করুন", en: "Don't have an account? Create one" },
+  forgotPassword: { bn: "পাসওয়ার্ড ভুলে গেছেন?", en: "Forgot Password?" },
+  sendResetLink: { bn: "রিসেট লিংক পাঠান", en: "Send Reset Link" },
+  resetSent: { bn: "পাসওয়ার্ড রিসেট লিংক আপনার ইমেইলে পাঠানো হয়েছে!", en: "Password reset link sent to your email!" },
+  resetPassword: { bn: "পাসওয়ার্ড রিসেট", en: "Reset Password" },
+  newPassword: { bn: "নতুন পাসওয়ার্ড", en: "New Password" },
+  updatePassword: { bn: "পাসওয়ার্ড পরিবর্তন করুন", en: "Update Password" },
+  passwordUpdated: { bn: "পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!", en: "Password updated successfully!" },
+  password: { bn: "পাসওয়ার্ড", en: "Password" },
+  signInPrompt: { bn: "লগইন করতে আপনার তথ্য দিন", en: "Enter your credentials to sign in" },
+
+  // পেইজ ও লেখক
+  newPage: { bn: "নতুন পাতা", en: "New Page" },
+  noMessages: { bn: "কোনো বার্তা নেই", en: "No messages" },
+  newAuthor: { bn: "নতুন লেখক", en: "New Author" },
+  authorNameBn: { bn: "লেখকের নাম (বাংলা)", en: "Author Name (Bengali)" },
+  authorNameEn: { bn: "লেখকের নাম (ইংরেজি)", en: "Author Name (English)" },
+  authorImage: { bn: "লেখকের ছবি (URL)", en: "Author Image (URL)" },
+  authorBioBn: { bn: "পরিচিতি (বাংলা)", en: "Bio (Bengali)" },
+  authorBioEn: { bn: "পরিচিতি (ইংরেজি)", en: "Bio (English)" },
+
+  // ক্যাটাগরি ফর্মের অনুবাদ
   newCategory: { bn: "নতুন ক্যাটাগরি", en: "New Category" },
   nameBn: { bn: "নাম (বাংলা)", en: "Name (Bengali)" },
   nameEn: { bn: "নাম (ইংরেজি)", en: "Name (English)" },

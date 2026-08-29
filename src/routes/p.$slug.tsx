@@ -18,5 +18,5 @@ export const Route = createFileRoute("/p/$slug")({
 
 function CustomPage() {
   const { slug } = Route.useParams();
-  return <PageBody slug={slug} fallbackTitle={slug} />;
+  return <PageBody slug={slug} fallbackTitle={slug} showNotFound={true} />;
 }

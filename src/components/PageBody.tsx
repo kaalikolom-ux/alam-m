@@ -19,7 +19,15 @@ export function usePage(slug: string) {
   });
 }
 
-export function PageBody({ slug, fallbackTitle }: { slug: string; fallbackTitle: string }) {
+export function PageBody({
+  slug,
+  fallbackTitle,
+  showNotFound = false,
+}: {
+  slug: string;
+  fallbackTitle: string;
+  showNotFound?: boolean;
+}) {
   const { t, lang } = usePrefs();
   const page = usePage(slug);
 
@@ -28,7 +36,7 @@ export function PageBody({ slug, fallbackTitle }: { slug: string; fallbackTitle:
   const content = lang === "en" ? page.data?.content_en || page.data?.content_bn : page.data?.content_bn;
 
   return (
-    <article className="mx-auto w-full max-w-3xl px-4 py-12 sm:py-16">
+    <article className="mx-auto w-full max-w-3xl px-4 py-8 sm:py-12">
       <h1 className="text-center text-3xl font-semibold sm:text-4xl">{title}</h1>
       {page.data?.cover_image_url && (
         <img
@@ -38,9 +46,9 @@ export function PageBody({ slug, fallbackTitle }: { slug: string; fallbackTitle:
           className="mt-8 w-full rounded-xl border border-border/70 object-cover"
         />
       )}
-      {page.isLoading && <p className="mt-8 text-sm text-muted-foreground">{t("loading")}</p>}
-      {!page.isLoading && !page.data && (
-        <p className="mt-8 text-center text-sm text-muted-foreground">{t("pageNotFound")}</p>
+      {page.isLoading && <p className="mt-6 text-center text-sm text-muted-foreground">{t("loading")}</p>}
+      {!page.isLoading && !page.data && showNotFound && (
+        <p className="mt-6 text-center text-sm text-muted-foreground">{t("pageNotFound")}</p>
       )}
       {content && (
         <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground/85">
