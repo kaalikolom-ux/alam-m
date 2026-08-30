@@ -11,6 +11,7 @@ import { useIsAdmin } from "@/lib/auth";
 export const Route = createFileRoute("/articles/")({
   validateSearch: (search: Record<string, unknown>) => ({
     q: typeof search["q"] === "string" ? (search["q"] as string) : undefined,
+    category: typeof search["category"] === "string" ? (search["category"] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -51,12 +52,25 @@ const CATEGORY_MAP: Record<string, { bn: string; en: string }> = {
   memory: { bn: "স্মৃতিকথা", en: "Memories" },
   memories: { bn: "স্মৃতিকথা", en: "Memories" },
   "স্মৃতিকথা": { bn: "স্মৃতিকথা", en: "Memories" },
+
+  status: { bn: "স্ট্যাটাস", en: "Status" },
+  "স্ট্যাটাস": { bn: "স্ট্যাটাস", en: "Status" },
+
+  khosra: { bn: "খসড়া", en: "Drafts" },
+  draft: { bn: "খসড়া", en: "Drafts" },
+  drafts: { bn: "খসড়া", en: "Drafts" },
+  "খসড়া": { bn: "খসড়া", en: "Drafts" },
+  "খসড়া": { bn: "খসড়া", en: "Drafts" },
 };
 
 function formatDisplayTitle(raw: string, lang: string): string {
   if (!raw) return lang === "bn" ? "সকল লেখা" : "All Posts";
   
-  const clean = raw.replace(/^.*\?q=/, "").replace(/^\//, "").trim();
+  let clean = raw.replace(/^.*\?q=/, "").replace(/^.*\?category=/, "").replace(/^\//, "").trim();
+  try {
+    clean = decodeURIComponent(clean);
+  } catch {}
+  
   const lower = clean.toLowerCase();
 
   if (CATEGORY_MAP[lower]) {
@@ -74,8 +88,13 @@ function ArticlesPage() {
   const { isAdmin } = useIsAdmin();
   const search = useSearch({ from: "/articles/" });
   
-  const rawQuery = search.q?.trim() || "";
-  const cleanFilter = rawQuery.replace(/^.*\?q=/, "").replace(/^\//, "").trim();
+  const rawParam = search.category || search.q || "";
+  let cleanFilter = "";
+  try {
+    cleanFilter = decodeURIComponent(rawParam).trim();
+  } catch {
+    cleanFilter = rawParam.trim();
+  }
 
   // ক্যাটাগরি তালিকা আনা (অ্যাডমিন না হলে 'খসড়া'/'draft' বাদ দেওয়া হবে)
   const categoriesQuery = useQuery({
@@ -103,7 +122,7 @@ function ArticlesPage() {
       const { data, error } = await supabase
         .from("articles")
         .select(
-          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en, slug))",
+          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, category_id, article_categories(categories(id, name_bn, name_en, slug))",
         )
         .eq("published", true)
         .order("published_at", { ascending: false });
@@ -123,28 +142,47 @@ function ArticlesPage() {
 
   const filteredArticles = cleanFilter
     ? allArticles.filter((a) => {
-        const matchesCategory = (a.article_categories ?? []).some((ac: any) => {
-          const catBn = ac.categories?.name_bn || "";
-          const catEn = ac.categories?.name_en || "";
-          const catSlug = ac.categories?.slug || "";
+        const filterLower = cleanFilter.toLowerCase();
+        const mapped = CATEGORY_MAP[filterLower] || CATEGORY_MAP[cleanFilter];
+
+        // ১. article_categories junction table
+        const inArticleCategories = (a.article_categories ?? []).some((ac: any) => {
+          const catBn = (ac.categories?.name_bn || "").toLowerCase();
+          const catEn = (ac.categories?.name_en || "").toLowerCase();
+          const catSlug = (ac.categories?.slug || "").toLowerCase();
           
-          return (
-            catBn.includes(cleanFilter) ||
-            catEn.toLowerCase().includes(cleanFilter.toLowerCase()) ||
-            catSlug.toLowerCase().includes(cleanFilter.toLowerCase()) ||
-            (() => {
-              const mapped = CATEGORY_MAP[cleanFilter.toLowerCase()];
-              if (!mapped) return false;
-              return catBn.includes(mapped.bn) || catEn.toLowerCase().includes(mapped.en.toLowerCase());
-            })()
-          );
+          if (catBn.includes(filterLower) || catEn.includes(filterLower) || catSlug.includes(filterLower)) {
+            return true;
+          }
+          if (mapped) {
+            if (catBn.includes(mapped.bn.toLowerCase()) || catEn.includes(mapped.en.toLowerCase())) {
+              return true;
+            }
+          }
+          return false;
         });
 
-        const matchesTitle =
-          a.title_bn?.includes(cleanFilter) ||
-          a.title_en?.toLowerCase().includes(cleanFilter.toLowerCase());
+        // ২. direct category_id match
+        const catObj = categoriesQuery.data?.find((c: any) => c.id === a.category_id);
+        let inDirectCategory = false;
+        if (catObj) {
+          const catBn = (catObj.name_bn || "").toLowerCase();
+          const catEn = (catObj.name_en || "").toLowerCase();
+          const catSlug = (catObj.slug || "").toLowerCase();
+          if (catBn.includes(filterLower) || catEn.includes(filterLower) || catSlug.includes(filterLower)) {
+            inDirectCategory = true;
+          }
+          if (mapped && (catBn.includes(mapped.bn.toLowerCase()) || catEn.includes(mapped.en.toLowerCase()))) {
+            inDirectCategory = true;
+          }
+        }
 
-        return matchesCategory || matchesTitle;
+        // ৩. title match
+        const matchesTitle =
+          a.title_bn?.toLowerCase().includes(filterLower) ||
+          a.title_en?.toLowerCase().includes(filterLower);
+
+        return inArticleCategories || inDirectCategory || matchesTitle;
       })
     : allArticles;
 
@@ -178,7 +216,7 @@ function ArticlesPage() {
       <div className="mt-6 flex flex-wrap items-center gap-2 border-b border-border/50 pb-6">
         <Link
           to="/articles"
-          search={{ q: undefined }}
+          search={{ q: undefined, category: undefined } as any}
           className={`inline-flex items-center rounded-lg px-3.5 py-1.5 text-xs font-medium border transition-all duration-200 ${
             !cleanFilter
               ? "border-primary/40 bg-primary/15 text-primary shadow-sm font-semibold"
@@ -189,16 +227,19 @@ function ArticlesPage() {
         </Link>
         {categoriesQuery.data?.map((cat) => {
           const name = lang === "en" && cat.name_en ? cat.name_en : cat.name_bn;
+          const slugOrEn = cat.slug || cat.name_en?.toLowerCase() || cat.name_bn;
+          const mapped = CATEGORY_MAP[cleanFilter.toLowerCase()] || CATEGORY_MAP[cleanFilter];
           const isActive =
             cleanFilter === cat.name_bn ||
             cleanFilter.toLowerCase() === cat.name_en?.toLowerCase() ||
-            cleanFilter.toLowerCase() === cat.slug?.toLowerCase();
+            cleanFilter.toLowerCase() === cat.slug?.toLowerCase() ||
+            (mapped && (mapped.bn === cat.name_bn || mapped.en.toLowerCase() === cat.name_en?.toLowerCase()));
 
           return (
             <Link
               key={cat.id}
               to="/articles"
-              search={{ q: cat.name_bn } as any}
+              search={{ q: slugOrEn } as any}
               className={`inline-flex items-center rounded-lg px-3.5 py-1.5 text-xs font-medium border transition-all duration-200 ${
                 isActive
                   ? "border-primary/40 bg-primary/15 text-primary shadow-sm font-semibold"

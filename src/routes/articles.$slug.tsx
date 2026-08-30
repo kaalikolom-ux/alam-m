@@ -55,6 +55,58 @@ interface CommentItem {
   created_at: string;
 }
 
+// ফেসবুক, হোয়াটসঅ্যাপ, ওয়ার্ড ও চ্যাটজিপিটি থেকে পেস্ট করা টেক্সট ও মার্কডাউনকে ক্লিন HTML-এ রূপান্তর
+function formatInlineText(str: string): string {
+  return str
+    // **bold** বা __bold__ -> <strong>
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/__(.*?)__/g, "<strong>$1</strong>")
+    // *italic* বা _italic_ -> <em>
+    .replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, "<em>$1</em>")
+    // [text](url) -> <a>
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary underline">$1</a>')
+    // Standalone URLs -> <a>
+    .replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, '$1<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary underline">$2</a>');
+}
+
+function sanitizeAndFormatContent(rawText: string): string {
+  if (!rawText) return "";
+
+  // ১. অদৃশ্য ক্ষতিকর চিহ্ন, জিরো-উইডথ স্পেস ও অপ্রয়োজনীয় ক্যারেক্টার ক্লিন করা
+  const text = rawText
+    .replace(/[\u200B-\u200D\uFEFF\u200E\u200F\u202A-\u202E]/g, "")
+    .replace(/\u00A0/g, " ");
+
+  // ২. প্যারাগ্রাফ ও ব্লককোট আলাদা করা
+  const rawBlocks = text.split(/\r?\n\r?\n+/);
+  const htmlBlocks: string[] = [];
+
+  for (let block of rawBlocks) {
+    block = block.trim();
+    if (!block) continue;
+
+    // ব্লককোট হ্যান্ডলিং (> "...")
+    if (block.startsWith(">")) {
+      const quoteLines = block
+        .split(/\r?\n/)
+        .map((l) => formatInlineText(l.replace(/^>\s*/, "").trim()))
+        .filter(Boolean)
+        .join("<br>");
+      htmlBlocks.push(`<blockquote><p>${quoteLines}</p></blockquote>`);
+      continue;
+    }
+
+    // সাধারণ প্যারাগ্রাফ
+    const lines = block
+      .split(/\r?\n/)
+      .map((l) => formatInlineText(l.trim()))
+      .join("<br>");
+    htmlBlocks.push(`<p>${lines}</p>`);
+  }
+
+  return htmlBlocks.join("");
+}
+
 function InlineRichEditor({
   label,
   value,
@@ -85,41 +137,89 @@ function InlineRichEditor({
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
-    const text = e.clipboardData.getData("text/plain");
-    
-    const formattedHtml = text
-      .split(/\r\n|\r|\n/)
-      .map((line) => line.trim())
-      .map((line) => (line ? `<p>${line}</p>` : `<p><br></p>`))
-      .join("");
+    const clipboardData = e.clipboardData;
+    const textData = clipboardData.getData("text/plain");
+    const htmlData = clipboardData.getData("text/html");
 
-    document.execCommand("insertHTML", false, formattedHtml);
+    if (textData && (textData.includes("**") || textData.includes(">") || textData.includes("http") || !htmlData)) {
+      const cleanHtml = sanitizeAndFormatContent(textData);
+      document.execCommand("insertHTML", false, cleanHtml);
+    } else if (htmlData) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlData, "text/html");
+
+      doc.body.querySelectorAll("*").forEach((node) => {
+        if (node instanceof HTMLElement) {
+          node.style.backgroundColor = "";
+          node.style.background = "";
+          node.style.color = "";
+          node.style.fontFamily = "";
+          node.style.fontSize = "";
+          node.style.lineHeight = "";
+          node.removeAttribute("class");
+          if (!node.getAttribute("style")?.trim()) {
+            node.removeAttribute("style");
+          }
+        }
+      });
+
+      let innerHtml = doc.body.innerHTML;
+      innerHtml = innerHtml
+        .replace(/[\u200B-\u200D\uFEFF\u200E\u200F\u202A-\u202E]/g, "")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+      document.execCommand("insertHTML", false, innerHtml);
+    }
+
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML);
     }
+  };
+
+  const handleCleanFormatting = () => {
+    if (!editorRef.current) return;
+    const currentText = editorRef.current.innerText || editorRef.current.textContent || "";
+    if (!currentText.trim()) return;
+
+    const cleaned = sanitizeAndFormatContent(currentText);
+    editorRef.current.innerHTML = cleaned;
+    onChange(cleaned);
+    toast.success("অপ্রয়োজনীয় চিহ্ন, ব্যাকগ্রাউন্ড ও ফরম্যাটিং নিখুঁতভাবে ক্লিন করা হয়েছে!");
   };
 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <Label className="text-sm font-semibold">{label}</Label>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="h-7 gap-1.5 px-2.5 text-xs font-medium"
-          onClick={() => setIsHtmlMode(!isHtmlMode)}
-        >
-          {isHtmlMode ? (
-            <>
-              <Eye className="size-3.5" /> সাধারণ ভিউ
-            </>
-          ) : (
-            <>
-              <Code className="size-3.5" /> HTML কোড ভিউ
-            </>
-          )}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-7 gap-1.5 px-2.5 text-xs text-muted-foreground hover:text-foreground"
+            onClick={handleCleanFormatting}
+            title="সব সাদা ব্যাকগ্রাউন্ড ও অপ্রয়োজনীয় চিহ্ন ক্লিন করুন"
+          >
+            <span>ফরম্যাট ক্লিন করুন</span>
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-7 gap-1.5 px-2.5 text-xs font-medium"
+            onClick={() => setIsHtmlMode(!isHtmlMode)}
+          >
+            {isHtmlMode ? (
+              <>
+                <Eye className="size-3.5" /> সাধারণ ভিউ
+              </>
+            ) : (
+              <>
+                <Code className="size-3.5" /> HTML কোড ভিউ
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-lg border border-input bg-background shadow-sm focus-within:ring-2 focus-within:ring-primary/20">
@@ -320,6 +420,33 @@ function ArticlePage() {
   });
 
   const a = article.data;
+
+  // আগের ও পরের পোস্ট লোড করা
+  const adjacentArticlesQuery = useQuery({
+    queryKey: ["adjacent-articles-alam", a?.id, a?.published_at || a?.created_at],
+    enabled: !!a?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("articles")
+        .select("id, slug, title_bn, title_en, published_at, created_at")
+        .eq("published", true)
+        .order("published_at", { ascending: false });
+
+      if (error || !data) return { prev: null, next: null };
+
+      const currentIndex = data.findIndex((item) => item.id === a?.id || item.slug === slug);
+      if (currentIndex === -1) return { prev: null, next: null };
+
+      return {
+        next: currentIndex > 0 ? data[currentIndex - 1] : null,
+        prev: currentIndex < data.length - 1 ? data[currentIndex + 1] : null,
+      };
+    },
+  });
+
+  const prevArticle = adjacentArticlesQuery.data?.prev;
+  const nextArticle = adjacentArticlesQuery.data?.next;
+
   const isDraftPost = (a?.article_categories || []).some(
     (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া"
   );
@@ -930,7 +1057,46 @@ function ArticlePage() {
         </div>
       )}
 
-      <section className="mt-12 rounded-xl border border-border bg-card/40 p-6 shadow-sm">
+      {/* আগের ও পরের প্রকাশনার ন্যাভিগেশন কার্ড বক্স */}
+      {(prevArticle || nextArticle) && (
+        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-border/60">
+          {prevArticle ? (
+            <Link
+              to="/articles/$slug"
+              params={{ slug: prevArticle.slug }}
+              className="group flex flex-col justify-between p-4 rounded-xl border border-border/80 bg-card hover:border-primary/50 hover:bg-muted/40 transition-all shadow-xs"
+            >
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1 group-hover:text-primary transition-colors">
+                <ArrowLeft className="size-3.5" />
+                <span>{lang === "bn" ? "পূর্ববর্তী প্রকাশনা" : "Previous Post"}</span>
+              </div>
+              <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                {lang === "en" && prevArticle.title_en ? prevArticle.title_en : prevArticle.title_bn}
+              </p>
+            </Link>
+          ) : (
+            <div className="hidden sm:block" />
+          )}
+
+          {nextArticle && (
+            <Link
+              to="/articles/$slug"
+              params={{ slug: nextArticle.slug }}
+              className="group flex flex-col justify-between p-4 rounded-xl border border-border/80 bg-card hover:border-primary/50 hover:bg-muted/40 transition-all shadow-xs sm:text-right"
+            >
+              <div className="flex items-center sm:justify-end gap-1.5 text-xs text-muted-foreground mb-1 group-hover:text-primary transition-colors">
+                <span>{lang === "bn" ? "পরবর্তী প্রকাশনা" : "Next Post"}</span>
+                <ArrowRight className="size-3.5" />
+              </div>
+              <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                {lang === "en" && nextArticle.title_en ? nextArticle.title_en : nextArticle.title_bn}
+              </p>
+            </Link>
+          )}
+        </div>
+      )}
+
+      <section className="mt-10 rounded-xl border border-border bg-card/40 p-6 shadow-sm">
         <div className="flex items-center gap-2 border-b border-border/40 pb-4">
           <MessageSquare className="size-5 text-primary" />
           <h2 className="text-lg font-semibold">

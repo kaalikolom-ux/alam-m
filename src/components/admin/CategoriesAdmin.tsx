@@ -88,19 +88,62 @@ export function CategoriesAdmin() {
         }}
       >
         <h2 className="font-semibold">{editingId ? t("edit") : t("newCategory")}</h2>
-        <div className="space-y-2">
-          <Label htmlFor="cat-slug">{t("slug")}</Label>
-          <Input id="cat-slug" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
-        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="cat-bn">{t("nameBn")}</Label>
-            <Input id="cat-bn" value={form.name_bn} onChange={(e) => setForm({ ...form, name_bn: e.target.value })} />
+            <Label htmlFor="cat-bn">{t("nameBn") || "ক্যাটাগরির নাম (বাংলা)"}</Label>
+            <Input
+              id="cat-bn"
+              value={form.name_bn}
+              onChange={(e) => {
+                const val = e.target.value;
+                const bnToEnMap: Record<string, string> = {
+                  "গল্প": "golpo",
+                  "কবিতা": "kobita",
+                  "স্মৃতিকথা": "smritikotha",
+                  "খসড়া": "khosra",
+                  "খসড়া": "khosra",
+                  "স্ট্যাটাস": "status",
+                  "প্রবন্ধ": "probondho",
+                  "উপন্যাস": "uponnash",
+                  "নাটক": "natok",
+                  "গান": "gan",
+                };
+                const autoSlug = bnToEnMap[val.trim()] || "";
+                setForm((prev) => ({
+                  ...prev,
+                  name_bn: val,
+                  slug: !editingId && autoSlug ? autoSlug : prev.slug,
+                }));
+              }}
+              placeholder="যেমন: গল্প, কবিতা..."
+            />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cat-en">{t("nameEn")}</Label>
-            <Input id="cat-en" value={form.name_en} onChange={(e) => setForm({ ...form, name_en: e.target.value })} />
+            <Label htmlFor="cat-en">{t("nameEn") || "ক্যাটাগরির নাম (English)"}</Label>
+            <Input
+              id="cat-en"
+              value={form.name_en}
+              onChange={(e) => {
+                const val = e.target.value;
+                const cleanSlug = val.toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-");
+                setForm((prev) => ({
+                  ...prev,
+                  name_en: val,
+                  slug: !editingId && cleanSlug ? cleanSlug : prev.slug,
+                }));
+              }}
+              placeholder="e.g. Stories, Poems..."
+            />
           </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="cat-slug">{t("slug") || "স্লাগ (URL Slug)"}</Label>
+          <Input
+            id="cat-slug"
+            value={form.slug}
+            onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") })}
+            placeholder="golpo"
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="cat-desc">{t("description")}</Label>
