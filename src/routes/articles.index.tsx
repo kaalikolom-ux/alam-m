@@ -49,6 +49,8 @@ const CATEGORY_MAP: Record<string, { bn: string; en: string }> = {
   "কবিতা": { bn: "কবিতা", en: "Poems" },
 
   smritikotha: { bn: "স্মৃতিকথা", en: "Memories" },
+  memoir: { bn: "স্মৃতিকথা", en: "Memories" },
+  memoirs: { bn: "স্মৃতিকথা", en: "Memories" },
   memory: { bn: "স্মৃতিকথা", en: "Memories" },
   memories: { bn: "স্মৃতিকথা", en: "Memories" },
   "স্মৃতিকথা": { bn: "স্মৃতিকথা", en: "Memories" },
@@ -96,22 +98,23 @@ function ArticlesPage() {
     cleanFilter = rawParam.trim();
   }
 
-  // ক্যাটাগরি তালিকা আনা (অ্যাডমিন না হলে 'খসড়া'/'draft' বাদ দেওয়া হবে)
+  // ক্যাটাগরি তালিকা আনা (সাধারণ ভিজিটরদের ক্ষেত্রে 'খসড়া'/'draft' সম্পূর্ণ লুকানো থাকবে)
   const categoriesQuery = useQuery({
     queryKey: ["all-categories-list", isAdmin],
     queryFn: async () => {
-      let query = supabase
+      const { data, error } = await supabase
         .from("categories")
         .select("id, name_bn, name_en, slug")
         .order("name_bn");
 
-      if (!isAdmin) {
-        query = query.neq("slug", "draft");
-      }
-
-      const { data, error } = await query;
       if (error) throw error;
-      return (data || []).filter((c) => isAdmin || (c.slug !== "draft" && c.name_bn !== "খসড়া"));
+      return (data || []).filter((c) => {
+        if (isAdmin) return true;
+        const slug = (c.slug || "").toLowerCase();
+        const bn = c.name_bn || "";
+        const en = (c.name_en || "").toLowerCase();
+        return slug !== "draft" && bn !== "খসড়া" && bn !== "খসড়া" && en !== "draft";
+      });
     },
   });
 
@@ -122,21 +125,24 @@ function ArticlesPage() {
       const { data, error } = await supabase
         .from("articles")
         .select(
-          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, category_id, article_categories(categories(id, name_bn, name_en, slug))",
+          "id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, published_at, cover_image_url, article_categories(categories(id, name_bn, name_en, slug))",
         )
         .eq("published", true)
         .order("published_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
   // অ্যাডমিন ছাড়া সাধারণ ভিজিটরের ক্ষেত্রে 'খসড়া' ক্যাটাগরির পোস্টগুলো সম্পূর্ণ ফিল্টার করা
   const allArticles = (articles.data ?? []).filter((a: any) => {
     if (isAdmin) return true;
-    const hasDraftCategory = (a.article_categories ?? []).some(
-      (ac: any) => ac.categories?.slug === "draft" || ac.categories?.name_bn === "খসড়া"
-    );
+    const hasDraftCategory = (a.article_categories ?? []).some((ac: any) => {
+      const slug = (ac.categories?.slug || "").toLowerCase();
+      const bn = ac.categories?.name_bn || "";
+      const en = (ac.categories?.name_en || "").toLowerCase();
+      return slug === "draft" || bn === "খসড়া" || bn === "খসড়া" || en === "draft";
+    });
     return !hasDraftCategory;
   });
 
@@ -162,27 +168,14 @@ function ArticlesPage() {
           return false;
         });
 
-        // ২. direct category_id match
-        const catObj = categoriesQuery.data?.find((c: any) => c.id === a.category_id);
-        let inDirectCategory = false;
-        if (catObj) {
-          const catBn = (catObj.name_bn || "").toLowerCase();
-          const catEn = (catObj.name_en || "").toLowerCase();
-          const catSlug = (catObj.slug || "").toLowerCase();
-          if (catBn.includes(filterLower) || catEn.includes(filterLower) || catSlug.includes(filterLower)) {
-            inDirectCategory = true;
-          }
-          if (mapped && (catBn.includes(mapped.bn.toLowerCase()) || catEn.includes(mapped.en.toLowerCase()))) {
-            inDirectCategory = true;
-          }
-        }
+        // ২. title / excerpt match
+        const matchesTitleOrExcerpt =
+          (a.title_bn || "").toLowerCase().includes(filterLower) ||
+          (a.title_en || "").toLowerCase().includes(filterLower) ||
+          (a.excerpt_bn || "").toLowerCase().includes(filterLower) ||
+          (a.excerpt_en || "").toLowerCase().includes(filterLower);
 
-        // ৩. title match
-        const matchesTitle =
-          a.title_bn?.toLowerCase().includes(filterLower) ||
-          a.title_en?.toLowerCase().includes(filterLower);
-
-        return inArticleCategories || inDirectCategory || matchesTitle;
+        return inArticleCategories || matchesTitleOrExcerpt;
       })
     : allArticles;
 
@@ -297,7 +290,13 @@ function ArticlesPage() {
               <div className="flex min-w-0 flex-1 flex-col p-5">
                 <div className="mb-2.5 flex flex-wrap items-center gap-2">
                   {a.article_categories
-                    ?.filter((ac: any) => isAdmin || (ac.categories?.slug !== "draft" && ac.categories?.name_bn !== "খসড়া"))
+                    ?.filter((ac: any) => {
+                      if (isAdmin) return true;
+                      const slug = (ac.categories?.slug || "").toLowerCase();
+                      const bn = ac.categories?.name_bn || "";
+                      const en = (ac.categories?.name_en || "").toLowerCase();
+                      return slug !== "draft" && bn !== "খসড়া" && bn !== "খসড়া" && en !== "draft";
+                    })
                     .map(
                       (ac: any) =>
                         ac.categories && (

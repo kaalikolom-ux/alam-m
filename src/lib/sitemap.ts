@@ -7,7 +7,7 @@ export async function generateSitemapXml(origin: string): Promise<string> {
   const { data: articles } = await supabase
     .from("articles")
     .select("slug, updated_at, published_at")
-    .eq("status", "published")
+    .eq("published", true)
     .order("updated_at", { ascending: false });
 
   // Fetch all categories
