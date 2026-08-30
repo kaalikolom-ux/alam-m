@@ -38,6 +38,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { formatArticleContent } from "@/lib/contentFormatter";
 import {
   AntiSpamCaptcha,
   generateMathCaptcha,
@@ -807,21 +808,11 @@ function ArticlePage() {
         />
       )}
 
-      <div className="prose-reader mt-8 text-base leading-relaxed text-foreground">
-        {isHtml ? (
-          <div
-            dangerouslySetInnerHTML={{ __html: content || "" }}
-            className="[&_p]:mb-4 [&_p:empty]:h-4 [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:my-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"
-          />
-        ) : (
-          <div>
-            {(content ?? "").split(/\n{2,}/).map((para, i) => (
-              <p key={i} className="mb-4 whitespace-pre-line last:mb-0">
-                {para}
-              </p>
-            ))}
-          </div>
-        )}
+      <div className="prose-reader mt-8 text-base leading-relaxed text-foreground font-serif">
+        <div
+          dangerouslySetInnerHTML={{ __html: formatArticleContent(content || "") }}
+          className="[&_p]:mb-4 [&_p:empty]:h-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"
+        />
       </div>
 
       <div className="mt-10 flex flex-wrap items-center gap-2 border-t border-border/40 pt-6">

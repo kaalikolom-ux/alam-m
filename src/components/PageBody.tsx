@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { supabase } from "@/integrations/supabase/client";
 import { usePrefs } from "@/lib/prefs";
+import { formatArticleContent } from "@/lib/contentFormatter";
 
 export function usePage(slug: string) {
   return useQuery({
@@ -51,13 +52,10 @@ export function PageBody({
         <p className="mt-6 text-center text-sm text-muted-foreground">{t("pageNotFound")}</p>
       )}
       {content && (
-        <div className="mt-8 space-y-4 text-base leading-relaxed text-foreground/85">
-          {content.split(/\n{2,}/).map((para, i) => (
-            <p key={i} className="whitespace-pre-wrap">
-              {para}
-            </p>
-          ))}
-        </div>
+        <div
+          dangerouslySetInnerHTML={{ __html: formatArticleContent(content) }}
+          className="mt-8 space-y-4 text-base leading-relaxed text-foreground/85 font-serif"
+        />
       )}
     </article>
   );
