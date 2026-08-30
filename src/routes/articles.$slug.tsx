@@ -45,6 +45,44 @@ import {
 } from "@/components/AntiSpamCaptcha";
 
 export const Route = createFileRoute("/articles/$slug")({
+  loader: async ({ params }) => {
+    const rawSlug = (params as Record<string, string>)["slug"] || "";
+    const slug = decodeURIComponent(rawSlug).trim();
+    if (!slug) return { article: null };
+
+    const { data: art } = await supabase
+      .from("articles")
+      .select("id, slug, title_bn, title_en, excerpt_bn, excerpt_en, cover_image_url, published_at")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    return { article: art };
+  },
+  head: ({ loaderData }) => {
+    const art = loaderData?.article;
+    const title = art?.title_bn ? `${art.title_bn} — Alam M` : "Alam M — শব্দ আমার ক্যানভাস";
+    const description = art?.excerpt_bn || "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।";
+    const image = art?.cover_image_url || "https://a.wooniche.com/og-image.png";
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:type", content: "article" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:image", content: image },
+        { property: "og:image:secure_url", content: image },
+        { property: "og:image:type", content: "image/png" },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: image },
+      ],
+    };
+  },
   component: ArticlePage,
 });
 
