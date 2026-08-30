@@ -174,3 +174,30 @@ html.dark {
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-soft);
 }
+
+.prose blockquote,
+blockquote {
+  position: relative;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  background-color: rgba(56, 189, 248, 0.04) !important;
+  border-radius: 14px !important;
+  padding: 1.25rem 1.5rem 1.25rem 3.5rem !important;
+  margin: 1.75rem 0 !important;
+  font-style: italic;
+  color: inherit;
+  box-shadow: 0 4px 14px -3px rgba(0, 0, 0, 0.05);
+}
+
+.prose blockquote::before,
+blockquote::before {
+  content: "“";
+  position: absolute;
+  left: 1rem;
+  top: 0.2rem;
+  font-size: 3.5rem;
+  line-height: 1;
+  font-family: Georgia, serif;
+  color: rgba(56, 189, 248, 0.45);
+  pointer-events: none;
+}
+
