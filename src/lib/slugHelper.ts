@@ -1,242 +1,203 @@
-/**
- * বাংলা শিরোনাম থেকে অর্থপূর্ণ ও পরিষ্কার ইংরেজি ফোনেটিক স্লাগ (Slug / Permalink) তৈরির ইঞ্জিন
- * যেমন: "দুইবার মৃত্যু এবং দুইবার জীবন" -> "duibar-mrityu-ebong-duibar-jibon"
- */
+const commonBengaliWordMap: Record<string, string> = {
+  "আমার": "amar",
+  "সোনার": "sonar",
+  "বাংলা": "bangla",
+  "ভুলু": "bhulu",
+  "একটা": "ekta",
+  "লাল": "lal",
+  "কুকুরের": "kukurer",
+  "কুকুর": "kukur",
+  "নাম": "nam",
+  "বেলাশেষের": "belashesher",
+  "বেলাশেষে": "belasheshe",
+  "গোধুলী": "godhuli",
+  "গোধূলি": "godhuli",
+  "ছেলে": "chele",
+  "ধরা": "dhora",
+  "জীবন": "jibon",
+  "থেকে": "theke",
+  "নেয়া": "neya",
+  "নেওয়া": "neya",
+  "হিপনোটিজম": "hypnotism",
+  "শিক্ষিত": "shikkhito",
+  "এবং": "ebong",
+  "সুশিক্ষিত": "sushikkhito",
+  "অতীত": "otit",
+  "বর্তমান": "bortoman",
+  "ভবিষ্যত": "bhobisshot",
+  "ভবিষ্যৎ": "bhobisshot",
+  "আড়ি": "aari",
+  "আড়ি": "aari",
+  "গোপন": "gopon",
+  "সত্যি": "sotyi",
+  "নীল": "neel",
+  "প্রজাপতি": "projapoti",
+  "প্রেম": "prem",
+  "একটাই": "ektai",
+  "তবে": "tobe",
+  "অনেক": "onek",
+  "পাগলি": "pagli",
+  "খুশি": "khushi",
+  "সুলতানা": "sultana",
+  "মামালুর": "mamalur",
+  "সংসার": "songsar",
+  "কি": "ki",
+  "কী": "ki",
+  "স্বপ্ন": "swopno",
+  "দেখলাম": "dekhlam",
+  "কিছুক্ষণ": "kichukkhon",
+  "কিছুক্ষন": "kichukkhon",
+  "আগে": "age",
+  "মোটা": "mota",
+  "বই": "boi",
+  "সাইকেল": "cycle",
+  "ভ্রমন": "bhromon",
+  "ভ্রমণ": "bhromon",
+  "ও": "o",
+  "হারিয়ে": "hariye",
+  "হারিয়ে": "hariye",
+  "যাওয়া": "jaowa",
+  "যাওয়া": "jaowa",
+  "সুইটি": "sweety",
+  "কিরো": "cheiro",
+  "হাতের": "hater",
+  "রেখা": "rekha",
+  "কথা": "kotha",
+  "বলে": "bole",
+  "পর্ব": "porbo",
+  "শেষ": "shesh",
+  "যে": "je",
+  "চিঠি": "chithi",
+  "পোস্ট": "post",
+  "করা": "kora",
+  "যায়না": "jayna",
+  "যায়": "jay",
+  "না": "na",
+  "আপনি": "apni",
+  "দিয়ে": "diye",
+  "দিয়ে": "diye",
+  "ভাত": "bhat",
+  "খেয়েছেন": "kheyechhen",
+  "খেয়েছেন": "kheyechhen",
+  "হৃদয়ের": "hridoyer",
+  "হৃদয়": "hridoy",
+  "ক্ষত": "khoto",
+  "আছি": "achhi",
+  "ভালোবাসার": "bhalobashar",
+  "ভালোবাসা": "bhalobasha",
+  "বুনো": "buno",
+  "হাঁস": "hash",
+  "ছোঁয়া": "chhowa",
+  "নিষিদ্ধ": "nishiddho",
+  "গল্প": "golpo",
+  "কবিতা": "kobita",
+  "স্মৃতিকথা": "smritikotha",
+  "স্মৃতি": "smriti",
+  "স্ট্যাটাস": "status"
+};
 
-const CONJUNCTS: [RegExp, string][] = [
-  [/মৃত্যু/g, "mrityu"],
-  [/স্মৃতি/g, "smriti"],
-  [/কুরআন/g, "quran"],
-  [/কোরআন/g, "quran"],
-  [/আল্লাহ/g, "allah"],
-  [/রসুল|রাসুল/g, "rasul"],
-  [/নবী/g, "nobi"],
-  [/হাদিস/g, "hadith"],
-  [/বিজ্ঞান/g, "biggan"],
-  [/জীবন/g, "jibon"],
-  [/মানুষ/g, "manush"],
-  [/পৃথিবী/g, "prithibi"],
-  [/আকাশ/g, "akash"],
-  [/চন্দ্র/g, "chondro"],
-  [/সূর্য|সুর্য/g, "surjo"],
-  [/নক্ষত্র/g, "nokkhotro"],
-  [/সৃষ্টি/g, "srishti"],
-  [/ইতিহাস/g, "itihas"],
-  [/গল্প/g, "golpo"],
-  [/কবিতা/g, "kobita"],
-  [/উপন্যাস/g, "uponnash"],
-  [/প্রবন্ধ/g, "probondho"],
-  [/স্মৃতিকথা/g, "smritikotha"],
-  [/স্ট্যাটাস/g, "status"],
-  [/খসড়া|খসড়া/g, "khosra"],
-  [/এবং/g, "ebong"],
-  [/অথবা/g, "othoba"],
-  [/কিন্তু/g, "kintu"],
-  [/কারণ/g, "karon"],
-  [/ক্ষ/g, "kkh"],
-  [/জ্ঞ/g, "gg"],
-  [/ঞ্চ/g, "nch"],
-  [/ঞ্ছ/g, "nchh"],
-  [/ঞ্জ/g, "nj"],
-  [/ষ্ট/g, "sht"],
-  [/ষ্ঠ/g, "shth"],
-  [/স্ত/g, "st"],
-  [/স্থ/g, "sth"],
-  [/ষ্ণ/g, "shn"],
-  [/হ্ম/g, "hm"],
-  [/ম্প/g, "mp"],
-  [/ম্ব/g, "mb"],
-  [/ম্ভ/g, "mbh"],
-  [/ন্দ/g, "nd"],
-  [/ন্ধ/g, "ndh"],
-  [/ন্ত/g, "nt"],
-  [/ন্থ/g, "nth"],
-  [/স্প/g, "sp"],
-  [/স্ফ/g, "sph"],
-  [/স্ট/g, "st"],
-  [/ঙ্ক/g, "nk"],
-  [/ঙ্গ/g, "ng"],
-  [/ল্ক/g, "lk"],
-  [/ল্গ/g, "lg"],
-  [/ল্ট/g, "lt"],
-  [/ল্ড/g, "ld"],
-  [/ল্প/g, "lp"],
-  [/ল্ফ/g, "lph"],
-  [/ল্ব/g, "lb"],
-  [/ল্ম/g, "lm"],
-  [/ল্ল/g, "ll"],
-  [/ব্ধ/g, "bdh"],
-  [/ব্দ/g, "bd"],
-  [/ব্জ/g, "bj"],
-  [/ব্ব/g, "bb"],
-  [/প্ত/g, "pt"],
-  [/প্স/g, "ps"],
-  [/প্ন/g, "pn"],
-  [/প্প/g, "pp"],
-  [/দ্ব/g, "dw"],
-  [/দ্ম/g, "ddm"],
-  [/দ্দ/g, "dd"],
-  [/দ্ধ/g, "ddh"],
-  [/ত্ম/g, "ttm"],
-  [/ত্ত/g, "tt"],
-  [/ত্থ/g, "tth"],
-  [/চ্ছ/g, "cch"],
-  [/চ্চ/g, "cc"],
-  [/জ্জ/g, "jj"],
-  [/শ্র/g, "shr"],
-  [/শ্ব/g, "shw"],
-  [/শ্ম/g, "shm"],
-  [/শ্ন/g, "shn"],
-  [/শ্ল/g, "shl"],
-  [/স্ক্র/g, "skr"],
-  [/স্ক/g, "sk"],
-  [/স্খ/g, "skh"],
-  [/স্ন/g, "sn"],
-  [/স্ব/g, "sw"],
-  [/স্ম/g, "sm"],
-  [/স্ল/g, "sl"],
-  [/ত্র/g, "tr"],
-  [/প্র/g, "pr"],
-  [/গ্র/g, "gr"],
-  [/ব্র/g, "br"],
-  [/দ্র/g, "dr"],
-  [/ধ্র/g, "dhr"],
-  [/ক্র/g, "kr"],
-  [/ভ্র/g, "bhr"],
-  [/মর/g, "mr"],
-  [/হ্র/g, "hr"],
-  [/র‌্য/g, "ry"],
+const charMap: Record<string, string> = {
+  'অ': 'o', 'আ': 'a', 'ই': 'i', 'ঈ': 'i', 'উ': 'u', 'ঊ': 'u', 'ঋ': 'ri',
+  'এ': 'e', 'ঐ': 'oi', 'ও': 'o', 'ঔ': 'ou',
+  'া': 'a', 'ি': 'i', 'ী': 'i', 'ু': 'u', 'ূ': 'u', 'ৃ': 'ri',
+  'ে': 'e', 'ৈ': 'oi', 'ো': 'o', 'ৌ': 'ou',
+  'ক': 'k', 'খ': 'kh', 'গ': 'g', 'ঘ': 'gh', 'ঙ': 'ng',
+  'চ': 'ch', 'ছ': 'ch', 'জ': 'j', 'ঝ': 'jh', 'ঞ': 'n',
+  'ট': 't', 'ঠ': 'th', 'ড': 'd', 'ঢ': 'dh', 'ণ': 'n',
+  'ত': 't', 'থ': 'th', 'দ': 'd', 'ধ': 'dh', 'ন': 'n',
+  'প': 'p', 'ফ': 'f', 'ব': 'b', 'ভ': 'bh', 'ম': 'm',
+  'য': 'j', 'র': 'r', 'ল': 'l', 'শ': 'sh', 'ষ': 'sh', 'স': 's', 'হ': 'h',
+  'ড়': 'r', 'ঢ়': 'rh', 'য়': 'y', 'ৎ': 't', 'ং': 'ng', 'ঃ': 'h', 'ঁ': 'n',
+  '্': '', 'ঽ': '',
+  '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4',
+  '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9'
+};
+
+const conjuncts = [
+  { bn: /ক্ষ/g, en: 'kkh' },
+  { bn: /জ্ঞ/g, en: 'gyo' },
+  { bn: /ঙ্ক/g, en: 'nk' },
+  { bn: /ঙ্গ/g, en: 'ng' },
+  { bn: /ঞ্চ/g, en: 'nch' },
+  { bn: /ঞ্জ/g, en: 'nj' },
+  { bn: /ন্ত/g, en: 'nt' },
+  { bn: /ন্থ/g, en: 'nth' },
+  { bn: /ন্দ/g, en: 'nd' },
+  { bn: /ন্ধ/g, en: 'ndh' },
+  { bn: /ম্প/g, en: 'mp' },
+  { bn: /ম্ব/g, en: 'mb' },
+  { bn: /ম্ভ/g, en: 'mbh' },
+  { bn: /ষ্ট/g, en: 'sht' },
+  { bn: /ষ্ঠ/g, en: 'shth' },
+  { bn: /স্থ/g, en: 'sth' },
+  { bn: /স্প/g, en: 'sp' },
+  { bn: /স্ফ/g, en: 'sph' },
+  { bn: /স্ব/g, en: 'sw' },
+  { bn: /স্ম/g, en: 'sm' },
+  { bn: /হ্ম/g, en: 'hm' },
+  { bn: /হ্ন/g, en: 'hn' },
+  { bn: /হ্ল/g, en: 'hl' },
+  { bn: /হ্ব/g, en: 'hb' },
+  { bn: /ত্ত/g, en: 'tt' },
+  { bn: /ত্র/g, en: 'tr' },
+  { bn: /প্র/g, en: 'pr' },
+  { bn: /গ্র/g, en: 'gr' },
+  { bn: /ক্র/g, en: 'kr' },
+  { bn: /ব্র/g, en: 'br' },
+  { bn: /ভ্র/g, en: 'bhr' },
+  { bn: /শ্র/g, en: 'shr' },
+  { bn: /দ্র/g, en: 'dr' },
+  { bn: /ধ্ব/g, en: 'dhw' },
+  { bn: /দ্ব/g, en: 'dw' },
+  { bn: /ত্ব/g, en: 'tw' },
+  { bn: /র্ক/g, en: 'rk' },
+  { bn: /র্ম/g, en: 'rm' },
+  { bn: /র্য/g, en: 'ry' },
+  { bn: /র্ব/g, en: 'rb' }
 ];
 
-const VOWEL_SIGNS: [RegExp, string][] = [
-  [/া/g, "a"],
-  [/ি/g, "i"],
-  [/ী/g, "i"],
-  [/ু/g, "u"],
-  [/ূ/g, "u"],
-  [/ৃ/g, "ri"],
-  [/ে/g, "e"],
-  [/ৈ/g, "oi"],
-  [/ো/g, "o"],
-  [/ৌ/g, "ou"],
-  [/্/g, ""],
-  [/ৎ/g, "t"],
-  [/ং/g, "ng"],
-  [/ঃ/g, "h"],
-  [/ঁ/g, ""],
-];
-
-const VOWELS: [RegExp, string][] = [
-  [/অ/g, "o"],
-  [/আ/g, "a"],
-  [/ই/g, "i"],
-  [/ঈ/g, "i"],
-  [/উ/g, "u"],
-  [/ঊ/g, "u"],
-  [/ঋ/g, "ri"],
-  [/এ/g, "e"],
-  [/ঐ/g, "oi"],
-  [/ও/g, "o"],
-  [/ঔ/g, "ou"],
-];
-
-const CONSONANTS: [RegExp, string][] = [
-  [/ক/g, "k"],
-  [/খ/g, "kh"],
-  [/গ/g, "g"],
-  [/ঘ/g, "gh"],
-  [/ঙ/g, "ng"],
-  [/চ/g, "ch"],
-  [/ছ/g, "chh"],
-  [/জ/g, "j"],
-  [/ঝ/g, "jh"],
-  [/ঞ/g, "n"],
-  [/ট/g, "t"],
-  [/ঠ/g, "th"],
-  [/ড/g, "d"],
-  [/ঢ/g, "dh"],
-  [/ণ/g, "n"],
-  [/ত/g, "t"],
-  [/থ/g, "th"],
-  [/দ/g, "d"],
-  [/ধ/g, "dh"],
-  [/ন/g, "n"],
-  [/প/g, "p"],
-  [/ফ/g, "f"],
-  [/ব/g, "b"],
-  [/ভ/g, "bh"],
-  [/ম/g, "m"],
-  [/য/g, "j"],
-  [/র/g, "r"],
-  [/ল/g, "l"],
-  [/শ/g, "sh"],
-  [/ষ/g, "sh"],
-  [/স/g, "s"],
-  [/হ/g, "h"],
-  [/ড়/g, "r"],
-  [/ঢ়/g, "rh"],
-  [/য়/g, "y"],
-  [/ৎ/g, "t"],
-];
-
-const NUMBERS: [RegExp, string][] = [
-  [/০/g, "0"],
-  [/১/g, "1"],
-  [/২/g, "2"],
-  [/৩/g, "3"],
-  [/৪/g, "4"],
-  [/৫/g, "5"],
-  [/৬/g, "6"],
-  [/৭/g, "7"],
-  [/৮/g, "8"],
-  [/৯/g, "9"],
-];
-
-export function bnToEnSlug(rawText: string, fallback = ""): string {
-  if (!rawText || typeof rawText !== "string") {
-    return fallback ? `post-${fallback}` : `post-${Date.now().toString().slice(-4)}`;
+function transliterateWord(word: string): string {
+  let str = word;
+  for (const c of conjuncts) {
+    str = str.replace(c.bn, c.en);
   }
 
-  let text = rawText.trim();
-
-  // ১. যুক্তাক্ষর প্রতিস্থাপন
-  for (const [pattern, rep] of CONJUNCTS) {
-    text = text.replace(pattern, rep);
+  let res = '';
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    res += charMap[ch] !== undefined ? charMap[ch] : ch;
   }
+  return res;
+}
 
-  // ২. কার চিহ্ন প্রতিস্থাপন
-  for (const [pattern, rep] of VOWEL_SIGNS) {
-    text = text.replace(pattern, rep);
-  }
+export function generatePhoneticSlug(text: string): string {
+  if (!text) return "";
 
-  // ৩. স্বরবর্ণ প্রতিস্থাপন
-  for (const [pattern, rep] of VOWELS) {
-    text = text.replace(pattern, rep);
-  }
-
-  // ৪. ব্যঞ্জনবর্ণ প্রতিস্থাপন
-  for (const [pattern, rep] of CONSONANTS) {
-    text = text.replace(pattern, rep);
-  }
-
-  // ৫. সংখ্যা প্রতিস্থাপন
-  for (const [pattern, rep] of NUMBERS) {
-    text = text.replace(pattern, rep);
-  }
-
-  // ৬. ক্লিন স্লাগ ফরম্যাটিং (lowercase, alphanumerics and hyphens only)
+  // Clean punctuation
   const clean = text
+    .replace(/[!?,;:()[\]"'\-–—]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const words = clean.split(" ");
+  const translatedWords = words.map((w) => {
+    const trimmed = w.trim();
+    if (!trimmed) return "";
+    if (commonBengaliWordMap[trimmed]) {
+      return commonBengaliWordMap[trimmed];
+    }
+    // Check for English word
+    if (/^[a-zA-Z0-9]+$/.test(trimmed)) {
+      return trimmed.toLowerCase();
+    }
+    return transliterateWord(trimmed);
+  });
+
+  return translatedWords
+    .filter(Boolean)
+    .join("-")
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "")
     .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 100);
-
-  if (!clean || clean.length < 2) {
-    return fallback ? `post-${fallback}` : `post-${Date.now().toString().slice(-4)}`;
-  }
-
-  return clean;
+    .replace(/^-+|-+$/g, "");
 }

@@ -18,6 +18,7 @@ import {
   Quote,
   Trash2,
   Underline as UnderlineIcon,
+  Wand2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -25,6 +26,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin, useSession } from "@/lib/auth";
 import { usePrefs } from "@/lib/prefs";
+import { generatePhoneticSlug } from "@/lib/slugHelper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,6 +39,7 @@ import { PagesAdmin } from "@/components/admin/PagesAdmin";
 import { MenuAdmin } from "@/components/admin/MenuAdmin";
 import { MessagesAdmin } from "@/components/admin/MessagesAdmin";
 import { FooterAdmin } from "@/components/admin/FooterAdmin";
+import { BulkSlugModal } from "@/components/admin/BulkSlugModal";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -466,6 +469,7 @@ function ArticlesAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [authorId, setAuthorId] = useState<string>("");
   const [catIds, setCatIds] = useState<string[]>([]);
+  const [isBulkSlugModalOpen, setIsBulkSlugModalOpen] = useState(false);
 
   const authors = useQuery({
     queryKey: ["authors"],
@@ -637,7 +641,35 @@ function ArticlesAdmin() {
             <Switch checked={published} onCheckedChange={setPublished} />
           </div>
         </div>
-        {field("slug", t("slug"))}
+        {/* Custom Slug Input with Auto-Generate Button */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="slug">{t("slug")}</Label>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-6 text-xs gap-1.5 text-primary hover:bg-primary/10 font-medium px-2"
+              onClick={() => {
+                const sug = generatePhoneticSlug(form.title_bn || form.title_en || "");
+                if (sug) {
+                  setForm({ ...form, slug: sug });
+                  toast.info(`অটো স্ল্যাগ জেনারেট হয়েছে: /${sug}`);
+                } else {
+                  toast.error("প্রথমে একটি শিরোনাম লিখুন");
+                }
+              }}
+            >
+              <Wand2 className="size-3" /> শিরোনাম থেকে অটো পার্মালিঙ্ক
+            </Button>
+          </div>
+          <Input
+            id="slug"
+            value={form.slug}
+            onChange={(e) => setForm({ ...form, slug: e.target.value })}
+            placeholder="amar-sonar-bangla"
+          />
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {field("title_bn", t("titleBn"))}
           {field("title_en", t("titleEn"))}
@@ -691,6 +723,22 @@ function ArticlesAdmin() {
       </form>
 
       <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-border">
+          <div>
+            <h3 className="text-lg font-semibold">{t("articles")} ({list.data?.length || 0})</h3>
+            <p className="text-xs text-muted-foreground">আপনার প্রকাশিত ও খসড়া লেখাগুলোর তালিকা</p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setIsBulkSlugModalOpen(true)}
+            className="gap-2 border-primary/40 text-primary hover:bg-primary/10 shadow-sm font-medium self-start sm:self-auto"
+          >
+            <Wand2 className="size-4" /> ⚡ পার্মালিঙ্ক / স্ল্যাগ বাল্ক জেনারেটর
+          </Button>
+        </div>
+
         {list.data?.map((a) => {
           const isDraft = (a.article_categories || []).some((ac: any) => ac.categories?.slug === "draft");
           return (
@@ -704,7 +752,7 @@ function ArticlesAdmin() {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground font-mono">
                   /{a.slug} · {a.published ? t("published") : t("draft")}
                 </p>
               </div>
@@ -738,6 +786,12 @@ function ArticlesAdmin() {
           );
         })}
       </div>
+
+      <BulkSlugModal
+        open={isBulkSlugModalOpen}
+        onOpenChange={setIsBulkSlugModalOpen}
+        articles={list.data || []}
+      />
     </div>
   );
 }
