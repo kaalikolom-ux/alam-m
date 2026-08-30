@@ -33,6 +33,7 @@ import { usePrefs } from "@/lib/prefs";
 import { useIsAdmin } from "@/lib/auth";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { AuthorCard } from "@/components/AuthorCard";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -143,233 +144,6 @@ function sanitizeAndFormatContent(rawText: string): string {
   }
 
   return htmlBlocks.join("");
-}
-
-function InlineRichEditor({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (val: string) => void;
-}) {
-  const [isHtmlMode, setIsHtmlMode] = useState(false);
-  const editorRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (editorRef.current && !isHtmlMode) {
-      if (editorRef.current.innerHTML !== (value || "")) {
-        editorRef.current.innerHTML = value || "";
-      }
-    }
-  }, [value, isHtmlMode]);
-
-  const executeCommand = (command: string, arg?: string) => {
-    if (isHtmlMode) return;
-    document.execCommand(command, false, arg);
-    if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const clipboardData = e.clipboardData;
-    const textData = clipboardData.getData("text/plain");
-    const htmlData = clipboardData.getData("text/html");
-
-    if (textData && (textData.includes("**") || textData.includes(">") || textData.includes("http") || !htmlData)) {
-      const cleanHtml = sanitizeAndFormatContent(textData);
-      document.execCommand("insertHTML", false, cleanHtml);
-    } else if (htmlData) {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlData, "text/html");
-
-      doc.body.querySelectorAll("*").forEach((node) => {
-        if (node instanceof HTMLElement) {
-          node.style.backgroundColor = "";
-          node.style.background = "";
-          node.style.color = "";
-          node.style.fontFamily = "";
-          node.style.fontSize = "";
-          node.style.lineHeight = "";
-          node.removeAttribute("class");
-          if (!node.getAttribute("style")?.trim()) {
-            node.removeAttribute("style");
-          }
-        }
-      });
-
-      let innerHtml = doc.body.innerHTML;
-      innerHtml = innerHtml
-        .replace(/[\u200B-\u200D\uFEFF\u200E\u200F\u202A-\u202E]/g, "")
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-
-      document.execCommand("insertHTML", false, innerHtml);
-    }
-
-    if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
-    }
-  };
-
-  const handleCleanFormatting = () => {
-    if (!editorRef.current) return;
-    const currentText = editorRef.current.innerText || editorRef.current.textContent || "";
-    if (!currentText.trim()) return;
-
-    const cleaned = sanitizeAndFormatContent(currentText);
-    editorRef.current.innerHTML = cleaned;
-    onChange(cleaned);
-    toast.success("অপ্রয়োজনীয় চিহ্ন, ব্যাকগ্রাউন্ড ও ফরম্যাটিং নিখুঁতভাবে ক্লিন করা হয়েছে!");
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label className="text-sm font-semibold">{label}</Label>
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="h-7 gap-1.5 px-2.5 text-xs text-muted-foreground hover:text-foreground"
-            onClick={handleCleanFormatting}
-            title="সব সাদা ব্যাকগ্রাউন্ড ও অপ্রয়োজনীয় চিহ্ন ক্লিন করুন"
-          >
-            <span>ফরম্যাট ক্লিন করুন</span>
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="h-7 gap-1.5 px-2.5 text-xs font-medium"
-            onClick={() => setIsHtmlMode(!isHtmlMode)}
-          >
-            {isHtmlMode ? (
-              <>
-                <Eye className="size-3.5" /> সাধারণ ভিউ
-              </>
-            ) : (
-              <>
-                <Code className="size-3.5" /> HTML কোড ভিউ
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-input bg-background shadow-sm focus-within:ring-2 focus-within:ring-primary/20">
-        <div className="flex flex-wrap items-center gap-1 border-b border-border bg-muted/30 p-1.5">
-          <button
-            type="button"
-            title="বোল্ড"
-            disabled={isHtmlMode}
-            onClick={() => executeCommand("bold")}
-            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
-          >
-            <Bold className="size-4" />
-          </button>
-          <button
-            type="button"
-            title="ইটালিক"
-            disabled={isHtmlMode}
-            onClick={() => executeCommand("italic")}
-            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
-          >
-            <Italic className="size-4" />
-          </button>
-          <button
-            type="button"
-            title="আন্ডারলাইন"
-            disabled={isHtmlMode}
-            onClick={() => executeCommand("underline")}
-            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
-          >
-            <UnderlineIcon className="size-4" />
-          </button>
-          <div className="mx-1 h-4 w-px bg-border" />
-          <button
-            type="button"
-            title="বামে সারিবদ্ধ"
-            disabled={isHtmlMode}
-            onClick={() => executeCommand("justifyLeft")}
-            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
-          >
-            <AlignLeft className="size-4" />
-          </button>
-          <button
-            type="button"
-            title="মাঝখানে সারিবদ্ধ"
-            disabled={isHtmlMode}
-            onClick={() => executeCommand("justifyCenter")}
-            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
-          >
-            <AlignCenter className="size-4" />
-          </button>
-          <button
-            type="button"
-            title="ডানে সারিবদ্ধ"
-            disabled={isHtmlMode}
-            onClick={() => executeCommand("justifyRight")}
-            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
-          >
-            <AlignRight className="size-4" />
-          </button>
-          <div className="mx-1 h-4 w-px bg-border" />
-          <button
-            type="button"
-            title="উদ্ধৃতি"
-            disabled={isHtmlMode}
-            onClick={() => executeCommand("formatBlock", "blockquote")}
-            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
-          >
-            <Quote className="size-4" />
-          </button>
-          <button
-            type="button"
-            title="বুলেট লিস্ট"
-            disabled={isHtmlMode}
-            onClick={() => executeCommand("insertUnorderedList")}
-            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
-          >
-            <List className="size-4" />
-          </button>
-          <button
-            type="button"
-            title="নাম্বার লিস্ট"
-            disabled={isHtmlMode}
-            onClick={() => executeCommand("insertOrderedList")}
-            className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
-          >
-            <ListOrdered className="size-4" />
-          </button>
-        </div>
-
-        {isHtmlMode ? (
-          <Textarea
-            rows={12}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-full rounded-b-lg border-0 bg-background font-mono text-xs text-foreground focus-visible:ring-0 p-3"
-          />
-        ) : (
-          <div
-            ref={editorRef}
-            contentEditable
-            onPaste={handlePaste}
-            onInput={() => {
-              if (editorRef.current) {
-                onChange(editorRef.current.innerHTML);
-              }
-            }}
-            className="min-h-[260px] p-3 text-sm text-foreground focus:outline-none [&_*]:!bg-transparent [&_*]:!text-inherit [&_p]:mb-3 [&_p]:!bg-transparent [&_p:empty]:h-4 [&_div]:!bg-transparent [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
-          />
-        )}
-      </div>
-    </div>
-  );
 }
 
 function ArticlePage() {
@@ -928,13 +702,13 @@ function ArticlePage() {
             </div>
           </div>
 
-          <InlineRichEditor
+          <RichTextEditor
             label="মূল কন্টেন্ট (বাংলা)"
             value={formData.content_bn}
             onChange={(val) => setFormData({ ...formData, content_bn: val })}
           />
 
-          <InlineRichEditor
+          <RichTextEditor
             label="মূল কন্টেন্ট (ইংরেজি)"
             value={formData.content_en}
             onChange={(val) => setFormData({ ...formData, content_en: val })}
@@ -1037,7 +811,7 @@ function ArticlePage() {
         {isHtml ? (
           <div
             dangerouslySetInnerHTML={{ __html: content || "" }}
-            className="[&_*]:!bg-transparent [&_*]:!text-inherit [&_p]:mb-3 [&_p:empty]:h-4 [&_div]:mb-2 [&_blockquote]:!border-l-4 [&_blockquote]:!border-primary [&_blockquote]:!pl-4 [&_blockquote]:italic [&_blockquote]:my-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"
+            className="[&_p]:mb-4 [&_p:empty]:h-4 [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:my-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"
           />
         ) : (
           <div>

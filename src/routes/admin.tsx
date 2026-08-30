@@ -40,6 +40,7 @@ import { MenuAdmin } from "@/components/admin/MenuAdmin";
 import { MessagesAdmin } from "@/components/admin/MessagesAdmin";
 import { FooterAdmin } from "@/components/admin/FooterAdmin";
 import { BulkSlugModal } from "@/components/admin/BulkSlugModal";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -344,104 +345,6 @@ function ImportAdmin({ platform, user }: { platform: string; user: any }) {
         {isImporting ? (lang === "bn" ? "ইমপোর্ট হচ্ছে..." : "Importing...") : (lang === "bn" ? "ইমপোর্ট শুরু করুন" : "Start Import")}
       </Button>
     </form>
-  );
-}
-
-function RichTextEditor({ label, value, onChange }: { label: string; value: string; onChange: (val: string) => void; }) {
-  const [isHtmlMode, setIsHtmlMode] = useState(false);
-  const editorRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (editorRef.current && !isHtmlMode) {
-      if (editorRef.current.innerHTML !== (value || "")) {
-        editorRef.current.innerHTML = value || "";
-      }
-    }
-  }, [value, isHtmlMode]);
-
-  const executeCommand = (command: string, arg?: string) => {
-    if (isHtmlMode) return;
-    document.execCommand(command, false, arg);
-    if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const text = e.clipboardData.getData("text/plain");
-    
-    const formattedHtml = text
-      .split(/\r\n|\r|\n/)
-      .map((line) => line.trim())
-      .map((line) => (line ? `<p>${line}</p>` : `<p><br></p>`))
-      .join("");
-
-    document.execCommand("insertHTML", false, formattedHtml);
-    if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
-    }
-  };
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <Label>{label}</Label>
-        <Button type="button" variant="outline" size="sm" className="h-7 gap-1.5 px-2.5 text-xs font-medium" onClick={() => setIsHtmlMode(!isHtmlMode)}>
-          {isHtmlMode ? <><Eye className="size-3.5" /> সাধারণ ভিউ</> : <><Code className="size-3.5" /> HTML কোড ভিউ</>}
-        </Button>
-      </div>
-
-      <div className="rounded-lg border border-input bg-background shadow-sm focus-within:ring-2 focus-within:ring-primary/20">
-        <div className="flex flex-wrap items-center gap-1 border-b border-border bg-muted/30 p-1.5">
-          <button type="button" title="বোল্ড" disabled={isHtmlMode} onClick={() => executeCommand("bold")} className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40">
-            <Bold className="size-4" />
-          </button>
-          <button type="button" title="ইটালিক" disabled={isHtmlMode} onClick={() => executeCommand("italic")} className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40">
-            <Italic className="size-4" />
-          </button>
-          <button type="button" title="আন্ডারলাইন" disabled={isHtmlMode} onClick={() => executeCommand("underline")} className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40">
-            <UnderlineIcon className="size-4" />
-          </button>
-          <div className="mx-1 h-4 w-px bg-border" />
-          <button type="button" title="বামে সারিবদ্ধ (Left)" disabled={isHtmlMode} onClick={() => executeCommand("justifyLeft")} className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40">
-            <AlignLeft className="size-4" />
-          </button>
-          <button type="button" title="মাঝখানে সারিবদ্ধ (Center)" disabled={isHtmlMode} onClick={() => executeCommand("justifyCenter")} className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40">
-            <AlignCenter className="size-4" />
-          </button>
-          <button type="button" title="ডানে সারিবদ্ধ (Right)" disabled={isHtmlMode} onClick={() => executeCommand("justifyRight")} className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40">
-            <AlignRight className="size-4" />
-          </button>
-          <div className="mx-1 h-4 w-px bg-border" />
-          <button type="button" title="উদ্ধৃতি (Quote)" disabled={isHtmlMode} onClick={() => executeCommand("formatBlock", "blockquote")} className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40">
-            <Quote className="size-4" />
-          </button>
-          <button type="button" title="বুলেট লিস্ট" disabled={isHtmlMode} onClick={() => executeCommand("insertUnorderedList")} className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40">
-            <List className="size-4" />
-          </button>
-          <button type="button" title="নাম্বার লিস্ট" disabled={isHtmlMode} onClick={() => executeCommand("insertOrderedList")} className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40">
-            <ListOrdered className="size-4" />
-          </button>
-        </div>
-
-        {isHtmlMode ? (
-          <Textarea rows={10} value={value} onChange={(e) => onChange(e.target.value)} placeholder="এখানে সরাসরি কাস্টম HTML কোড লিখুন বা পেস্ট করুন..." className="w-full rounded-b-lg border-0 bg-background font-mono text-xs text-foreground focus-visible:ring-0 p-3" />
-        ) : (
-          <div
-            ref={editorRef}
-            contentEditable
-            onPaste={handlePaste}
-            onInput={() => {
-              if (editorRef.current) {
-                onChange(editorRef.current.innerHTML);
-              }
-            }}
-            className="min-h-[220px] p-3 text-sm text-foreground focus:outline-none [&_*]:!bg-transparent [&_*]:!text-inherit [&_span]:!bg-transparent [&_div]:!bg-transparent [&_p]:mb-3 [&_p]:!bg-transparent [&_p:empty]:h-4 [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-3 [&_blockquote]:italic [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
-          />
-        )}
-      </div>
-    </div>
   );
 }
 
