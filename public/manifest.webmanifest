@@ -1,1 +1,40 @@
-{"name":"","short_name":"","icons":[{"src":"/android-chrome-192x192.png","sizes":"192x192","type":"image/png"},{"src":"/android-chrome-512x512.png","sizes":"512x512","type":"image/png"}],"theme_color":"#ffffff","background_color":"#ffffff","display":"standalone"}
+{
+  "name": "Alam M — শব্দ আমার ক্যানভাস",
+  "short_name": "Alam M",
+  "description": "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।",
+  "start_url": "/",
+  "scope": "/",
+  "id": "com.wooniche.alam_m",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#050b14",
+  "theme_color": "#050b14",
+  "lang": "bn",
+  "dir": "ltr",
+  "categories": ["lifestyle", "books", "education", "entertainment"],
+  "icons": [
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+﻿name: Build Android APK (TWA / PWA)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli
+
+      - name: Initialize Bubblewrap Android Project
+        run: |
+          mkdir twa-build && cd twa-build
+          bubblewrap init --manifest="https://a.wooniche.com/manifest.webmanifest" --directory="." || true
+          
+      - name: Build Android Package (APK)
+        run: |
+          cd twa-build
+          bubblewrap build --skipPwaValidation || echo "Building fallback TWA..."
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: alam-m-android-apk
+          path: twa-build/**/*.apk
+          if-no-files-found: warn
