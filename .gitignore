@@ -45,3 +45,4 @@ dist-ssr
 
 # Allow public downloadable APK
 !public/alam-m.apk
+!public/alam-m-v2.apk
