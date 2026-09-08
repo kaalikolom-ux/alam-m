@@ -42,3 +42,6 @@ dist-ssr
 *.apk
 *.aab
 *.keystore
+
+# Allow public downloadable APK
+!public/alam-m.apk
