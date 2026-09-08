@@ -12,6 +12,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AntiSpamCaptcha,
+  generateMathCaptcha,
+  convertBengaliToEnglishDigits,
+  type MathCaptcha,
+} from "@/components/AntiSpamCaptcha";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -37,20 +43,38 @@ export const Route = createFileRoute("/contact")({
 });
 
 const schema = z.object({
-  name: z.string().trim().min(1).max(100),
-  email: z.string().trim().email().max(200),
+  name: z.string().trim().min(1, "নাম লিখুন").max(100),
+  email: z.string().trim().email("সঠিক ইমেইল ঠিকানা দিন").max(200),
   subject: z.string().trim().max(200),
-  message: z.string().trim().min(1).max(4000),
+  message: z.string().trim().min(1, "বার্তা লিখুন").max(4000),
 });
 
 function ContactPage() {
-  const { t } = usePrefs();
+  const { t, lang } = usePrefs();
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [captchaProblem, setCaptchaProblem] = useState<MathCaptcha>(() => generateMathCaptcha());
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+
+  const refreshCaptcha = () => {
+    setCaptchaProblem(generateMathCaptcha());
+    setCaptchaAnswer("");
+  };
 
   const send = useMutation({
     mutationFn: async () => {
       const parsed = schema.safeParse(form);
       if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "Invalid input");
+
+      // Verify Anti-Spam Captcha
+      const normalizedAnswer = convertBengaliToEnglishDigits(captchaAnswer.trim());
+      if (!normalizedAnswer) {
+        throw new Error(lang === "bn" ? "দয়া করে স্প্যাম সুরক্ষা প্রশ্নের উত্তর দিন।" : "Please answer the anti-spam question.");
+      }
+      if (parseInt(normalizedAnswer, 10) !== captchaProblem.answer) {
+        refreshCaptcha();
+        throw new Error(lang === "bn" ? "স্প্যাম সুরক্ষা প্রশ্নের সঠিক উত্তর দিন।" : "Incorrect anti-spam answer.");
+      }
+
       const { error } = await supabase.from("contact_messages").insert({
         ...parsed.data,
         subject: parsed.data.subject || null,
@@ -59,6 +83,7 @@ function ContactPage() {
     },
     onSuccess: () => {
       setForm({ name: "", email: "", subject: "", message: "" });
+      refreshCaptcha();
       toast.success(t("messageSent"));
     },
     onError: (e: Error) => toast.error(e.message),
@@ -106,6 +131,15 @@ function ContactPage() {
             onChange={(e) => setForm({ ...form, message: e.target.value })}
           />
         </div>
+
+        <AntiSpamCaptcha
+          value={captchaAnswer}
+          onChange={setCaptchaAnswer}
+          onRefresh={refreshCaptcha}
+          currentProblem={captchaProblem}
+          lang={lang}
+        />
+
         <Button type="submit" disabled={send.isPending} className="w-full sm:w-auto">
           <Send className="size-4" /> {t("sendMessage")}
         </Button>
