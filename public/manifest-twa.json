@@ -1,9 +1,9 @@
-﻿{
+{
   "name": "Alam M",
   "short_name": "Alam M",
   "description": "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।",
-  "start_url": "https://a.wooniche.com/",
-  "scope": "https://a.wooniche.com/",
+  "start_url": "/",
+  "scope": "/",
   "id": "com.wooniche.alam_m",
   "display": "standalone",
   "orientation": "portrait-primary",
