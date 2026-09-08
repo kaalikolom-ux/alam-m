@@ -1,0 +1,10 @@
+Keep this file and signing.keystore in a safe place. You'll need these files if you want to upload future versions of your PWA to the Google Play Store.
+
+Key store file: signing.keystore
+Key store password: QLfKFyS0nW57
+Key alias: alam-key
+Key password: QLfKFyS0nW57
+Signer's full name: Alam M
+Signer's organization: Alam M
+Signer's organizational unit: Literature
+Signer's country code: BD

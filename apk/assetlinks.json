@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.wooniche.alam_m",
+        "sha256_cert_fingerprints": ["F0:7A:C4:4D:D9:21:FD:28:B4:CA:2B:A6:4E:7F:46:60:25:F5:D2:C6:54:EC:A9:2A:F8:72:B2:38:53:A1:18:A2"]
+      }
+    }]
