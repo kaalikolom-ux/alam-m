@@ -134,26 +134,50 @@ const TABLES_WITH_UPDATED_AT = new Set([
 let activeD1Database: D1Database | null = null;
 const initializedDbs = new WeakSet<D1Database>();
 
-export function setWorkerEnv(env: unknown): void {
-  if (!env || typeof env !== "object") return;
+function extractD1FromEnvObject(env: unknown): D1Database | null {
+  if (!env || typeof env !== "object") return null;
   const record = env as Record<string, unknown>;
   for (const key of ["DB", "alam-m", "alam_m", "D1", "d1"]) {
     const candidate = record[key];
     if (candidate && typeof (candidate as D1Database).prepare === "function") {
-      activeD1Database = candidate as D1Database;
-      return;
+      return candidate as D1Database;
     }
   }
-  // Also scan any property on env that looks like a D1Database binding
   for (const val of Object.values(record)) {
     if (val && typeof (val as D1Database).prepare === "function") {
-      activeD1Database = val as D1Database;
-      return;
+      return val as D1Database;
     }
+  }
+  return null;
+}
+
+export function setWorkerEnv(env: unknown, request?: unknown): void {
+  const fromArg = extractD1FromEnvObject(env);
+  if (fromArg) {
+    activeD1Database = fromArg;
+    return;
+  }
+  const reqEnv = (request as { runtime?: { cloudflare?: { env?: unknown } } } | undefined)?.runtime
+    ?.cloudflare?.env;
+  const fromReq = extractD1FromEnvObject(reqEnv);
+  if (fromReq) {
+    activeD1Database = fromReq;
+    return;
+  }
+  const globalEnv = (globalThis as { __env__?: unknown }).__env__;
+  const fromGlobal = extractD1FromEnvObject(globalEnv);
+  if (fromGlobal) {
+    activeD1Database = fromGlobal;
   }
 }
 
 export function getActiveD1Database(): D1Database | null {
+  if (activeD1Database) return activeD1Database;
+  const globalEnv = (globalThis as { __env__?: unknown }).__env__;
+  const fromGlobal = extractD1FromEnvObject(globalEnv);
+  if (fromGlobal) {
+    activeD1Database = fromGlobal;
+  }
   return activeD1Database;
 }
 
@@ -684,7 +708,7 @@ export async function executeD1Query(
   descriptor: D1QueryDescriptor,
   dbOverride?: D1Database | null,
 ): Promise<{ data: unknown; error: { message: string } | null }> {
-  const db = dbOverride !== undefined ? dbOverride : activeD1Database;
+  const db = dbOverride !== undefined ? dbOverride : getActiveD1Database();
   if (db) {
     await ensureD1Initialized(db);
   }
@@ -977,7 +1001,7 @@ export async function executeD1Auth(
   payload: { email?: string; password?: string; token?: string },
   dbOverride?: D1Database | null,
 ): Promise<{ data: Record<string, unknown>; error: { message: string } | null }> {
-  const db = dbOverride !== undefined ? dbOverride : activeD1Database;
+  const db = dbOverride !== undefined ? dbOverride : getActiveD1Database();
   if (db) {
     await ensureD1Initialized(db);
   }

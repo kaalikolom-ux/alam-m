@@ -54,7 +54,7 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
-    setWorkerEnv(env);
+    setWorkerEnv(env, request);
     const url = new URL(request.url);
 
     // Cloudflare D1 SQLite Query API
