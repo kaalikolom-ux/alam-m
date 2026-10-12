@@ -1,4 +1,3 @@
-import type { Session } from "@supabase/supabase-js";
 import {
   executeD1Auth,
   executeD1Query,
@@ -7,6 +6,27 @@ import {
   type D1Order,
   type D1QueryDescriptor,
 } from "../d1/engine";
+
+export interface User {
+  id: string;
+  aud: string;
+  role: string;
+  email?: string;
+  email_confirmed_at?: string;
+  user_metadata: Record<string, unknown>;
+  app_metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface Session {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  expires_at?: number;
+  token_type: string;
+  user: User;
+}
 
 const SESSION_STORAGE_KEY = "alam_m_d1_auth_session";
 
@@ -50,38 +70,34 @@ function notifyAuthListeners(event: string, session: Session | null): void {
 async function runQueryDescriptor(
   descriptor: D1QueryDescriptor,
 ): Promise<{ data: any; error: any }> {
-  // On the server (SSR / Cloudflare Worker), execute directly against D1
+  // On the server (SSR / Cloudflare Worker), execute directly against Cloudflare D1
   if (typeof window === "undefined") {
     return executeD1Query(descriptor);
   }
 
-  // In the browser, call the Worker's /api/d1/query endpoint
-  try {
-    const session = readStoredSession();
-    const headers: Record<string, string> = {
-      "content-type": "application/json",
-    };
-    if (session?.access_token) {
-      headers["authorization"] = `Bearer ${session.access_token}`;
-    }
-
-    const response = await fetch("/api/d1/query", {
-      method: "POST",
-      headers,
-      body: JSON.stringify(descriptor),
-    });
-
-    if (
-      response.ok &&
-      (response.headers.get("content-type") || "").includes("application/json")
-    ) {
-      return (await response.json()) as { data: any; error: any };
-    }
-  } catch (err) {
-    console.warn("[D1 Client] Falling back to local D1 engine:", err);
+  // In the browser, execute strictly against the Cloudflare Worker D1 endpoint
+  const session = readStoredSession();
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
+  };
+  if (session?.access_token) {
+    headers["authorization"] = `Bearer ${session.access_token}`;
   }
 
-  return executeD1Query(descriptor);
+  const response = await fetch("/api/d1/query", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(descriptor),
+  });
+
+  if (!response.ok) {
+    return {
+      data: null,
+      error: { message: `Cloudflare D1 query failed (${response.status})` },
+    };
+  }
+
+  return (await response.json()) as { data: any; error: any };
 }
 
 async function runAuthAction(
@@ -92,23 +108,20 @@ async function runAuthAction(
     return executeD1Auth(action, payload);
   }
 
-  try {
-    const response = await fetch("/api/d1/auth", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ action, ...payload }),
-    });
-    if (
-      response.ok &&
-      (response.headers.get("content-type") || "").includes("application/json")
-    ) {
-      return (await response.json()) as { data: any; error: any };
-    }
-  } catch (err) {
-    console.warn("[D1 Auth] Falling back to local D1 auth:", err);
+  const response = await fetch("/api/d1/auth", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ action, ...payload }),
+  });
+
+  if (!response.ok) {
+    return {
+      data: {},
+      error: { message: `Cloudflare D1 auth failed (${response.status})` },
+    };
   }
 
-  return executeD1Auth(action, payload);
+  return (await response.json()) as { data: any; error: any };
 }
 
 class D1QueryBuilder implements PromiseLike<{ data: any; error: any }> {
