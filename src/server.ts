@@ -3,6 +3,13 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { generateSitemapXml } from "./lib/sitemap";
+import {
+  executeD1Auth,
+  executeD1Query,
+  getActiveD1Database,
+  setWorkerEnv,
+  type D1QueryDescriptor,
+} from "./integrations/d1/engine";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -47,7 +54,83 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    setWorkerEnv(env);
     const url = new URL(request.url);
+
+    // Cloudflare D1 SQLite Query API
+    if (url.pathname === "/api/d1/query" && request.method === "POST") {
+      try {
+        const descriptor = (await request.json()) as D1QueryDescriptor;
+        const result = await executeD1Query(descriptor);
+        return new Response(JSON.stringify(result), {
+          status: 200,
+          headers: { "content-type": "application/json; charset=utf-8" },
+        });
+      } catch (err) {
+        return new Response(
+          JSON.stringify({
+            data: null,
+            error: { message: err instanceof Error ? err.message : String(err) },
+          }),
+          {
+            status: 400,
+            headers: { "content-type": "application/json; charset=utf-8" },
+          },
+        );
+      }
+    }
+
+    // Cloudflare D1 Auth API
+    if (url.pathname === "/api/d1/auth" && request.method === "POST") {
+      try {
+        const body = (await request.json()) as {
+          action: "signIn" | "signUp" | "updateUser" | "resetPassword" | "session";
+          email?: string;
+          password?: string;
+          token?: string;
+        };
+        const result = await executeD1Auth(body.action, body);
+        return new Response(JSON.stringify(result), {
+          status: 200,
+          headers: { "content-type": "application/json; charset=utf-8" },
+        });
+      } catch (err) {
+        return new Response(
+          JSON.stringify({
+            data: {},
+            error: { message: err instanceof Error ? err.message : String(err) },
+          }),
+          {
+            status: 400,
+            headers: { "content-type": "application/json; charset=utf-8" },
+          },
+        );
+      }
+    }
+
+    // Cloudflare D1 Health & Status endpoint
+    if (url.pathname === "/api/d1/health") {
+      const dbBound = !!getActiveD1Database();
+      const articlesCheck = await executeD1Query({
+        table: "articles",
+        operation: "select",
+        select: "id",
+      });
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          engine: "cloudflare-d1-sqlite",
+          database_name: "alam-m",
+          database_id: "addf217c-a0a6-4ffe-83b9-3d945a1091cb",
+          d1_binding_active: dbBound,
+          articles_count: Array.isArray(articlesCheck.data) ? articlesCheck.data.length : 0,
+        }),
+        {
+          status: 200,
+          headers: { "content-type": "application/json; charset=utf-8" },
+        },
+      );
+    }
 
     // Dynamic Sitemap endpoint
     if (url.pathname === "/sitemap.xml") {

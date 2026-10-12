@@ -1,0 +1,8 @@
+name = "alam-m"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "alam-m"
+database_id = "addf217c-a0a6-4ffe-83b9-3d945a1091cb"
