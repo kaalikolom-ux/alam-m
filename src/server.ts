@@ -3,6 +3,7 @@ import "./lib/error-capture";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { generateSitemapXml } from "./lib/sitemap";
+import { generateArticleOgSvg } from "./lib/ogImageSvg";
 import {
   executeD1Auth,
   executeD1Query,

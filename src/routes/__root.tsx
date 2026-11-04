@@ -90,7 +90,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। গল্প, কবিতা ও স্মৃতিকথা।",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://a.wooniche.com/" },
+      
       { property: "og:site_name", content: "Alam M — শব্দ আমার ক্যানভাস" },
       { property: "og:title", content: "Alam M — শব্দ আমার ক্যানভাস" },
       {

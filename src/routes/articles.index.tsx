@@ -14,6 +14,7 @@ export const Route = createFileRoute("/articles/")({
     category: typeof search["category"] === "string" ? (search["category"] as string) : undefined,
   }),
   head: () => ({
+    links: [{ rel: "canonical", href: "https://a.wooniche.com/articles" }],
     meta: [
       { title: "লেখালেখি — Alam M" },
       {
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/articles/")({
         content: "গল্প, কবিতা, স্মৃতিকথা ও ভাবনা নিয়ে নিয়মিত প্রকাশনা।",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://a.wooniche.com/articles" },
       { property: "og:title", content: "লেখালেখি — Alam M" },
       {
         property: "og:description",

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
+    links: [{ rel: "canonical", href: "https://a.wooniche.com/about" }],
     meta: [
       { title: "আমার পাতা — Alam M" },
       {
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/about")({
         content: "আমি আলম। শব্দের একজন লেখক, দৈনন্দিন মুহূর্তের গল্পের অনুসন্ধানী। লেখক পরিচিতি ও ভাবনা।",
       },
       { property: "og:type", content: "profile" },
+      { property: "og:url", content: "https://a.wooniche.com/about" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:title", content: "আমার পাতা — Alam M" },
       { property: "og:description", content: "আমি আলম। শব্দের ভাঁজে ভাঁজে লুকিয়ে থাকা গল্পগুলোর সন্ধানী।" },

@@ -62,15 +62,18 @@ export const Route = createFileRoute("/articles/$slug")({
   },
   head: ({ loaderData }) => {
     const art = loaderData?.article;
+    const slug = art?.slug ? encodeURIComponent(art.slug) : "";
     const title = art?.title_bn ? `${art.title_bn} — Alam M` : "Alam M — শব্দ আমার ক্যানভাস";
     const description = art?.excerpt_bn || "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।";
-    const image = art?.cover_image_url || "https://a.wooniche.com/og-image.png";
+    const canonicalUrl = slug ? `https://a.wooniche.com/articles/${slug}` : "https://a.wooniche.com/";
+    const image = art?.cover_image_url || (slug ? `https://a.wooniche.com/og/articles/${slug}.png` : "https://a.wooniche.com/og-image.png");
 
     return {
       meta: [
         { title },
         { name: "description", content: description },
         { property: "og:type", content: "article" },
+        { property: "og:url", content: canonicalUrl },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:image", content: image },
@@ -78,10 +81,14 @@ export const Route = createFileRoute("/articles/$slug")({
         { property: "og:image:type", content: "image/png" },
         { property: "og:image:width", content: "1200" },
         { property: "og:image:height", content: "630" },
+        { property: "og:image:alt", content: title },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
         { name: "twitter:image", content: image },
+      ],
+      links: [
+        { rel: "canonical", href: canonicalUrl },
       ],
     };
   },

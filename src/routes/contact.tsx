@@ -21,6 +21,7 @@ import {
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
+    links: [{ rel: "canonical", href: "https://a.wooniche.com/contact" }],
     meta: [
       { title: "যোগাযোগ — Alam M" },
       {
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/contact")({
         content: "লেখক আলমের সাথে যোগাযোগ করুন — প্রশ্ন, মতামত বা কাজের প্রস্তাব পাঠান।",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://a.wooniche.com/contact" },
       { property: "og:title", content: "যোগাযোগ — Alam M" },
       { property: "og:description", content: "প্রশ্ন, মতামত বা কাজের প্রস্তাব পাঠান।" },
       { property: "og:image", content: "https://a.wooniche.com/og-image.png" },
