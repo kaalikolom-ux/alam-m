@@ -416,3 +416,9 @@ INSERT OR IGNORE INTO articles (id, slug, title_bn, title_en, excerpt_bn, excerp
 <p>জীবনের স্বাদ বিচিত্র রকমের,<br>বিচিত্র রকমের।</p>
 <p class="poem-date"><strong>© আলম</strong> — ১৭/০২/১৯৯৫ ইং, শুক্রবার, রাত ১২টা ১৯ মিনিটে লেখা</p>', NULL, NULL, 1, '2026-11-04T00:28:00.000Z', NULL, '6a308470-2d8d-4cd8-996b-a96de32efdc2', '2026-11-04T00:28:00.000Z', '2026-11-04T00:28:00.000Z');
 INSERT OR IGNORE INTO article_categories (article_id, category_id, created_at) VALUES ('5ed76359-4e31-4408-9b61-ef0c50a0aca5', 'fa17b7b2-a53b-4d67-b2bb-3828971b72ba', '2026-11-04T00:28:00.000Z');
+INSERT OR IGNORE INTO articles (id, slug, title_bn, title_en, excerpt_bn, excerpt_en, content_bn, content_en, cover_image_url, published, published_at, created_by, author_id, created_at, updated_at) VALUES ('169c37e8-c792-4154-bf42-53c1d920bf84', 'ekta-sharir-opekkhay-achi', 'একটা শাড়ীর অপেক্ষায় আছি', NULL, 'সখী, ভালো তো বাসি, সে কথা তো অসত্য নয়, তবে ভয় হয় — সেদিন যদি তোমায় শাড়িতে দেখে নতুন করে প্রেমে পড়ে যাই!', NULL, '<p>সখী, ভালো তো বাসি<br>সে কথা তো অসত্য নয়,<br>তবে ভয় হয় —<br>সেদিন যদি তোমায় শাড়িতে দেখে<br>নতুন করে প্রেমে পড়ে যাই!</p>
+<p>যদি চোখ ফেরাতে না পারি,<br>যদি কথারা হারিয়ে যায়,<br>যদি তোমার একটুখানি হাসি<br>আমার সমস্ত বিকেল কেড়ে নেয়,<br>যদি মুগ্ধতা গোপন রাখতে না পারি!</p>
+<p>তুমি কি তখনও সখী থাকবে, নাকি<br>একটু দূরে সরে যাবে?<br>বেলাশেষের প্রেমকে ছেলেমানুষি ভেবে হাসবে, নাকি<br>চোখের ভাষা বুঝে নেবে? নাকি<br>দূরেই সরে যাবে?</p>
+<p>সখী, ভালো তো বাসি,<br>শুধু শাড়িতে দেখে তোমার প্রেমে পড়ে গেলে<br>উপেক্ষা করতে পারবে তো?</p>
+<p class="poem-date"><strong>© আলম</strong> — ২৪ অক্টোবর ২০২৬ইং, বেলা ১০টা ৩১মি.</p>', NULL, NULL, 1, '2026-11-04T00:34:00.000Z', NULL, '6a308470-2d8d-4cd8-996b-a96de32efdc2', '2026-11-04T00:34:00.000Z', '2026-11-04T00:34:00.000Z');
+INSERT OR IGNORE INTO article_categories (article_id, category_id, created_at) VALUES ('169c37e8-c792-4154-bf42-53c1d920bf84', 'fa17b7b2-a53b-4d67-b2bb-3828971b72ba', '2026-11-04T00:34:00.000Z');

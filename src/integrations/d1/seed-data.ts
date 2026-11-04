@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "169c37e8-c792-4154-bf42-53c1d920bf84",
+      "slug": "ekta-sharir-opekkhay-achi",
+      "title_bn": "একটা শাড়ীর অপেক্ষায় আছি",
+      "title_en": null,
+      "excerpt_bn": "সখী, ভালো তো বাসি, সে কথা তো অসত্য নয়, তবে ভয় হয় — সেদিন যদি তোমায় শাড়িতে দেখে নতুন করে প্রেমে পড়ে যাই!",
+      "excerpt_en": null,
+      "content_bn": "<p>সখী, ভালো তো বাসি<br>সে কথা তো অসত্য নয়,<br>তবে ভয় হয় —<br>সেদিন যদি তোমায় শাড়িতে দেখে<br>নতুন করে প্রেমে পড়ে যাই!</p>\n<p>যদি চোখ ফেরাতে না পারি,<br>যদি কথারা হারিয়ে যায়,<br>যদি তোমার একটুখানি হাসি<br>আমার সমস্ত বিকেল কেড়ে নেয়,<br>যদি মুগ্ধতা গোপন রাখতে না পারি!</p>\n<p>তুমি কি তখনও সখী থাকবে, নাকি<br>একটু দূরে সরে যাবে?<br>বেলাশেষের প্রেমকে ছেলেমানুষি ভেবে হাসবে, নাকি<br>চোখের ভাষা বুঝে নেবে? নাকি<br>দূরেই সরে যাবে?</p>\n<p>সখী, ভালো তো বাসি,<br>শুধু শাড়িতে দেখে তোমার প্রেমে পড়ে গেলে<br>উপেক্ষা করতে পারবে তো?</p>\n<p class=\"poem-date\"><strong>© আলম</strong> — ২৪ অক্টোবর ২০২৬ইং, বেলা ১০টা ৩১মি.</p>",
+      "content_en": null,
+      "cover_image_url": null,
+      "published": true,
+      "published_at": "2026-11-04T00:34:00.000Z",
+      "created_by": null,
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-11-04T00:34:00.000Z",
+      "updated_at": "2026-11-04T00:34:00.000Z"
+    },
+    {
       "id": "5ed76359-4e31-4408-9b61-ef0c50a0aca5",
       "slug": "jiboner-mishro-swad",
       "title_bn": "জীবনের মিশ্র স্বাদ",
@@ -140,6 +157,11 @@ export const INITIAL_SEED_DATA = {
   ],
   "verse_translations": [],
   "article_categories": [
+    {
+      "article_id": "169c37e8-c792-4154-bf42-53c1d920bf84",
+      "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba",
+      "created_at": "2026-11-04T00:34:00.000Z"
+    },
     {
       "article_id": "5ed76359-4e31-4408-9b61-ef0c50a0aca5",
       "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba",
