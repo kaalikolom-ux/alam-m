@@ -21,6 +21,7 @@ import { Route as ArticlesIndexRouteImport } from './routes/articles.index'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
+import { Route as ApiAdminCacheRouteImport } from './routes/api/admin/cache'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -82,6 +83,11 @@ const PSlugRoute = PSlugRouteImport.update({
   path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminCacheRoute = ApiAdminCacheRouteImport.update({
+  id: '/api/admin/cache',
+  path: '/api/admin/cache',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/c/$slug': typeof CSlugRoute
   '/p/$slug': typeof PSlugRoute
   '/articles/': typeof ArticlesIndexRoute
+  '/api/admin/cache': typeof ApiAdminCacheRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/c/$slug': typeof CSlugRoute
   '/p/$slug': typeof PSlugRoute
   '/articles': typeof ArticlesIndexRoute
+  '/api/admin/cache': typeof ApiAdminCacheRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/c/$slug': typeof CSlugRoute
   '/p/$slug': typeof PSlugRoute
   '/articles/': typeof ArticlesIndexRoute
+  '/api/admin/cache': typeof ApiAdminCacheRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/c/$slug'
     | '/p/$slug'
     | '/articles/'
+    | '/api/admin/cache'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/c/$slug'
     | '/p/$slug'
     | '/articles'
+    | '/api/admin/cache'
   id:
     | '__root__'
     | '/'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/c/$slug'
     | '/p/$slug'
     | '/articles/'
+    | '/api/admin/cache'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,6 +196,7 @@ export interface RootRouteChildren {
   CSlugRoute: typeof CSlugRoute
   PSlugRoute: typeof PSlugRoute
   ArticlesIndexRoute: typeof ArticlesIndexRoute
+  ApiAdminCacheRoute: typeof ApiAdminCacheRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/cache': {
+      id: '/api/admin/cache'
+      path: '/api/admin/cache'
+      fullPath: '/api/admin/cache'
+      preLoaderRoute: typeof ApiAdminCacheRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -288,6 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   CSlugRoute: CSlugRoute,
   PSlugRoute: PSlugRoute,
   ArticlesIndexRoute: ArticlesIndexRoute,
+  ApiAdminCacheRoute: ApiAdminCacheRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

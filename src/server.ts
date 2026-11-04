@@ -1,3 +1,4 @@
+import { STATIC_ARTICLES_META } from "./lib/staticArticlesMeta";
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
@@ -51,6 +52,22 @@ function isH3SwallowedErrorBody(body: string): boolean {
   } catch {
     return false;
   }
+}
+
+
+const STATIC_META_MAP = new Map<string, (typeof STATIC_ARTICLES_META)[number]>();
+for (const item of STATIC_ARTICLES_META) {
+  if (item.slug) STATIC_META_MAP.set(item.slug, item);
+  if (item.id) STATIC_META_MAP.set(item.id, item);
+}
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 export default {

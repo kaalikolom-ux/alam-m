@@ -163,3 +163,24 @@ export function usePrefs() {
   }
   return context;
 }
+export const TRACK_TO_LAYER_MAP: Record<string, string> = {
+  conventional_bn: "showConventionalBn",
+  modern_bn: "showModernBn",
+  conventional_en: "showConventionalEn",
+  modern_en: "showModernEn",
+  arabic: "showArabic",
+};
+
+export function getBaseApiUrl(): string {
+  if (typeof window === "undefined") return "https://a.wooniche.com";
+  return window.location.origin;
+}
+
+export const PUBLIC_PERMS_STORAGE_KEY = "alam_m_public_display_permissions_v1";
+
+export function savePrefs(newPrefs: any) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem("alam_m_prefs_v1", JSON.stringify(newPrefs));
+  } catch {}
+}
