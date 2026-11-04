@@ -3,8 +3,8 @@ export const INITIAL_SEED_DATA = {
   "articles": [
     {
       "id": "169c37e8-c792-4154-bf42-53c1d920bf84",
-      "slug": "ekta-sharir-opekkhay-achi",
-      "title_bn": "একটা শাড়ীর অপেক্ষায় আছি",
+      "slug": "ekta-shari",
+      "title_bn": "একটা শাড়ী",
       "title_en": null,
       "excerpt_bn": "সখী, ভালো তো বাসি, সে কথা তো অসত্য নয়, তবে ভয় হয় — সেদিন যদি তোমায় শাড়িতে দেখে নতুন করে প্রেমে পড়ে যাই!",
       "excerpt_en": null,
