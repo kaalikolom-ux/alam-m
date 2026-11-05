@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "537ef68e-f7fa-4c14-93ad-c2e25ebd23b1",
+    "slug": "bhabnar-kobor",
+    "title_bn": "ভাবনার কবর",
+    "title_en": "ভাবনার কবর",
+    "excerpt_bn": "আমি চাই না— তুমি আমার স্বপ্নে আসো, ঘুমের গভীরে তোমার মুখ দেখে ভোরবেলা আর নিঃস্ব হতে চাই না। আমি চাই না— তুমি আমার কল্পনাতেও আসো, কোনো অবসরে তোমাকে নিয়ে গল্প সাজাতে চাই না...",
+    "excerpt_en": "আমি চাই না— তুমি আমার স্বপ্নে আসো, ঘুমের গভীরে তোমার মুখ দেখে ভোরবেলা আর নিঃস্ব হতে চাই না। আমি চাই না— তুমি আমার কল্পনাতেও আসো, কোনো অবসরে তোমাকে নিয়ে গল্প সাজাতে চাই না...",
+    "cover_image_url": "https://a.wooniche.com/og/articles/bhabnar-kobor.png",
+    "published_at": "2026-11-05T05:44:00.000Z"
+  },
+  {
     "id": "59f149c4-9a4e-4d23-82d5-1731a86ddbca",
     "slug": "berar-opare-tumi",
     "title_bn": "বেড়ার ওপারে তুমি",
