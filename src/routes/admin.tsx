@@ -119,7 +119,6 @@ import { PostsExportImportAdmin } from "@/components/PostsExportImportAdmin";
 import { TwoFactorAdmin } from "@/components/TwoFactorAdmin";
 import { VideoTranscriberAdmin } from "@/components/VideoTranscriberAdmin";
 import { ImageToTextAdmin } from "@/components/ImageToTextAdmin";
-import { QuranLogoBadge } from "@/components/QuranLogoBadge";
 import { QuranExplorerLogo } from "@/components/QuranExplorerLogo";
 import { PageHeroBackground } from "@/components/PageHeroBackground";
 import {
@@ -1079,7 +1078,7 @@ function AdminPage() {
       <div className="flex min-h-screen flex-col items-center justify-center bg-[#f0f0f1] px-4">
         <div className="w-full max-w-sm rounded border border-[#c3c4c7] bg-white p-6 text-center shadow-xs">
           <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-[#1d2327] p-2 shadow-xs">
-            <QuranLogoBadge className="h-8 w-8 rounded-lg" />
+            <Lock className="size-6 text-[#ecd599]" />
           </div>
           <h2 className="text-lg font-semibold text-[#1d2327]">অ্যাডমিন প্রবেশাধিকার সংরক্ষিত</h2>
           <p className="mt-1 text-xs text-[#646970]">শুধুমাত্র অনুমোদিত অ্যাডমিন এই প্যানেলে প্রবেশ করতে পারবেন।</p>
@@ -1123,14 +1122,10 @@ function AdminPage() {
           >
             <Link
               to="/"
-              className="flex items-center gap-2 h-8 px-2.5 hover:bg-white/40 dark:hover:bg-white/10 text-stone-800 dark:text-stone-200 hover:text-[#8e5a07] dark:hover:text-[#ecd599] cursor-pointer transition-colors group select-none"
+              className="flex items-center gap-1.5 h-8 px-2 hover:bg-white/40 dark:hover:bg-white/10 text-stone-800 dark:text-stone-200 hover:text-[#8e5a07] dark:hover:text-[#ecd599] cursor-pointer transition-colors group select-none"
               title="Alam M — হোমপেজে যান (Visit Site)"
             >
-              <QuranLogoBadge
-                className="h-6.5 w-6.5 rounded-[4px] shrink-0 shadow-xs"
-                iconClassName="size-3.5"
-              />
-              <div className="flex flex-col justify-center leading-none shrink-0">
+              <div className="flex flex-col justify-center leading-none shrink-0 py-0.5">
                 <QuranExplorerLogo size="xs" />
               </div>
               <ChevronDown className="size-2.5 text-[#8c8f94] group-hover:text-[#ecd599] transition-transform ml-0.5" />
@@ -1553,12 +1548,8 @@ function AdminPage() {
                     onClick={() => setIsMobileMenuOpen(false)}
                     title="Alam M — হোমপেজে যান"
                   >
-                    <QuranLogoBadge
-                      className="h-7 w-7 rounded-[4px] shrink-0 shadow-xs"
-                      iconClassName="size-4"
-                    />
                     <div className="flex flex-col justify-center leading-none">
-                      <QuranExplorerLogo size="xs" />
+                      <QuranExplorerLogo size="sm" />
                     </div>
                   </Link>
                   <button

@@ -36,7 +36,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { STATIC_ARTICLES_META } from "@/lib/staticArticlesMeta";
 import { generateEnglishSlug } from "@/lib/slugHelper";
 import { formatDurationBn, formatNumberBn, getAnalyticsEndpoint } from "@/lib/visitorTracker";
-import { QuranLogoBadge } from "@/components/QuranLogoBadge";
 import { QuranExplorerLogo } from "@/components/QuranExplorerLogo";
 import { PageHeroBackground } from "@/components/PageHeroBackground";
 
@@ -199,18 +198,14 @@ export function WordPressDashboardOverview({
           <div className="relative z-10 space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#c4aa82]/30 dark:border-[#b88e58]/20 pb-4">
               <div className="flex items-center gap-3.5">
-                <QuranLogoBadge
-                  className="h-10 w-10 sm:h-11 sm:w-11 rounded-[5px] shrink-0 shadow-sm"
-                  iconClassName="size-5.5 sm:size-6"
-                />
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <QuranExplorerLogo size="sm" />
+                    <QuranExplorerLogo size="md" />
                     <span className="text-lg sm:text-xl font-bold text-[#1d2327] dark:text-white">
                       ড্যাশবোর্ডে স্বাগতম!
                     </span>
                   </div>
-                  <p className="text-xs text-[#646970] dark:text-[#a7aaad] mt-0.5">
+                  <p className="text-xs text-[#646970] dark:text-[#a7aaad] mt-1">
                     শব্দ আমার ক্যানভাস &bull; গল্প, কবিতা, স্মৃতিকথা ও সাহিত্যিক প্রবন্ধ পরিচালনার ডিজিটাল কন্ট্রোল প্যানেল
                   </p>
                 </div>
