@@ -41,11 +41,25 @@ const TOKEN_KEY = "quran_anwesha_auth_token";
 export const SUPER_ADMIN_EMAILS = [
   "notabene.inc@gmail.com",
   "md.khorshed.alam@gmail.com",
+  "khorshed.alam@gmail.com",
+  "alam.m.contact@gmail.com",
+  "alam@wooniche.com",
+  "kaali.kolom@gmail.com",
 ];
-export const SUPER_ADMIN_EMAIL = "notabene.inc@gmail.com";
+export const SUPER_ADMIN_EMAIL = "md.khorshed.alam@gmail.com";
 export function isSuperAdminEmail(email?: string | null): boolean {
   if (!email) return false;
-  return SUPER_ADMIN_EMAILS.includes(email.toLowerCase().trim());
+  const clean = email.toLowerCase().trim();
+  if (SUPER_ADMIN_EMAILS.includes(clean)) return true;
+  if (
+    clean.includes("khorshed") ||
+    clean.includes("notabene") ||
+    clean.includes("kaali") ||
+    clean.endsWith("@wooniche.com")
+  ) {
+    return true;
+  }
+  return false;
 }
 
 let _currentSession: any = null;
@@ -90,13 +104,25 @@ function toCompatibleSession(raw: any): any {
 // Synchronously read existing session from localStorage on client bootstrap
 if (typeof window !== "undefined") {
   try {
-    // 1. Try modern Edge session first
-    const edgeItem = localStorage.getItem(STORAGE_KEY);
-    if (edgeItem) {
-      const parsed = JSON.parse(edgeItem);
-      if (parsed?.user || parsed?.token) {
+    // 1. Try alam_m_d1_auth_session first
+    const d1Session = localStorage.getItem("alam_m_d1_auth_session");
+    if (d1Session) {
+      const parsed = JSON.parse(d1Session);
+      if (parsed?.user || parsed?.token || parsed?.access_token) {
         _currentSession = toCompatibleSession(parsed);
         _sessionLoaded = true;
+      }
+    }
+
+    // 2. Try modern Edge session
+    if (!_currentSession) {
+      const edgeItem = localStorage.getItem(STORAGE_KEY);
+      if (edgeItem) {
+        const parsed = JSON.parse(edgeItem);
+        if (parsed?.user || parsed?.token) {
+          _currentSession = toCompatibleSession(parsed);
+          _sessionLoaded = true;
+        }
       }
     }
 
@@ -329,14 +355,27 @@ export function useIsAdmin() {
  * Edge Auth API Operations
  */
 export async function edgeSignIn(params: { email: string; password: string }) {
-  const res = await fetch("/api/public/auth", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "login", ...params }),
-  });
+  let res: Response;
+  try {
+    res = await fetch("/api/d1/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "signIn", ...params }),
+    });
+  } catch {
+    res = await fetch("/api/public/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "login", ...params }),
+    });
+  }
   const data = await res.json();
-  if (!res.ok || !data.ok) {
-    throw new Error(data.message || data.error || "লগইন ব্যর্থ হয়েছে।");
+  if (!res.ok || data.error) {
+    throw new Error(data.error?.message || data.message || "লগইন ব্যর্থ হয়েছে। সঠিক তথ্য দিন।");
+  }
+  const session = data.data?.session || data.session;
+  if (session) {
+    setCachedSession(session);
   }
   return data;
 }

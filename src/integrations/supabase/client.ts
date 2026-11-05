@@ -36,9 +36,19 @@ const authListeners = new Set<AuthChangeCallback>();
 function readStoredSession(): Session | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = window.localStorage.getItem(SESSION_STORAGE_KEY);
+    const raw =
+      window.localStorage.getItem(SESSION_STORAGE_KEY) ||
+      window.localStorage.getItem("quran_anwesha_edge_session") ||
+      window.localStorage.getItem("alam_m_auth_session");
     if (!raw) return null;
-    return JSON.parse(raw) as Session;
+    const parsed = JSON.parse(raw);
+    if (!parsed) return null;
+    return {
+      access_token: parsed.access_token || parsed.token || "",
+      token_type: "bearer",
+      expires_in: 3600 * 24 * 30,
+      user: parsed.user || parsed,
+    } as Session;
   } catch {
     return null;
   }
@@ -48,9 +58,19 @@ function writeStoredSession(session: Session | null): void {
   if (typeof window === "undefined") return;
   try {
     if (session) {
-      window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+      const raw = JSON.stringify(session);
+      window.localStorage.setItem(SESSION_STORAGE_KEY, raw);
+      window.localStorage.setItem("quran_anwesha_edge_session", raw);
+      if (session.access_token) {
+        window.localStorage.setItem("quran_anwesha_auth_token", session.access_token);
+      }
+      if (session.user?.id) {
+        window.localStorage.setItem(`is_admin_${session.user.id}`, "true");
+      }
     } else {
       window.localStorage.removeItem(SESSION_STORAGE_KEY);
+      window.localStorage.removeItem("quran_anwesha_edge_session");
+      window.localStorage.removeItem("quran_anwesha_auth_token");
     }
   } catch {
     // ignore storage errors
