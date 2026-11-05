@@ -8,45 +8,50 @@ interface QuranExplorerLogoProps {
 
 /**
  * Alam M Brand Text Logo
- * Renders "Alam M" in Kaushan Script with the tagline "শব্দ আমার ক্যানভাস"
- * Matches SiteHeader styling exactly without any extraneous badges.
+ * Exact 1:1 match with SiteHeader & SiteFooter:
+ * - "Alam M": font-['Kaushan_Script'] font-bold tracking-tight text-primary
+ * - "শব্দ আমার ক্যানভাস": font-['Hind_Siliguri'] font-medium tracking-widest text-muted-foreground
  */
 export function QuranExplorerLogo({ className = "", size = "md", fill }: QuranExplorerLogoProps) {
   const sizeConfig = {
     xs: {
-      title: "text-[15px] sm:text-[16px]",
-      sub: "text-[8px] sm:text-[8.5px]",
+      title: "text-[16px] sm:text-[17px]",
+      sub: "text-[8.5px] sm:text-[9px]",
+      gap: "gap-0",
     },
     sm: {
-      title: "text-[18px] sm:text-[20px]",
-      sub: "text-[9px] sm:text-[9.5px]",
+      title: "text-[19px] sm:text-[21px]",
+      sub: "text-[9.5px] sm:text-[10px]",
+      gap: "gap-0.5",
     },
     md: {
-      title: "text-[22px] sm:text-[24px]",
+      title: "text-[23px] sm:text-[25px]",
       sub: "text-[10px] sm:text-[10.5px]",
+      gap: "gap-0.5",
     },
     lg: {
       title: "text-[28px] sm:text-[32px]",
       sub: "text-[11px] sm:text-[12px]",
+      gap: "gap-1",
     },
   }[size];
 
-  const titleColor = fill || "text-stone-900 dark:text-stone-100 group-hover:text-[#b88e58] transition-colors";
-  const subColor = fill ? "" : "text-amber-800 dark:text-[#ecd599] font-medium tracking-widest";
+  const titleColor = fill || "text-primary";
+  const subColor = fill ? "" : "text-muted-foreground";
 
   return (
     <div
-      className={`inline-flex flex-col justify-center leading-none select-none text-left ${className}`}
+      className={`inline-flex flex-col justify-center leading-none select-none text-left ${sizeConfig.gap} ${className}`}
       role="img"
       aria-label="Alam M — শব্দ আমার ক্যানভাস"
     >
       <span
-        className={`font-['Kaushan_Script'] font-bold leading-none tracking-tight drop-shadow-xs ${sizeConfig.title} ${titleColor}`}
+        className={`font-['Kaushan_Script'] font-bold leading-none tracking-tight ${sizeConfig.title} ${titleColor}`}
       >
         Alam M
       </span>
       <span
-        className={`font-['Hind_Siliguri'] leading-none mt-1 ${sizeConfig.sub} ${subColor}`}
+        className={`font-['Hind_Siliguri'] font-medium tracking-widest leading-none mt-1 ${sizeConfig.sub} ${subColor}`}
       >
         শব্দ আমার ক্যানভাস
       </span>

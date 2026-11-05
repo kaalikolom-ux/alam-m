@@ -1122,43 +1122,43 @@ function AdminPage() {
           >
             <Link
               to="/"
-              className="flex items-center gap-1.5 h-8 px-2 hover:bg-white/40 dark:hover:bg-white/10 text-stone-800 dark:text-stone-200 hover:text-[#8e5a07] dark:hover:text-[#ecd599] cursor-pointer transition-colors group select-none"
+              className="flex items-center gap-1.5 h-8 px-2 hover:bg-white/10 cursor-pointer transition-colors group select-none"
               title="Alam M — হোমপেজে যান (Visit Site)"
             >
               <div className="flex flex-col justify-center leading-none shrink-0 py-0.5">
                 <QuranExplorerLogo size="xs" />
               </div>
-              <ChevronDown className="size-2.5 text-[#8c8f94] group-hover:text-[#ecd599] transition-transform ml-0.5" />
+              <ChevronDown className="size-2.5 text-muted-foreground group-hover:text-primary transition-transform ml-0.5" />
             </Link>
             {siteDropdown && (
               <div
-                className="absolute left-0 top-8 w-52 bg-[var(--gradient-hero)] text-stone-800 dark:text-stone-200 py-1 shadow-2xl border border-[#c4aa82]/60 dark:border-[#b88e58]/35 border-t-2 border-t-[#b88e58] z-50 text-xs rounded-b backdrop-blur-md overflow-hidden"
+                className="absolute left-0 top-8 w-52 bg-[var(--gradient-hero)] text-stone-800 dark:text-stone-200 py-1 shadow-2xl border border-border/60 z-50 text-xs rounded-b backdrop-blur-md overflow-hidden"
               >
-                <div className="px-3 py-1.5 font-bold text-stone-900 dark:text-stone-100 border-b border-[#c4aa82]/30 dark:border-[#b88e58]/25 bg-white/30 dark:bg-black/30 flex items-center justify-between">
-                  <span>Alam M</span>
-                  <span className="text-[10px] text-[#8e5a07] dark:text-[#ecd599] font-mono">v4.0.0</span>
+                <div className="px-3 py-1.5 font-bold border-b border-border/30 bg-black/20 flex items-center justify-between">
+                  <span className="text-primary font-['Kaushan_Script'] text-base">Alam M</span>
+                  <span className="text-[10px] text-muted-foreground font-mono">v4.0.0</span>
                 </div>
                 <Link
                   to="/"
-                  className="flex items-center justify-between px-3 py-1.5 hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors"
+                  className="flex items-center justify-between px-3 py-1.5 hover:bg-white/10 hover:text-primary transition-colors"
                   onClick={() => setSiteDropdown(false)}
                 >
                   <span className="flex items-center gap-1.5">
-                    <Home className="size-3 text-[#b07818] dark:text-[#ecd599]" />
+                    <Home className="size-3 text-primary" />
                     <span>ওয়েবসাইট দেখুন (Visit Site)</span>
                   </span>
                   <ExternalLink className="size-3 opacity-60" />
                 </Link>
                 <Link
                   to="/about"
-                  className="block px-3 py-1.5 hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors"
+                  className="block px-3 py-1.5 hover:bg-white/10 hover:text-primary transition-colors"
                   onClick={() => setSiteDropdown(false)}
                 >
                   আমাদের সম্পর্কে (About)
                 </Link>
                 <Link
                   to="/articles"
-                  className="block px-3 py-1.5 hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors"
+                  className="block px-3 py-1.5 hover:bg-white/10 hover:text-primary transition-colors"
                   onClick={() => setSiteDropdown(false)}
                 >
                   লেখালেখি (Articles)
