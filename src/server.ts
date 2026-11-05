@@ -311,7 +311,58 @@ Alam M is a Bengali writer and storyteller who views words as a living canvas. W
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const normalized = await normalizeCatastrophicSsrResponse(response);
+
+      const contentType = normalized.headers.get("content-type") || "";
+      if (!contentType.includes("text/html")) {
+        return normalized;
+      }
+
+      const articleMatch = url.pathname.match(/^\/articles\/([^/]+)/);
+      if (articleMatch) {
+        const rawSlug = articleMatch[1];
+        const decodedSlug = decodeURIComponent(rawSlug);
+        const meta = STATIC_META_MAP.get(decodedSlug) || STATIC_META_MAP.get(rawSlug);
+
+        let html = await normalized.text();
+
+        const canonicalUrl = `${url.origin}/articles/${rawSlug}`;
+        const ogImage = `${url.origin}/og/articles/${rawSlug}.png`;
+        const title = meta?.title_bn ? `${meta.title_bn} — Alam M` : "Alam M — শব্দ আমার ক্যানভাস";
+
+        html = html.replace(/<link\s+rel=["']canonical["'][^>]*>/gi, "");
+        html = html.replace(/<meta\s+property=["']og:url["'][^>]*>/gi, "");
+        html = html.replace(/<meta\s+property=["']og:image["'][^>]*>/gi, "");
+        html = html.replace(/<meta\s+property=["']og:image:secure_url["'][^>]*>/gi, "");
+
+        const injection = `
+    <link rel="canonical" href="${canonicalUrl}" />
+    <meta property="og:url" content="${canonicalUrl}" />
+    <meta property="og:image" content="${ogImage}" />
+    <meta property="og:image:secure_url" content="${ogImage}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="${escapeHtml(title)}" />
+    <meta name="twitter:image" content="${ogImage}" />`;
+
+        if (html.includes("</title>")) {
+          html = html.replace("</title>", `</title>${injection}`);
+        } else if (html.includes("<head>")) {
+          html = html.replace("<head>", `<head>${injection}`);
+        }
+
+        const newHeaders = new Headers(normalized.headers);
+        newHeaders.set("Link", `<${canonicalUrl}>; rel="canonical"`);
+        newHeaders.set("Cache-Control", "public, max-age=0, must-revalidate");
+        newHeaders.set("Cloudflare-CDN-Cache-Control", "no-cache");
+
+        return new Response(html, {
+          status: normalized.status,
+          headers: newHeaders,
+        });
+      }
+
+      return normalized;
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {
