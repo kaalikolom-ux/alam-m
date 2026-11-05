@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "a4017adb-63d3-4ae8-a89d-2cb127b8892a",
+    "slug": "ki-sudhai-bolo",
+    "title_bn": "কি সুধাই বলো",
+    "title_en": "কি সুধাই বলো",
+    "excerpt_bn": "কি সুধাই বলো- যখন নীরবতাই উত্তর হয়ে দাঁড়ায়, শব্দেরা হারায় মুখের ভেতর, আর চোখে জমে থাকে অজানা জলের রেখা। কি সুধাই বলো- যখন সময় নিজেই ক্লান্ত...",
+    "excerpt_en": "কি সুধাই বলো- যখন নীরবতাই উত্তর হয়ে দাঁড়ায়, শব্দেরা হারায় মুখের ভেতর, আর চোখে জমে থাকে অজানা জলের রেখা। কি সুধাই বলো- যখন সময় নিজেই ক্লান্ত...",
+    "cover_image_url": "https://a.wooniche.com/og/articles/ki-sudhai-bolo.png",
+    "published_at": "2026-11-05T15:35:00.000Z"
+  },
+  {
     "id": "537ef68e-f7fa-4c14-93ad-c2e25ebd23b1",
     "slug": "bhabnar-kobor",
     "title_bn": "ভাবনার কবর",

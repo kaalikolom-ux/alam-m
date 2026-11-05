@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "a4017adb-63d3-4ae8-a89d-2cb127b8892a",
+      "slug": "ki-sudhai-bolo",
+      "title_bn": "কি সুধাই বলো",
+      "title_en": null,
+      "excerpt_bn": "কি সুধাই বলো- যখন নীরবতাই উত্তর হয়ে দাঁড়ায়, শব্দেরা হারায় মুখের ভেতর, আর চোখে জমে থাকে অজানা জলের রেখা। কি সুধাই বলো- যখন সময় নিজেই ক্লান্ত...",
+      "excerpt_en": null,
+      "content_bn": "<p>কি সুধাই বলো-<br>যখন নীরবতাই উত্তর হয়ে দাঁড়ায়,<br>শব্দেরা হারায় মুখের ভেতর,<br>আর চোখে জমে থাকে অজানা জলের রেখা।</p>\n<p>কি সুধাই বলো-<br>যখন সময় নিজেই ক্লান্ত,<br>পুরোনো দিনের ছায়া ঘুরে বেড়ায়<br>ঘরের দেওয়ালে, ঘড়ির কাঁটায়,<br>তবু কারও নাম আর উচ্চারিত হয় না।</p>\n<p>কি সুধাই বলো-<br>যখন দূরের আলোয় তোমার মুখ ভেসে ওঠে,<br>কিন্তু আর কাছে আসা যায় না,<br>যেন আকাশ থেকে পড়া এক নক্ষত্র<br>হাতে ধরলে ছাই হয়ে যায়।</p>\n<p>কি সুধাই বলো-<br>যখন সব প্রশ্ন শেষ হয়ে গেছে,<br>থেকে গেছে শুধু নিঃশব্দে জেগে থাকা এক মন,<br>যে জানে-<br>সব জানা মানেই সব হারানো নয়,<br>কখনো না জেনেও বেঁচে থাকা<br>আরেক রকম শান্তি।</p>\n<p class=\"poem-date\"><strong>©আলম</strong> - ৫ নভেম্বর ২০২৫ইং, রাত ৮টা ৪৯মি</p>",
+      "content_en": null,
+      "cover_image_url": null,
+      "published": true,
+      "published_at": "2026-11-05T15:35:00.000Z",
+      "created_by": null,
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-11-05T15:35:00.000Z",
+      "updated_at": "2026-11-05T15:35:00.000Z"
+    },
+    {
       "id": "537ef68e-f7fa-4c14-93ad-c2e25ebd23b1",
       "slug": "bhabnar-kobor",
       "title_bn": "ভাবনার কবর",
@@ -225,6 +242,11 @@ export const INITIAL_SEED_DATA = {
   ],
   "verse_translations": [],
   "article_categories": [
+    {
+      "article_id": "a4017adb-63d3-4ae8-a89d-2cb127b8892a",
+      "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba",
+      "created_at": "2026-11-05T15:35:00.000Z"
+    },
     {
       "article_id": "537ef68e-f7fa-4c14-93ad-c2e25ebd23b1",
       "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba",
