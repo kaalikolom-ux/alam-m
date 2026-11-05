@@ -6,51 +6,55 @@ interface QuranExplorerLogoProps {
   fill?: string;
 }
 
+/**
+ * Alam M Brand Text Logo
+ * Renders "Alam M" in Kaushan Script with the tagline "শব্দ আমার ক্যানভাস"
+ */
 export function QuranExplorerLogo({ className = "", size = "md", fill }: QuranExplorerLogoProps) {
   const sizeConfig = {
     xs: {
-      title: "text-[11px] sm:text-[12px]",
-      sub: "text-[5.5px] sm:text-[6px]",
-      gap: "gap-[1px]",
+      title: "text-[14px] sm:text-[15px]",
+      sub: "text-[7.5px] sm:text-[8px]",
+      gap: "gap-0",
     },
     sm: {
-      title: "text-[13px] sm:text-[15px]",
-      sub: "text-[6.5px] sm:text-[7.5px]",
-      gap: "gap-[1px]",
+      title: "text-[17px] sm:text-[19px]",
+      sub: "text-[8.5px] sm:text-[9.5px]",
+      gap: "gap-0",
     },
     md: {
-      title: "text-[16px] sm:text-[18px]",
-      sub: "text-[8px] sm:text-[9px]",
-      gap: "gap-[2px]",
+      title: "text-[21px] sm:text-[23px]",
+      sub: "text-[9.5px] sm:text-[10.5px]",
+      gap: "gap-0.5",
     },
     lg: {
-      title: "text-[22px] sm:text-[25px]",
-      sub: "text-[10px] sm:text-[11.5px]",
-      gap: "gap-[3px]",
+      title: "text-[28px] sm:text-[32px]",
+      sub: "text-[11.5px] sm:text-[13px]",
+      gap: "gap-1",
     },
   }[size];
 
-  const titleColor = fill || "text-foreground dark:text-white";
-  const subColor = fill ? "" : "text-primary dark:text-[#b88e58]";
+  const titleColor = fill || "text-stone-900 dark:text-stone-100";
+  const subColor = fill ? "" : "text-amber-800 dark:text-[#ecd599]";
 
   return (
     <div
       className={`inline-flex flex-col justify-center leading-none select-none text-left ${sizeConfig.gap} ${className}`}
       role="img"
-      aria-label="QUR'AN EXPLORER"
+      aria-label="Alam M — শব্দ আমার ক্যানভাস"
     >
       <span
-        className={`font-brand-serif font-black uppercase leading-none tracking-[0.06em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)] ${sizeConfig.title} ${titleColor}`}
-        style={{ letterSpacing: "0.06em" }}
+        className={`font-['Kaushan_Script'] font-bold leading-none tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.25)] ${sizeConfig.title} ${titleColor}`}
       >
-        QUR'AN
+        Alam M
       </span>
       <span
-        className={`font-brand-sans font-bold uppercase leading-none ${sizeConfig.sub} ${subColor}`}
-        style={{ letterSpacing: "0.34em" }}
+        className={`font-['Hind_Siliguri'] font-medium tracking-wider leading-none mt-0.5 ${sizeConfig.sub} ${subColor}`}
       >
-        EXPLORER
+        শব্দ আমার ক্যানভাস
       </span>
     </div>
   );
 }
+
+export const AlamMLogo = QuranExplorerLogo;

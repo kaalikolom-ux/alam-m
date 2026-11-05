@@ -125,13 +125,13 @@ export function CloudflareD1StatusAdmin() {
 
   const statusData = d1QueryStatus.data;
   const tables = statusData?.tables || [
-    { name: "articles", labelBn: "প্রবন্ধ ও পোস্ট (Articles)", descriptionBn: "কুরআন অন্বেষা ব্লগের সকল মৌলিক ও গবেষণামূলক প্রবন্ধ", count: 328, category: "core" },
+    { name: "articles", labelBn: "প্রবন্ধ ও পোস্ট (Articles)", descriptionBn: "Alam M ব্লগের সকল মৌলিক গল্প, কবিতা ও সাহিত্যিক প্রবন্ধ", count: 328, category: "core" },
     { name: "authors", labelBn: "লেখক ও গবেষক (Authors)", descriptionBn: "প্রবন্ধ রচয়িতা ও তাদাব্বুর গবেষকদের প্রোফাইল", count: 3, category: "core" },
     { name: "categories", labelBn: "বিষয়ভিত্তিক ক্যাটাগরি (Categories)", descriptionBn: "কুরআনিক, গবেষণা, বিজ্ঞান ইত্যাদি বিষয়শ্রেণী", count: 6, category: "core" },
     { name: "site_settings", labelBn: "সাইট কনফিগারেশন (Settings)", descriptionBn: "হেডার, ফুটার, টার্নস্টাইল ও সার্বিক সাইট সেটিংস", count: 14, category: "config" },
     { name: "users", labelBn: "নিবন্ধিত ব্যবহারকারী (Users)", descriptionBn: "এডমিন ও ইউজার অ্যাকাউন্ট রেকর্ড", count: 1, category: "user" },
     { name: "sessions", labelBn: "অ্যাক্টিভ সেশন (Sessions)", descriptionBn: "নিরাপদ লগইন ও ডিভাইস অথ সেশন", count: 9, category: "user" },
-    { name: "bookmarks", labelBn: "সংরক্ষিত বুকমার্ক (Bookmarks)", descriptionBn: "ব্যবহারকারীদের সংরক্ষিত আয়াত ও আর্টিকেল", count: 0, category: "user" },
+    { name: "bookmarks", labelBn: "সংরক্ষিত বুকমার্ক (Bookmarks)", descriptionBn: "পাঠকদের সংরক্ষিত প্রিয় গল্প ও কবিতা", count: 0, category: "user" },
     { name: "article_reactions", labelBn: "নিবন্ধ রিঅ্যাকশন (Reactions)", descriptionBn: "লাইক, লাভ ও পাঠক প্রতিক্রিয়া সংখ্যা", count: 0, category: "user" },
     { name: "newsletter_subscribers", labelBn: "নিউজলেটার গ্রাহক (Subscribers)", descriptionBn: "ইমেইল বিজ্ঞপ্তির জন্য সাবস্ক্রাইব করা পাঠক তালিকা", count: 0, category: "user" },
     { name: "contact_messages", labelBn: "পাঠক বার্তা (Contact Messages)", descriptionBn: "ওয়েবসাইটে পাঠানো পাঠক মতামত ও যোগাযোগ বার্তা", count: 0, category: "user" },

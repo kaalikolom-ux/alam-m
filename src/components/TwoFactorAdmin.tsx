@@ -225,7 +225,7 @@ export function TwoFactorAdmin() {
 
   function handleDownloadBackupCodes() {
     if (!backupCodes.length) return;
-    const text = `========================================\nQURAN EXPLORE PRO (কুরআন অন্বেষা)\n2FA EMERGENCY BACKUP RECOVERY CODES\n========================================\n\nAccount: ${user?.email || "Admin"}\nGenerated on: ${new Date().toLocaleString()}\n\nEach code below can be used ONCE to sign in if you lose access to Google Authenticator:\n\n` +
+    const text = `========================================\nALAM M (শব্দ আমার ক্যানভাস)\n2FA EMERGENCY BACKUP RECOVERY CODES\n========================================\n\nAccount: ${user?.email || "Admin"}\nGenerated on: ${new Date().toLocaleString()}\n\nEach code below can be used ONCE to sign in if you lose access to Google Authenticator:\n\n` +
       backupCodes.map((c, i) => `[ ${i + 1 < 10 ? "0" + (i + 1) : i + 1} ]  ${c}`).join("\n") +
       `\n\nKeep these codes safe and private!\n========================================\n`;
     const blob = new Blob([text], { type: "text/plain;charset=utf-8" });

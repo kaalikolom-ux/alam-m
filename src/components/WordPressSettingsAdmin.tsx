@@ -162,10 +162,10 @@ export function WordPressSettingsAdmin({
 
   // 1. GENERAL SETTINGS STATE
   const [generalSettings, setGeneralSettings] = useState({
-    siteTitle: "কুরআন অন্বেষা — Quran Explorer",
-    tagline: "বিজ্ঞানভিত্তিক গবেষণা, শব্দে শব্দে অর্থ ও কুরআন অন্বেষা",
-    siteUrl: "https://www.quraan.bd",
-    adminEmail: user?.email || "admin@quraan.bd",
+    siteTitle: "Alam M — শব্দ আমার ক্যানভাস",
+    tagline: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ",
+    siteUrl: "https://a.wooniche.com",
+    adminEmail: user?.email || "alam@wooniche.com",
     membership: true,
     defaultRole: "subscriber",
     siteLanguage: "bn",
@@ -1290,7 +1290,7 @@ export function WordPressSettingsAdmin({
                     onChange={(e) =>
                       setHeaderSettings({ ...headerSettings, siteTitle: e.target.value })
                     }
-                    placeholder="কুরআন অন্বেষা — Quran Explorer"
+                    placeholder="Alam M — শব্দ আমার ক্যানভাস"
                     className="max-w-md h-8 text-xs bg-background"
                   />
                   <p className="text-[11px] text-muted-foreground mt-1">
@@ -1310,7 +1310,7 @@ export function WordPressSettingsAdmin({
                     onChange={(e) =>
                       setHeaderSettings({ ...headerSettings, tagline: e.target.value })
                     }
-                    placeholder="শব্দে শব্দে কুরআন অন্বেষা"
+                    placeholder="শব্দ আমার ক্যানভাস"
                     className="max-w-md h-8 text-xs bg-background"
                   />
                   <p className="text-[11px] text-muted-foreground mt-1">
@@ -1414,7 +1414,7 @@ export function WordPressSettingsAdmin({
                             },
                           })
                         }
-                        placeholder="যেমন: পবিত্র রমজান উপলক্ষ্যে নতুন কুরআন অন্বেষা অনুবাদ উন্মুক্ত করা হয়েছে!"
+                        placeholder="যেমন: নতুন কবিতা বা গল্প প্রকাশিত হয়েছে — এখনই পড়ুন!"
                         className="md:col-span-3 h-8 text-xs bg-background"
                       />
                     </div>

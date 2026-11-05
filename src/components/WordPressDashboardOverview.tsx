@@ -211,7 +211,7 @@ export function WordPressDashboardOverview({
                     </span>
                   </div>
                   <p className="text-xs text-[#646970] dark:text-[#a7aaad] mt-0.5">
-                    শব্দে শব্দে কুরআন অন্বেষা &bull; কুরআনের গবেষণা, অনুবাদ ও প্রবন্ধ পরিচালনার ডিজিটাল কন্ট্রোল প্যানেল
+                    শব্দ আমার ক্যানভাস &bull; গল্প, কবিতা, স্মৃতিকথা ও সাহিত্যিক প্রবন্ধ পরিচালনার ডিজিটাল কন্ট্রোল প্যানেল
                   </p>
                 </div>
               </div>
@@ -307,7 +307,7 @@ export function WordPressDashboardOverview({
                         <Languages className="size-3.5" />
                       </div>
                       <span className="text-xs font-semibold text-[#1e150f] dark:text-[#f0f0f1] group-hover:text-[#a16e03] dark:group-hover:text-[#ecd599] transition-colors truncate">
-                        কুরআন আয়াত ও অনুবাদ পরীক্ষা করুন
+                        সকল সাহিত্যকর্ম ও লেখা পরীক্ষা করুন
                       </span>
                     </div>
                     <ChevronRight className="size-3.5 text-muted-foreground/60 group-hover:text-[#a16e03] dark:group-hover:text-[#ecd599] group-hover:translate-x-0.5 transition-all shrink-0" />
@@ -432,7 +432,7 @@ export function WordPressDashboardOverview({
                         <BookOpen className="size-3.5" />
                       </div>
                       <span className="text-xs font-semibold text-[#1e150f] dark:text-[#f0f0f1] group-hover:text-[#a16e03] dark:group-hover:text-[#ecd599] transition-colors truncate">
-                        কুরআন PDF ও ই-বুক এক্সপোর্টার
+                        আর্টিকেল PDF ও ই-বুক এক্সপোর্টার
                       </span>
                     </div>
                     <ChevronRight className="size-3.5 text-muted-foreground/60 group-hover:text-[#a16e03] dark:group-hover:text-[#ecd599] group-hover:translate-x-0.5 transition-all shrink-0" />
@@ -576,7 +576,7 @@ export function WordPressDashboardOverview({
                     <Activity className="size-3.5 text-[#a16e03] dark:text-[#ecd599]" />
                     <span>এক নজরে (At a Glance)</span>
                   </h3>
-                  <span className="text-[11px] font-semibold text-amber-800 dark:text-[#ecd599]">কুরআন অন্বেষা ডেটাবেস</span>
+                  <span className="text-[11px] font-semibold text-amber-800 dark:text-[#ecd599]">Cloudflare D1 ডেটাবেস</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">

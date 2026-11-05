@@ -140,7 +140,7 @@ export const Route = createFileRoute("/admin")({
   },
   head: () => ({
     meta: [
-      { title: "অ্যাডমিন ড্যাশবোর্ড — কুরআন অন্বেষা" },
+      { title: "অ্যাডমিন ড্যাশবোর্ড — Alam M" },
       { name: "description", content: "আর্টিকেল ও কনটেন্ট ব্যবস্থাপনা প্যানেল।" },
       { name: "robots", content: "noindex" },
     ],
@@ -1079,7 +1079,7 @@ function AdminPage() {
       <div className="flex min-h-screen flex-col items-center justify-center bg-[#f0f0f1] px-4">
         <div className="w-full max-w-sm rounded border border-[#c3c4c7] bg-white p-6 text-center shadow-xs">
           <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-[#1d2327] p-2 shadow-xs">
-            <img src="/favicon.svg" alt="কুরআন অন্বেষা লোগো" className="size-8 object-contain select-none" />
+            <QuranLogoBadge className="h-8 w-8 rounded-lg" />
           </div>
           <h2 className="text-lg font-semibold text-[#1d2327]">অ্যাডমিন প্রবেশাধিকার সংরক্ষিত</h2>
           <p className="mt-1 text-xs text-[#646970]">শুধুমাত্র অনুমোদিত অ্যাডমিন এই প্যানেলে প্রবেশ করতে পারবেন।</p>
@@ -1124,7 +1124,7 @@ function AdminPage() {
             <Link
               to="/"
               className="flex items-center gap-2 h-8 px-2.5 hover:bg-white/40 dark:hover:bg-white/10 text-stone-800 dark:text-stone-200 hover:text-[#8e5a07] dark:hover:text-[#ecd599] cursor-pointer transition-colors group select-none"
-              title="কুরআন অন্বেষা — হোমপেজে যান (Visit Site)"
+              title="Alam M — হোমপেজে যান (Visit Site)"
             >
               <QuranLogoBadge
                 className="h-6.5 w-6.5 rounded-[4px] shrink-0 shadow-xs"
@@ -1140,7 +1140,7 @@ function AdminPage() {
                 className="absolute left-0 top-8 w-52 bg-[var(--gradient-hero)] text-stone-800 dark:text-stone-200 py-1 shadow-2xl border border-[#c4aa82]/60 dark:border-[#b88e58]/35 border-t-2 border-t-[#b88e58] z-50 text-xs rounded-b backdrop-blur-md overflow-hidden"
               >
                 <div className="px-3 py-1.5 font-bold text-stone-900 dark:text-stone-100 border-b border-[#c4aa82]/30 dark:border-[#b88e58]/25 bg-white/30 dark:bg-black/30 flex items-center justify-between">
-                  <span>কুরআন অন্বেষা</span>
+                  <span>Alam M</span>
                   <span className="text-[10px] text-[#8e5a07] dark:text-[#ecd599] font-mono">v4.0.0</span>
                 </div>
                 <Link
@@ -1162,11 +1162,11 @@ function AdminPage() {
                   আমাদের সম্পর্কে (About)
                 </Link>
                 <Link
-                  to="/readme"
+                  to="/articles"
                   className="block px-3 py-1.5 hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors"
                   onClick={() => setSiteDropdown(false)}
                 >
-                  অন্বেষা ও বিবরণী (Readme)
+                  লেখালেখি (Articles)
                 </Link>
                 <Link
                   to="/contact"
@@ -1551,7 +1551,7 @@ function AdminPage() {
                     to="/"
                     className="flex items-center gap-2 select-none group"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    title="কুরআন অন্বেষা — হোমপেজে যান"
+                    title="Alam M — হোমপেজে যান"
                   >
                     <QuranLogoBadge
                       className="h-7 w-7 rounded-[4px] shrink-0 shadow-xs"
@@ -1734,7 +1734,7 @@ function AdminPage() {
                         এডমিন ড্যাশবোর্ড ওভারভিউ
                       </h3>
                       <p>
-                        কুরআন অন্বেষার নতুন এডমিন ড্যাশবোর্ডে আপনাকে স্বাগতম। এই প্যানেল থেকে আপনি সম্পূর্ণ ওয়েবসাইট, আর্টিকেল, কুরআনের আয়াত ও অনুবাদ, অডিও তেলাওয়াত, এবং ব্যবহারকারী রোল নিয়ন্ত্রণ করতে পারবেন।
+                        Alam M-এর এডমিন ড্যাশবোর্ডে আপনাকে স্বাগতম। এই প্যানেল থেকে আপনি সম্পূর্ণ ওয়েবসাইট, গল্প, কবিতা, স্মৃতিকথা, প্রবন্ধ ও ব্যবহারকারী রোল নিয়ন্ত্রণ করতে পারবেন।
                       </p>
                     </div>
                   ) : (
@@ -1847,7 +1847,7 @@ function AdminPage() {
                 <div className="space-y-1.5">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-[11px] font-bold text-amber-800 dark:text-[#ecd599] shadow-2xs">
                     <Sparkles className="size-3 text-amber-500 dark:text-[#ecd599] animate-pulse" />
-                    <span>কুরআন অন্বেষা — এআই ও মাল্টিমিডিয়া কনভার্টার</span>
+                    <span>আলম এম — এআই ও মাল্টিমিডিয়া কনভার্টার</span>
                   </div>
                   <h2 className="text-base sm:text-lg font-bold text-[#1e150f] dark:text-white font-serif">
                     ভিডিও ট্রান্সক্রিপশন ও ইমেজ টু টেক্সট (OCR)
@@ -2233,7 +2233,7 @@ function AdminPage() {
               className="mt-12 border-t border-[#c3c4c7] dark:border-[#3c434a] py-3 text-xs text-[#646970] dark:text-[#8c8f94] flex flex-wrap items-center justify-between gap-2 px-1 select-none"
             >
               <div>
-                <span>কুরআন অন্বেষা দিয়ে তৈরি করার জন্য ধন্যবাদ। (Thank you for creating with Quran Explorer.)</span>
+                <span>Alam M দিয়ে তৈরি করার জন্য ধন্যবাদ। (Thank you for creating with Alam M.)</span>
               </div>
               <div>
                 <span>ভার্সন ৩.৩.০ (Version 3.3.0)</span>
