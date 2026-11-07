@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "134bb1b1-738d-48d2-8457-db1c989f8401",
+    "slug": "kalo-amar-kalo",
+    "title_bn": "কালো আমার কালো",
+    "title_en": "কালো আমার কালো",
+    "excerpt_bn": "তুই কেন তুই হয়েছিলি, কেন তুই কালো হয়েছিলি- এই প্রশ্নটা আজও বুকের ভেতর নীরব আগুন হয়ে জ্বলে। মানুষ তোকে রঙে মাপতে চেয়েছিল, চোখের ভেতরের আলোটা দেখেনি কেউ...",
+    "excerpt_en": "তুই কেন তুই হয়েছিলি, কেন তুই কালো হয়েছিলি- এই প্রশ্নটা আজও বুকের ভেতর নীরব আগুন হয়ে জ্বলে। মানুষ তোকে রঙে মাপতে চেয়েছিল, চোখের ভেতরের আলোটা দেখেনি কেউ...",
+    "cover_image_url": "https://a.wooniche.com/og/articles/kalo-amar-kalo.png",
+    "published_at": "2026-11-07T15:55:00.000Z"
+  },
+  {
     "id": "a4017adb-63d3-4ae8-a89d-2cb127b8892a",
     "slug": "ki-sudhai-bolo",
     "title_bn": "কি সুধাই বলো",
