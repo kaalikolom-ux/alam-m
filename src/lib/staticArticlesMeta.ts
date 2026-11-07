@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "240ca110-56e6-4cb2-8483-b5cba79d6def",
+    "slug": "be-careful",
+    "title_bn": "ডুব সাঁতার (be careful)",
+    "title_en": "Be Careful",
+    "excerpt_bn": "রাত তখন সাড়ে এগারোটা। ল্যাপটপ বন্ধ করে আরিয়ান ফোন হাতে নিয়ে ফেসবুকে ঢুকলো। ইনবক্সে নতুন নোটিফিকেশন। অচেনা নাম- নায়লা। প্রথম মেসেজটা পড়েই বুকটা ধড়াস করে উঠলো...",
+    "excerpt_en": "It was half past eleven at night. Ariyan closed his laptop. Picked up his phone. Opened Facebook. And there it was—a message from a name he'd never seen before...",
+    "cover_image_url": "https://a.wooniche.com/og/articles/be-careful.png",
+    "published_at": "2026-11-07T16:30:00.000Z"
+  },
+  {
     "id": "134bb1b1-738d-48d2-8457-db1c989f8401",
     "slug": "kalo-amar-kalo",
     "title_bn": "কালো আমার কালো",
@@ -139,16 +149,6 @@ export const STATIC_ARTICLES_META = [
     "excerpt_en": "",
     "cover_image_url": "https://a.wooniche.com/og/articles/option-ami-noi.png",
     "published_at": "2026-08-19T22:15:49.528+00:00"
-  },
-  {
-    "id": "240ca110-56e6-4cb2-8483-b5cba79d6def",
-    "slug": "be-careful",
-    "title_bn": "ডুব সাঁতার",
-    "title_en": "Be Careful",
-    "excerpt_bn": "",
-    "excerpt_en": "",
-    "cover_image_url": "https://a.wooniche.com/og/articles/be-careful.png",
-    "published_at": "2026-08-20T04:32:56.37+00:00"
   }
 ] as const;
 
