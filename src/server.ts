@@ -328,7 +328,7 @@ Alam M is a Bengali writer and storyteller who views words as a living canvas. W
 
         const canonicalUrl = `${url.origin}/articles/${rawSlug}`;
         const ogImage = `${url.origin}/og/articles/${rawSlug}.png`;
-        const title = meta?.title_bn ? `${meta.title_bn} — Alam M` : "Alam M — শব্দ আমার ক্যানভাস";
+        const title = meta?.title_bn ? `${meta.title_bn} - Alam M` : "Alam M - শব্দ আমার ক্যানভাস";
 
         html = html.replace(/<link\s+rel=["']canonical["'][^>]*>/gi, "");
         html = html.replace(/<meta\s+property=["']og:url["'][^>]*>/gi, "");

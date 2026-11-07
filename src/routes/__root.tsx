@@ -26,7 +26,7 @@ function NotFoundComponent() {
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">পাতাটি খুঁজে পাওয়া যায়নি</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Page not found — the page you are looking for does not exist.
+          Page not found - the page you are looking for does not exist.
         </p>
         <div className="mt-6">
           <Link
@@ -84,15 +84,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Alam M — শব্দ আমার ক্যানভাস" },
+      { title: "Alam M - শব্দ আমার ক্যানভাস" },
       {
         name: "description",
         content: "শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। গল্প, কবিতা ও স্মৃতিকথা।",
       },
       { property: "og:type", content: "website" },
       
-      { property: "og:site_name", content: "Alam M — শব্দ আমার ক্যানভাস" },
-      { property: "og:title", content: "Alam M — শব্দ আমার ক্যানভাস" },
+      { property: "og:site_name", content: "Alam M - শব্দ আমার ক্যানভাস" },
+      { property: "og:title", content: "Alam M - শব্দ আমার ক্যানভাস" },
       {
         property: "og:description",
         content: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।",
@@ -102,9 +102,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image:type", content: "image/png" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "Alam M — শব্দ আমার ক্যানভাস" },
+      { property: "og:image:alt", content: "Alam M - শব্দ আমার ক্যানভাস" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Alam M — শব্দ আমার ক্যানভাস" },
+      { name: "twitter:title", content: "Alam M - শব্দ আমার ক্যানভাস" },
       { name: "twitter:description", content: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।" },
       { name: "twitter:image", content: "https://a.wooniche.com/og-image.png" },
       { name: "theme-color", content: "#050b14" },

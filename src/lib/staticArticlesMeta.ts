@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "5c18b7c9-4b2e-4b68-963a-2bc0a9b34a17",
+    "slug": "apnar-basha-ki-thakurgaon",
+    "title_bn": "আপনার বাসা কী ঠাকুরগাঁও?",
+    "title_en": "আপনার বাসা কী ঠাকুরগাঁও?",
+    "excerpt_bn": "\"আপনার বাসা কী ঠাকুরগাঁও?\"- এমন একটা ক্ষুদে বার্তা আসে জায়েদ আহমেদের মেসেঞ্জারে। সে ভাবতে থাকে এটা কেমন হলো। কেউ তো কথা শুরু করে hi, hey, hello দিয়ে, নয়তো সালাম দিয়ে...",
+    "excerpt_en": "\"আপনার বাসা কী ঠাকুরগাঁও?\"- এমন একটা ক্ষুদে বার্তা আসে জায়েদ আহমেদের মেসেঞ্জারে। সে ভাবতে থাকে এটা কেমন হলো। কেউ তো কথা শুরু করে hi, hey, hello দিয়ে, নয়তো সালাম দিয়ে...",
+    "cover_image_url": "https://a.wooniche.com/og/articles/apnar-basha-ki-thakurgaon.png",
+    "published_at": "2026-11-07T17:15:00.000Z"
+  },
+  {
     "id": "1452236b-5d15-483e-ae8c-2ed5e8aab893",
     "slug": "saikel-bhromon-o-hariye-jawa-sweety",
     "title_bn": "সাইকেল ভ্রমন ও হারিয়ে যাওয়া সুইটি",

@@ -60,10 +60,11 @@ export const Route = createFileRoute("/articles/$slug")({
 
     return { article: art };
   },
-  head: ({ loaderData }) => {
+  head: ({ loaderData, params }) => {
+    const rawSlug = (params as Record<string, string>)?.["slug"] || "";
     const art = loaderData?.article;
-    const slug = art?.slug ? encodeURIComponent(art.slug) : "";
-    const title = art?.title_bn ? `${art.title_bn} — Alam M` : "Alam M — শব্দ আমার ক্যানভাস";
+    const slug = art?.slug ? encodeURIComponent(art.slug) : (rawSlug ? encodeURIComponent(rawSlug) : "");
+    const title = art?.title_bn ? `${art.title_bn} - Alam M` : "Alam M - শব্দ আমার ক্যানভাস";
     const description = art?.excerpt_bn || "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।";
     const canonicalUrl = slug ? `https://a.wooniche.com/articles/${slug}` : "https://a.wooniche.com/";
     const image = art?.cover_image_url || (slug ? `https://a.wooniche.com/og/articles/${slug}.png` : "https://a.wooniche.com/og-image.png");
