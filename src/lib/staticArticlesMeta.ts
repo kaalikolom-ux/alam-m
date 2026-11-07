@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "1452236b-5d15-483e-ae8c-2ed5e8aab893",
+    "slug": "saikel-bhromon-o-hariye-jawa-sweety",
+    "title_bn": "সাইকেল ভ্রমন ও হারিয়ে যাওয়া সুইটি",
+    "title_en": "সাইকেল ভ্রমন ও হারিয়ে যাওয়া সুইটি",
+    "excerpt_bn": "তখন ইন্টারমিডিয়েটে পড়ি। আমরা সরকারী কলোনীতে থাকতাম। আমাদের বরাবর নীচতলায় এক ভাড়াটে থাকতো। তার একটা নতুন ফিনিক্স সাইকেল ছিলো। উনার কাছ থেকে মাঝেমাঝে সাইকেল নিয়ে চালাতাম...",
+    "excerpt_en": "তখন ইন্টারমিডিয়েটে পড়ি। আমরা সরকারী কলোনীতে থাকতাম। আমাদের বরাবর নীচতলায় এক ভাড়াটে থাকতো। তার একটা নতুন ফিনিক্স সাইকেল ছিলো। উনার কাছ থেকে মাঝেমাঝে সাইকেল নিয়ে চালাতাম...",
+    "cover_image_url": "https://a.wooniche.com/og/articles/saikel-bhromon-o-hariye-jawa-sweety.png",
+    "published_at": "2026-11-07T16:46:00.000Z"
+  },
+  {
     "id": "240ca110-56e6-4cb2-8483-b5cba79d6def",
     "slug": "be-careful",
     "title_bn": "ডুব সাঁতার (be careful)",
