@@ -21,24 +21,24 @@ import {
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
-    links: [{ rel: "canonical", href: "https://a.wooniche.com/contact" }],
+    links: [{ rel: "canonical", href: "https://blog.wooniche.com/contact" }],
     meta: [
-      { title: "যোগাযোগ — Alam M" },
+      { title: "যোগাযোগ - Alam M" },
       {
         name: "description",
         content: "লেখক আলমের সাথে যোগাযোগ করুন — প্রশ্ন, মতামত বা কাজের প্রস্তাব পাঠান।",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://a.wooniche.com/contact" },
-      { property: "og:title", content: "যোগাযোগ — Alam M" },
+      { property: "og:url", content: "https://blog.wooniche.com/contact" },
+      { property: "og:title", content: "যোগাযোগ - Alam M" },
       { property: "og:description", content: "প্রশ্ন, মতামত বা কাজের প্রস্তাব পাঠান।" },
-      { property: "og:image", content: "https://a.wooniche.com/og-image.png" },
-      { property: "og:image:secure_url", content: "https://a.wooniche.com/og-image.png" },
+      { property: "og:image", content: "https://blog.wooniche.com/og-image.png" },
+      { property: "og:image:secure_url", content: "https://blog.wooniche.com/og-image.png" },
       { property: "og:image:type", content: "image/png" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://a.wooniche.com/og-image.png" },
+      { name: "twitter:image", content: "https://blog.wooniche.com/og-image.png" },
     ],
   }),
   component: ContactPage,

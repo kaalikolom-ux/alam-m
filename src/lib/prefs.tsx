@@ -172,7 +172,7 @@ export const TRACK_TO_LAYER_MAP: Record<string, string> = {
 };
 
 export function getBaseApiUrl(): string {
-  if (typeof window === "undefined") return "https://a.wooniche.com";
+  if (typeof window === "undefined") return "https://blog.wooniche.com";
   return window.location.origin;
 }
 

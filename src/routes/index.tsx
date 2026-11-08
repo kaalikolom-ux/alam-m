@@ -11,26 +11,34 @@ import { NewsletterForm } from "@/components/NewsletterForm";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    links: [{ rel: "canonical", href: "https://a.wooniche.com/" }],
+    links: [
+      { rel: "canonical", href: "https://blog.wooniche.com/" },
+      { rel: "alternate", href: "https://a.wooniche.com/" },
+    ],
     meta: [
-      { title: "Alam M — শব্দ আমার ক্যানভাস" },
+      { title: "Alam M - শব্দ আমার ক্যানভাস" },
       {
         name: "description",
         content: "শব্দের একজন লেখক এবং দৈনন্দিন মুহূর্তের মাঝে লুকানো গল্পগুলোর এক অনুসন্ধানী। গল্প, কবিতা ও স্মৃতিকথা।",
       },
-      { property: "og:url", content: "https://a.wooniche.com/" },
-      { property: "og:title", content: "Alam M — শব্দ আমার ক্যানভাস" },
+      { property: "og:site_name", content: "Alam M - শব্দ আমার ক্যানভাস" },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://blog.wooniche.com/" },
+      { property: "og:title", content: "Alam M - শব্দ আমার ক্যানভাস" },
       {
         property: "og:description",
         content: "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।",
       },
-      { property: "og:image", content: "https://a.wooniche.com/og-image.png" },
-      { property: "og:image:secure_url", content: "https://a.wooniche.com/og-image.png" },
+      { property: "og:image", content: "https://blog.wooniche.com/og-image.png" },
+      { property: "og:image:secure_url", content: "https://blog.wooniche.com/og-image.png" },
       { property: "og:image:type", content: "image/png" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "Alam M - শব্দ আমার ক্যানভাস" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "https://a.wooniche.com/og-image.png" },
+      { name: "twitter:title", content: "Alam M - শব্দ আমার ক্যানভাস" },
+      { name: "twitter:description", content: "কবিতা, গল্প, সাহিত্য ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।" },
+      { name: "twitter:image", content: "https://blog.wooniche.com/og-image.png" },
     ],
   }),
   component: HomePage,

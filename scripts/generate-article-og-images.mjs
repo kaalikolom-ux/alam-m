@@ -2,13 +2,15 @@
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
-import { generateArticleOgSvg } from '../src/lib/ogImageSvg.ts';
+import { generateArticleOgSvg, generateHomeOgSvg } from '../src/lib/ogImageSvg.ts';
 
 async function main() {
   const args = process.argv.slice(2);
   const force = args.includes('--force') || args.includes('-f');
   const targetSlug = args.find(a => !a.startsWith('-'));
 
+  const publicDir = path.resolve('public');
+  const ogDir = path.resolve('public/og');
   const outputDir = path.resolve('public/og/articles');
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
@@ -19,7 +21,48 @@ async function main() {
     fs.mkdirSync(distOutputDir, { recursive: true });
   }
 
-  console.log('🖼️  Generating luxury article Open Graph (og:image) banners...');
+  console.log('🖼️  Generating luxury Open Graph (og:image) banners for Alam M (blog.wooniche.com)...');
+
+  // 1. Generate Homepage OG Image (1200x630 HD) for https://blog.wooniche.com/
+  try {
+    const homeSvg = generateHomeOgSvg({
+      siteName: 'Alam M',
+      tagline: 'শব্দ আমার ক্যানভাস',
+      description: 'কবিতা, গল্প, সাহিত্য ও চিন্তাভাবনার গভীর আলোড়নকারী সাহিত্যিক কাজ',
+      subDescription: 'শব্দের একজন লেখক এবং জীবনের নীরব মুহূর্তের গল্পকথক',
+      categoryBadge: 'অফিশিয়াল ওয়েবসাইট',
+      authorName: 'আলম এম.',
+      domain: 'blog.wooniche.com'
+    });
+
+    const homePngBuffer = await sharp(Buffer.from(homeSvg))
+      .png({ quality: 95, compressionLevel: 8 })
+      .toBuffer();
+
+    const homeJpgBuffer = await sharp(Buffer.from(homeSvg))
+      .jpeg({ quality: 92 })
+      .toBuffer();
+
+    // Write to public/
+    fs.writeFileSync(path.join(publicDir, 'og-image.png'), homePngBuffer);
+    fs.writeFileSync(path.join(publicDir, 'og-image.jpg'), homeJpgBuffer);
+    if (!fs.existsSync(ogDir)) fs.mkdirSync(ogDir, { recursive: true });
+    fs.writeFileSync(path.join(ogDir, 'home.png'), homePngBuffer);
+
+    // Write to .output/public/ if dist exists
+    const distPublic = path.resolve('.output/public');
+    if (fs.existsSync(distPublic)) {
+      fs.writeFileSync(path.join(distPublic, 'og-image.png'), homePngBuffer);
+      fs.writeFileSync(path.join(distPublic, 'og-image.jpg'), homeJpgBuffer);
+      const distOg = path.join(distPublic, 'og');
+      if (!fs.existsSync(distOg)) fs.mkdirSync(distOg, { recursive: true });
+      fs.writeFileSync(path.join(distOg, 'home.png'), homePngBuffer);
+    }
+
+    console.log('   ✅ Homepage OG Banner Generated: og-image.png, og-image.jpg, og/home.png (1200x630 HD)');
+  } catch (err) {
+    console.error('❌ Failed to generate Homepage OG image:', err.message);
+  }
 
   // Read articles from src/integrations/d1/seed-data.ts
   const seedPath = path.resolve('src/integrations/d1/seed-data.ts');
@@ -73,7 +116,7 @@ async function main() {
         excerpt,
         categoryName,
         authorName,
-        domain: 'a.wooniche.com'
+        domain: 'blog.wooniche.com'
       });
 
       await sharp(Buffer.from(svg))

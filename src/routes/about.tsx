@@ -7,24 +7,24 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
-    links: [{ rel: "canonical", href: "https://a.wooniche.com/about" }],
+    links: [{ rel: "canonical", href: "https://blog.wooniche.com/about" }],
     meta: [
-      { title: "আমার পাতা — Alam M" },
+      { title: "আমার পাতা - Alam M" },
       {
         name: "description",
         content: "আমি আলম। শব্দের একজন লেখক, দৈনন্দিন মুহূর্তের গল্পের অনুসন্ধানী। লেখক পরিচিতি ও ভাবনা।",
       },
       { property: "og:type", content: "profile" },
-      { property: "og:url", content: "https://a.wooniche.com/about" },
+      { property: "og:url", content: "https://blog.wooniche.com/about" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "আমার পাতা — Alam M" },
+      { property: "og:title", content: "আমার পাতা - Alam M" },
       { property: "og:description", content: "আমি আলম। শব্দের ভাঁজে ভাঁজে লুকিয়ে থাকা গল্পগুলোর সন্ধানী।" },
-      { property: "og:image", content: "https://a.wooniche.com/og-image.png" },
-      { property: "og:image:secure_url", content: "https://a.wooniche.com/og-image.png" },
+      { property: "og:image", content: "https://blog.wooniche.com/og-image.png" },
+      { property: "og:image:secure_url", content: "https://blog.wooniche.com/og-image.png" },
       { property: "og:image:type", content: "image/png" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
-      { name: "twitter:image", content: "https://a.wooniche.com/og-image.png" },
+      { name: "twitter:image", content: "https://blog.wooniche.com/og-image.png" },
     ],
   }),
   component: AboutPage,
