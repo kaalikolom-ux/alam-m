@@ -25,43 +25,57 @@ async function main() {
 
   // 1. Generate Homepage OG Image (1200x630 HD) for https://blog.wooniche.com/
   try {
-    let heroImageBase64 = '';
-    const heroImgPath = path.resolve('public/hero-image.webp');
-    if (fs.existsSync(heroImgPath)) {
-      heroImageBase64 = fs.readFileSync(heroImgPath).toString('base64');
-    }
-
-    const homeSvg = generateHomeOgSvg({
-      heroImageBase64,
-      authorName: 'আলম',
-      domain: 'blog.wooniche.com'
-    });
-
-    const homePngBuffer = await sharp(Buffer.from(homeSvg))
-      .png({ quality: 95, compressionLevel: 8 })
-      .toBuffer();
-
-    const homeJpgBuffer = await sharp(Buffer.from(homeSvg))
-      .jpeg({ quality: 92 })
-      .toBuffer();
-
-    // Write to public/
-    fs.writeFileSync(path.join(publicDir, 'og-image.png'), homePngBuffer);
-    fs.writeFileSync(path.join(publicDir, 'og-image.jpg'), homeJpgBuffer);
-    if (!fs.existsSync(ogDir)) fs.mkdirSync(ogDir, { recursive: true });
-    fs.writeFileSync(path.join(ogDir, 'home.png'), homePngBuffer);
-
-    // Write to .output/public/ if dist exists
+    const homeOgPngPath = path.join(publicDir, 'og-image.png');
+    const homeOgJpgPath = path.join(publicDir, 'og-image.jpg');
     const distPublic = path.resolve('.output/public');
-    if (fs.existsSync(distPublic)) {
-      fs.writeFileSync(path.join(distPublic, 'og-image.png'), homePngBuffer);
-      fs.writeFileSync(path.join(distPublic, 'og-image.jpg'), homeJpgBuffer);
-      const distOg = path.join(distPublic, 'og');
-      if (!fs.existsSync(distOg)) fs.mkdirSync(distOg, { recursive: true });
-      fs.writeFileSync(path.join(distOg, 'home.png'), homePngBuffer);
-    }
 
-    console.log('   ✅ Homepage OG Banner Generated: og-image.png, og-image.jpg, og/home.png (1200x630 HD)');
+    if (fs.existsSync(homeOgPngPath) && fs.statSync(homeOgPngPath).size > 10000 && !force) {
+      console.log('   ⏩ Homepage OG Banner exists, preserving pre-rendered HD asset (use --force to re-render)');
+      if (fs.existsSync(distPublic)) {
+        fs.copyFileSync(homeOgPngPath, path.join(distPublic, 'og-image.png'));
+        if (fs.existsSync(homeOgJpgPath)) fs.copyFileSync(homeOgJpgPath, path.join(distPublic, 'og-image.jpg'));
+        const distOg = path.join(distPublic, 'og');
+        if (!fs.existsSync(distOg)) fs.mkdirSync(distOg, { recursive: true });
+        fs.copyFileSync(homeOgPngPath, path.join(distOg, 'home.png'));
+      }
+    } else {
+      let heroImageBase64 = '';
+      const heroImgPath = path.resolve('public/hero-image.webp');
+      if (fs.existsSync(heroImgPath)) {
+        heroImageBase64 = fs.readFileSync(heroImgPath).toString('base64');
+      }
+
+      const homeSvg = generateHomeOgSvg({
+        heroImageBase64,
+        authorName: 'আলম',
+        domain: 'blog.wooniche.com'
+      });
+
+      const homePngBuffer = await sharp(Buffer.from(homeSvg))
+        .png({ quality: 95, compressionLevel: 8 })
+        .toBuffer();
+
+      const homeJpgBuffer = await sharp(Buffer.from(homeSvg))
+        .jpeg({ quality: 92 })
+        .toBuffer();
+
+      // Write to public/
+      fs.writeFileSync(homeOgPngPath, homePngBuffer);
+      fs.writeFileSync(homeOgJpgPath, homeJpgBuffer);
+      if (!fs.existsSync(ogDir)) fs.mkdirSync(ogDir, { recursive: true });
+      fs.writeFileSync(path.join(ogDir, 'home.png'), homePngBuffer);
+
+      // Write to .output/public/ if dist exists
+      if (fs.existsSync(distPublic)) {
+        fs.writeFileSync(path.join(distPublic, 'og-image.png'), homePngBuffer);
+        fs.writeFileSync(path.join(distPublic, 'og-image.jpg'), homeJpgBuffer);
+        const distOg = path.join(distPublic, 'og');
+        if (!fs.existsSync(distOg)) fs.mkdirSync(distOg, { recursive: true });
+        fs.writeFileSync(path.join(distOg, 'home.png'), homePngBuffer);
+      }
+
+      console.log('   ✅ Homepage OG Banner Generated: og-image.png, og-image.jpg, og/home.png (1200x630 HD)');
+    }
   } catch (err) {
     console.error('❌ Failed to generate Homepage OG image:', err.message);
   }

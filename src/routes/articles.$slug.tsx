@@ -67,7 +67,7 @@ export const Route = createFileRoute("/articles/$slug")({
     const title = art?.title_bn ? `${art.title_bn} - Alam M` : "Alam M - শব্দ আমার ক্যানভাস";
     const description = art?.excerpt_bn || "গল্প, কবিতা, স্মৃতিকথা ও চিন্তাভাবনা নিয়ে ব্যক্তিগত সাহিত্যিক ব্লগ।";
     const canonicalUrl = slug ? `https://blog.wooniche.com/articles/${slug}` : "https://blog.wooniche.com/";
-    const image = art?.cover_image_url || (slug ? `https://blog.wooniche.com/og/articles/${slug}.png` : "https://blog.wooniche.com/og-image.png");
+    const image = art?.cover_image_url || (slug ? `https://blog.wooniche.com/og/articles/${slug}.png` : "https://blog.wooniche.com/og-image.png?v=2");
 
     return {
       meta: [
