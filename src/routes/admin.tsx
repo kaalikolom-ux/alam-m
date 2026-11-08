@@ -3,6 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState, useEffect, useMemo, lazy, Suspense } from "react";
 import {
+  Calendar,
   Pencil,
   Plus,
   Trash2,
@@ -121,6 +122,12 @@ import { VideoTranscriberAdmin } from "@/components/VideoTranscriberAdmin";
 import { ImageToTextAdmin } from "@/components/ImageToTextAdmin";
 import { QuranExplorerLogo } from "@/components/QuranExplorerLogo";
 import { PageHeroBackground } from "@/components/PageHeroBackground";
+import { ArticleDateTimeModal } from "@/components/admin/ArticleDateTimeModal";
+import {
+  toDateTimeLocalString,
+  fromDateTimeLocalString,
+  formatFullDateTimeBn,
+} from "@/lib/dateUtils";
 import {
   exportToWordPressXml,
   exportToJson,
@@ -2294,6 +2301,7 @@ function ArticlesAdmin({
   const [newTagInput, setNewTagInput] = useState<string>("");
   const [tagSearchQuery, setTagSearchQuery] = useState<string>("");
   const [customPublishedAt, setCustomPublishedAt] = useState<string>("");
+  const [dateTimeModalArticle, setDateTimeModalArticle] = useState<any | null>(null);
   const [isAutoSlug, setIsAutoSlug] = useState<boolean>(true);
   const [isGeneratingSlug, setIsGeneratingSlug] = useState<boolean>(false);
   const [isAutoTranslating, setIsAutoTranslating] = useState<boolean>(false);
@@ -2970,7 +2978,7 @@ function ArticlesAdmin({
         category_id: categoryId || null,
         tags: combinedParsedTags,
         published_at: published
-          ? (customPublishedAt ? new Date(customPublishedAt).toISOString() : new Date().toISOString())
+          ? (customPublishedAt ? (fromDateTimeLocalString(customPublishedAt) || new Date().toISOString()) : new Date().toISOString())
           : null,
         created_by: user!.id,
         deleted_at: null,
@@ -3651,16 +3659,26 @@ function ArticlesAdmin({
           <div className="space-y-1.5">
             <Label htmlFor="post-published-at" className="text-xs font-semibold flex items-center justify-between">
               <span>প্রকাশের তারিখ ও সময়</span>
-              {customPublishedAt && (
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setCustomPublishedAt("")}
-                  className="text-[10px] text-muted-foreground hover:text-primary cursor-pointer"
-                  title="বর্তমান সময়ে রিসেট করুন"
+                  onClick={() => setCustomPublishedAt(toDateTimeLocalString(new Date()))}
+                  className="text-[10px] text-primary hover:underline cursor-pointer"
+                  title="বর্তমান সময় (এখন) নির্ধারণ করুন"
                 >
-                  রিসেট
+                  ⚡ এখন
                 </button>
-              )}
+                {customPublishedAt && (
+                  <button
+                    type="button"
+                    onClick={() => setCustomPublishedAt("")}
+                    className="text-[10px] text-muted-foreground hover:text-destructive cursor-pointer"
+                    title="বর্তমান সময়ে রিসেট করুন"
+                  >
+                    রিসেট
+                  </button>
+                )}
+              </div>
             </Label>
             <Input
               id="post-published-at"
@@ -3669,6 +3687,11 @@ function ArticlesAdmin({
               onChange={(e) => setCustomPublishedAt(e.target.value)}
               className="h-9 text-xs"
             />
+            {customPublishedAt && (
+              <p className="text-[10px] text-muted-foreground truncate">
+                প্রদর্শিত হবে: <span className="font-medium text-foreground">{formatFullDateTimeBn(fromDateTimeLocalString(customPublishedAt))}</span>
+              </p>
+            )}
           </div>
         </div>
 
@@ -3966,8 +3989,9 @@ function ArticlesAdmin({
 
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-semibold text-foreground">{a.title_bn}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      /{a.slug} ·{" "}
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground mt-0.5">
+                      <span>/{a.slug}</span>
+                      <span>·</span>
                       {a.deleted_at ? (
                         <span className="text-destructive font-medium">মুছে ফেলা হয়েছে (In Trash)</span>
                       ) : (
@@ -3975,7 +3999,19 @@ function ArticlesAdmin({
                           {a.published ? "প্রকাশিত" : "খসড়া (Draft)"}
                         </span>
                       )}
-                    </p>
+                      <span>·</span>
+                      <button
+                        type="button"
+                        onClick={() => setDateTimeModalArticle(a)}
+                        className="inline-flex items-center gap-1 text-slate-700 dark:text-slate-300 hover:text-primary transition-colors cursor-pointer group"
+                        title="ক্লিক করে এই পোস্টের সময় ও তারিখ পরিবর্তন করুন"
+                      >
+                        <Calendar className="size-3 text-primary/80 group-hover:text-primary shrink-0" />
+                        <span className="group-hover:underline">
+                          {formatFullDateTimeBn(a.published_at || a.created_at)}
+                        </span>
+                      </button>
+                    </div>
                   </div>
 
                   {statusFilter !== "trash" && (
@@ -4022,6 +4058,16 @@ function ArticlesAdmin({
                         <Button
                           variant="ghost"
                           size="icon"
+                          className="h-7 w-7 text-primary hover:bg-primary/10 cursor-pointer"
+                          aria-label="সময়/তারিখ পরিবর্তন"
+                          title="সময় ও তারিখ পরিবর্তন করুন (Change Date/Time)"
+                          onClick={() => setDateTimeModalArticle(a)}
+                        >
+                          <Calendar className="size-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="h-7 w-7 cursor-pointer"
                           aria-label="সম্পাদনা"
                           onClick={async () => {
@@ -4032,7 +4078,7 @@ function ArticlesAdmin({
                             setTagsInput(rawTags.join(", "));
                             setSelectedTags(rawTags.map((t: string) => String(t).trim().replace(/^#/, "")).filter(Boolean));
                             const pubDate = a.published_at || a.created_at;
-                            setCustomPublishedAt(pubDate ? new Date(pubDate).toISOString().slice(0, 16) : "");
+                            setCustomPublishedAt(toDateTimeLocalString(pubDate));
                             let contentBn = a.content_bn ?? "";
                             let contentEn = a.content_en ?? "";
                             if (!contentBn) {
@@ -4105,6 +4151,14 @@ function ArticlesAdmin({
           authorsList={authors.data || []}
         />
       )}
+
+      <ArticleDateTimeModal
+        open={!!dateTimeModalArticle}
+        onOpenChange={(open) => {
+          if (!open) setDateTimeModalArticle(null);
+        }}
+        article={dateTimeModalArticle}
+      />
     </div>
   );
 }

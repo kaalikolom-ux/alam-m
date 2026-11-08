@@ -34,6 +34,12 @@ import { useIsAdmin } from "@/lib/auth";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { AuthorCard } from "@/components/AuthorCard";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { ArticleDateTimeModal } from "@/components/admin/ArticleDateTimeModal";
+import {
+  toDateTimeLocalString,
+  fromDateTimeLocalString,
+  formatFullDateTimeBn,
+} from "@/lib/dateUtils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -176,6 +182,8 @@ function ArticlePage() {
   };
 
   const [isEditing, setIsEditing] = useState(false);
+  const [dateTimeModalOpen, setDateTimeModalOpen] = useState(false);
+  const [editPublishedAt, setEditPublishedAt] = useState<string>("");
   const [formData, setFormData] = useState({
     title_bn: "",
     title_en: "",
@@ -285,6 +293,7 @@ function ArticlePage() {
         slug: a.slug || "",
       });
       setSelectedAuthorId(a.author_id || "");
+      setEditPublishedAt(toDateTimeLocalString(a.published_at || a.created_at));
       setSelectedCatIds(
         (a.article_categories || []).map((ac: any) => ac.category_id).filter(Boolean)
       );
@@ -319,7 +328,9 @@ function ArticlePage() {
         cover_image_url: formData.cover_image_url || null,
         author_id: selectedAuthorId || null,
         published: true,
-        published_at: a.published_at || new Date().toISOString(),
+        published_at: editPublishedAt
+          ? (fromDateTimeLocalString(editPublishedAt) || a.published_at || new Date().toISOString())
+          : (a.published_at || new Date().toISOString()),
       };
 
       const { error } = await supabase.from("articles").update(payload).eq("id", a.id);
@@ -605,6 +616,16 @@ function ArticlePage() {
 
               <Button
                 size="sm"
+                variant="outline"
+                className="gap-1.5 text-primary border-primary/30 hover:bg-primary/10"
+                onClick={() => setDateTimeModalOpen(true)}
+                title="পোস্টের প্রকাশের সময় ও তারিখ পরিবর্তন করুন"
+              >
+                <Calendar className="size-3.5" /> সময়/তারিখ পরিবর্তন
+              </Button>
+
+              <Button
+                size="sm"
                 variant={isEditing ? "destructive" : "default"}
                 onClick={() => setIsEditing(!isEditing)}
                 className="gap-1.5"
@@ -747,6 +768,31 @@ function ArticlePage() {
                 ))}
               </select>
             </div>
+
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="edit-published-at" className="flex items-center justify-between text-xs font-semibold">
+                <span>প্রকাশের তারিখ ও সময় (Published Date & Time)</span>
+                <button
+                  type="button"
+                  onClick={() => setEditPublishedAt(toDateTimeLocalString(new Date()))}
+                  className="text-[11px] text-primary hover:underline cursor-pointer"
+                >
+                  ⚡ বর্তমান সময় (এখন)
+                </button>
+              </Label>
+              <Input
+                id="edit-published-at"
+                type="datetime-local"
+                value={editPublishedAt}
+                onChange={(e) => setEditPublishedAt(e.target.value)}
+                className="h-10 text-sm font-medium"
+              />
+              {editPublishedAt && (
+                <p className="text-[11px] text-muted-foreground truncate">
+                  প্রদর্শিত হবে: <span className="font-medium text-foreground">{formatFullDateTimeBn(fromDateTimeLocalString(editPublishedAt))}</span>
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-border">
@@ -796,11 +842,24 @@ function ArticlePage() {
       <h1 className="mt-6 text-3xl font-semibold leading-snug">{title}</h1>
 
       <div className="mt-4 flex items-center justify-between gap-3 border-b border-border/40 pb-4">
-        {formattedDate && (
-          <p className="text-xs text-muted-foreground">
-            {formattedDate}
-          </p>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {formattedDate && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <Calendar className="size-3 text-primary/70" />
+              {formattedDate}
+            </p>
+          )}
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => setDateTimeModalOpen(true)}
+              className="text-[11px] text-primary hover:underline font-medium cursor-pointer inline-flex items-center gap-0.5"
+              title="এই পোস্টের সময় ও তারিখ পরিবর্তন করুন"
+            >
+              (তারিখ পরিবর্তন)
+            </button>
+          )}
+        </div>
         <BookmarkButton
           variant="outline"
           target={{ kind: "article", articleId: a.id, label: a.title_bn }}
@@ -970,6 +1029,25 @@ function ArticlePage() {
           )}
         </div>
       </section>
+
+      {isAdmin && a && (
+        <ArticleDateTimeModal
+          open={dateTimeModalOpen}
+          onOpenChange={setDateTimeModalOpen}
+          article={{
+            id: a.id,
+            title_bn: a.title_bn,
+            title_en: a.title_en,
+            slug: a.slug,
+            published_at: a.published_at,
+            created_at: a.created_at,
+          }}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ["article-single", slug] });
+            queryClient.invalidateQueries({ queryKey: ["articles"] });
+          }}
+        />
+      )}
     </article>
   );
 }
