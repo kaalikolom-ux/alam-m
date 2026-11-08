@@ -257,7 +257,7 @@ export function AlamMDashboardOverview({ setActiveTab }: AlamMDashboardOverviewP
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             <Button
               type="button"
-              onClick={() => setActiveTab("articles")}
+              onClick={() => setActiveTab("articles-new")}
               className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs gap-1.5 shadow-md hover:shadow-lg transition-all"
             >
               <PenTool className="size-3.5" />

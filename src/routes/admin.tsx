@@ -50,6 +50,7 @@ import {
   ChevronDown,
   ChevronUp,
   ChevronLeft,
+  ArrowLeft,
   Home,
   Layers,
   Activity,
@@ -845,6 +846,15 @@ function AdminPage() {
       group: "সাহিত্য ও লেখালেখি",
       items: [
         {
+          id: "articles-new",
+          title: "নতুন পোস্ট লিখুন",
+          icon: PenTool,
+          defaultTab: "articles-new",
+          subItems: [
+            { tab: "articles-new", label: "নতুন সাহিত্যকর্ম তৈরি" },
+          ],
+        },
+        {
           id: "articles",
           title: "সকল সাহিত্যকর্ম",
           icon: BookOpen,
@@ -988,6 +998,7 @@ function AdminPage() {
     "cf-dns": "ক্লাউডফ্লেয়ার ডিএনএস",
     "seo-center": "এসইও ও সার্চ ইঞ্জিন ম্যানেজমেন্ট",
     "seo-gsc": "গুগল সার্চ কনসোল পারফরম্যান্স",
+    "articles-new": "নতুন সাহিত্যকর্ম লিখুন (Create New Post)",
     articles: "সাহিত্যকর্ম ও পোস্ট পরিচালনা",
     categories: "সাহিত্য বিভাগসমূহ (Categories)",
     tags: "ট্যাগসমূহ (Tags)",
@@ -1095,11 +1106,11 @@ function AdminPage() {
           <Button
             type="button"
             size="sm"
-            onClick={() => setActiveTab("articles")}
-            className="h-8 text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
+            onClick={() => setActiveTab("articles-new")}
+            className="h-8 text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs cursor-pointer"
           >
             <PenTool className="size-3.5" />
-            <span className="hidden sm:inline">নতুন লেখা</span>
+            <span className="hidden sm:inline">নতুন পোস্ট লিখুন</span>
           </Button>
 
           {/* Quick Purge Cache */}
@@ -1374,7 +1385,7 @@ function AdminPage() {
               </p>
             </div>
 
-            {activeTab === "articles" && (
+            {(activeTab === "articles" || activeTab === "articles-new") && (
               <div className="flex items-center gap-2">
                 <Button
                   size="sm"
@@ -1394,6 +1405,27 @@ function AdminPage() {
                   <Download className="size-3.5" />
                   এক্সপোর্ট
                 </Button>
+                {activeTab === "articles" && (
+                  <Button
+                    size="sm"
+                    onClick={() => setActiveTab("articles-new")}
+                    className="h-8 text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs cursor-pointer font-medium"
+                  >
+                    <PenTool className="size-3.5" />
+                    + নতুন পোস্ট লিখুন
+                  </Button>
+                )}
+                {activeTab === "articles-new" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setActiveTab("articles")}
+                    className="h-8 text-xs gap-1.5 hover:bg-muted cursor-pointer font-medium"
+                  >
+                    <BookOpen className="size-3.5" />
+                    পোস্ট তালিকা দেখুন
+                  </Button>
+                )}
               </div>
             )}
           </div>
@@ -1446,8 +1478,23 @@ function AdminPage() {
             <TabsContent value="articles" className="mt-0 focus-visible:outline-none">
               <div id="article-editor-top">
                 <ArticlesAdmin
+                  initialView="list"
                   onOpenImport={(type) => setImportModalType(type)}
                   onGoToExport={() => setActiveTab("export")}
+                  onNavigateToNewPost={() => setActiveTab("articles-new")}
+                  onNavigateToList={() => setActiveTab("articles")}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="articles-new" className="mt-0 focus-visible:outline-none">
+              <div id="article-editor-new">
+                <ArticlesAdmin
+                  initialView="editor"
+                  onOpenImport={(type) => setImportModalType(type)}
+                  onGoToExport={() => setActiveTab("export")}
+                  onNavigateToNewPost={() => setActiveTab("articles-new")}
+                  onNavigateToList={() => setActiveTab("articles")}
                 />
               </div>
             </TabsContent>
@@ -1611,23 +1658,36 @@ const EMPTY = {
   content_bn: "",
   content_en: "",
   cover_image_url: "",
-  disclaimer_enabled: true,
+  disclaimer_enabled: false,
   disclaimer_bn: BANGLA_DISCLAIMER,
   disclaimer_en: ENGLISH_DISCLAIMER,
 };
 
+interface ArticlesAdminProps {
+  onOpenImport: (type: "wordpress" | "blogger") => void;
+  onGoToExport?: () => void;
+  initialView?: "list" | "editor";
+  onNavigateToNewPost?: () => void;
+  onNavigateToList?: () => void;
+}
+
 function ArticlesAdmin({
   onOpenImport,
   onGoToExport,
-}: {
-  onOpenImport: (type: "wordpress" | "blogger") => void;
-  onGoToExport?: () => void;
-}) {
+  initialView = "list",
+  onNavigateToNewPost,
+  onNavigateToList,
+}: ArticlesAdminProps) {
   const { user } = useSession();
   const queryClient = useQueryClient();
+  const [viewMode, setViewMode] = useState<"list" | "editor">(initialView);
   const [form, setForm] = useState({ ...EMPTY });
   const [published, setPublished] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setViewMode(initialView);
+  }, [initialView]);
   const [authorId, setAuthorId] = useState<string>("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [tagsInput, setTagsInput] = useState<string>("");
@@ -2446,6 +2506,8 @@ function ArticlesAdmin({
       setCustomPublishedAt("");
       setPublished(true);
       toast.success(published ? "আর্টিকেল সফলভাবে প্রকাশিত হয়েছে" : "আর্টিকেল সফলভাবে খসড়া (Draft) হিসেবে সংরক্ষিত হয়েছে");
+      setViewMode("list");
+      if (onNavigateToList) onNavigateToList();
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -2514,19 +2576,116 @@ function ArticlesAdmin({
 
   return (
     <div className="space-y-6">
-      <form
-        className="rounded border border-border bg-card p-5 shadow-sm space-y-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          save.mutate();
-        }}
-      >
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
-          <div>
-            <h2 className="font-semibold text-base">
-              {editingId ? "আর্টিকেল সম্পাদনা করুন" : "নতুন আর্টিকেল লিখুন"}
-            </h2>
-          </div>
+      {/* 1. View Mode Switcher Pills */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-muted/40 p-2 sm:p-2.5 rounded-xl border border-border">
+        <div className="inline-flex items-center rounded-lg bg-card p-1 border border-border shadow-2xs">
+          <button
+            type="button"
+            onClick={() => {
+              setViewMode("list");
+              if (onNavigateToList) onNavigateToList();
+            }}
+            className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+              viewMode === "list"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <BookOpen className="size-3.5" />
+            <span>সকল পোস্টের তালিকা ({activeArticles.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setEditingId(null);
+              setForm({ ...EMPTY });
+              setPublished(true);
+              setAuthorId("");
+              setCategoryId("");
+              setTagsInput("");
+              setSelectedTags([]);
+              setCustomPublishedAt("");
+              setViewMode("editor");
+              if (onNavigateToNewPost) onNavigateToNewPost();
+            }}
+            className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+              viewMode === "editor"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <PenTool className="size-3.5" />
+            <span>{editingId ? "পোস্ট সম্পাদনা" : "✍️ নতুন পোস্ট লিখুন"}</span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs">
+          {viewMode === "editor" ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setViewMode("list");
+                if (onNavigateToList) onNavigateToList();
+              }}
+              className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+            >
+              <ArrowLeft className="size-3.5" />
+              <span>← সকল পোস্টের তালিকায় ফিরুন</span>
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => {
+                setEditingId(null);
+                setForm({ ...EMPTY });
+                setPublished(true);
+                setAuthorId("");
+                setCategoryId("");
+                setTagsInput("");
+                setSelectedTags([]);
+                setCustomPublishedAt("");
+                setViewMode("editor");
+                if (onNavigateToNewPost) onNavigateToNewPost();
+              }}
+              className="h-8 gap-1.5 text-xs bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs cursor-pointer font-medium"
+            >
+              <Plus className="size-3.5" />
+              <span>নতুন পোস্ট লিখুন</span>
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {viewMode === "editor" ? (
+        <form
+          className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            save.mutate();
+          }}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setViewMode("list");
+                  if (onNavigateToList) onNavigateToList();
+                }}
+                className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <ArrowLeft className="size-3.5" />
+                <span>← তালিকায় ফিরুন</span>
+              </Button>
+              <h2 className="font-semibold text-base ml-1">
+                {editingId ? "আর্টিকেল সম্পাদনা করুন" : "নতুন সাহিত্যকর্ম লিখুন"}
+              </h2>
+            </div>
 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
@@ -2649,7 +2808,7 @@ function ArticlesAdmin({
             />
           </div>
           <p className="text-[11px] text-muted-foreground">
-            পার্মালিঙ্ক: <span className="font-mono text-foreground font-semibold">https://www.quraan.bd/articles/{form.slug || "your-slug"}</span>
+            পার্মালিঙ্ক: <span className="font-mono text-foreground font-semibold">https://blog.wooniche.com/articles/{form.slug || "your-slug"}</span>
           </p>
         </div>
 
@@ -3071,9 +3230,25 @@ function ArticlesAdmin({
                   setNewTagInput("");
                   setTagSearchQuery("");
                   setCustomPublishedAt("");
+                  setViewMode("list");
+                  if (onNavigateToList) onNavigateToList();
                 }}
               >
-                বাতিল
+                বাতিল ও তালিকায় ফিরুন
+              </Button>
+            )}
+            {!editingId && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="cursor-pointer"
+                onClick={() => {
+                  setViewMode("list");
+                  if (onNavigateToList) onNavigateToList();
+                }}
+              >
+                তালিকায় ফিরুন
               </Button>
             )}
           </div>
@@ -3092,9 +3267,43 @@ function ArticlesAdmin({
           )}
         </div>
       </form>
+      ) : (
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-card border border-border rounded-xl p-4 shadow-xs">
+            <div>
+              <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+                <BookOpen className="size-5 text-primary" />
+                সকল সাহিত্যকর্ম ও পোস্ট তালিকা
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                মোট {activeArticles.length}টি সক্রিয় লেখা &bull; {publishedCount}টি প্রকাশিত &bull; {draftCount}টি ড্রাফট
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                onClick={() => {
+                  setEditingId(null);
+                  setForm({ ...EMPTY });
+                  setPublished(true);
+                  setAuthorId("");
+                  setCategoryId("");
+                  setTagsInput("");
+                  setSelectedTags([]);
+                  setCustomPublishedAt("");
+                  setViewMode("editor");
+                  if (onNavigateToNewPost) onNavigateToNewPost();
+                }}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm gap-1.5 shadow-xs cursor-pointer font-semibold"
+              >
+                <PenTool className="size-4" />
+                <span>+ নতুন পোস্ট লিখুন</span>
+              </Button>
+            </div>
+          </div>
 
-      {/* আর্টিকেল তালিকা ও ট্র্যাশ ফিল্টার বার */}
-      <div className="space-y-3">
+          {/* আর্টিকেল তালিকা ও ট্র্যাশ ফিল্টার বার */}
+          <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-2">
           <div className="flex items-center gap-3">
             <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">আর্টিকেল তালিকা</h3>
@@ -3441,6 +3650,7 @@ function ArticlesAdmin({
                               disclaimer_bn: disc.bn,
                               disclaimer_en: disc.en,
                             });
+                            setViewMode("editor");
                             window.scrollTo({ top: 0, behavior: "smooth" });
                           }}
                         >
@@ -3477,6 +3687,8 @@ function ArticlesAdmin({
           )}
         </div>
       </div>
+    </div>
+  )}
 
       {newsletterModalArticle && (
         <NewsletterBroadcastModal
