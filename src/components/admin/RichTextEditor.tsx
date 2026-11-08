@@ -24,7 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 interface RichTextEditorProps {
-  label: string;
+  label?: string;
   value: string;
   onChange: (val: string) => void;
 }
@@ -279,7 +279,7 @@ export function RichTextEditor({ label, value, onChange }: RichTextEditorProps) 
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-semibold">{label}</Label>
+        {label ? <Label className="text-sm font-semibold">{label}</Label> : <div />}
         <div className="flex items-center gap-2">
           <Button
             type="button"
@@ -487,3 +487,5 @@ export function RichTextEditor({ label, value, onChange }: RichTextEditorProps) 
     </div>
   );
 }
+
+export default RichTextEditor;

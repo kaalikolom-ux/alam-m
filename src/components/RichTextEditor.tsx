@@ -1,2 +1,3 @@
-export { RichTextEditor } from "./admin/RichTextEditor";
+import { RichTextEditor } from "./admin/RichTextEditor";
+export { RichTextEditor };
 export default RichTextEditor;

@@ -118,6 +118,8 @@ import { TwoFactorAdmin } from "@/components/TwoFactorAdmin";
 import { QuranExplorerLogo } from "@/components/QuranExplorerLogo";
 import { PageHeroBackground } from "@/components/PageHeroBackground";
 import { ArticleDateTimeModal } from "@/components/admin/ArticleDateTimeModal";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { AdminTabErrorBoundary } from "@/components/admin/AdminTabErrorBoundary";
 import {
   toDateTimeLocalString,
   fromDateTimeLocalString,
@@ -651,13 +653,8 @@ function InlineImportModal({
 }
 
 /* ========================================================================== */
-/* DUAL-MODE RICH TEXT EDITOR (IMPORTED COMPONENT)                            */
+/* DUAL-MODE RICH TEXT EDITOR (DIRECTLY IMPORTED)                             */
 /* ========================================================================== */
-const RichTextEditor = React.lazy(() =>
-  import("@/components/RichTextEditor").then((m) => ({
-    default: m.RichTextEditor,
-  }))
-);
 
 
 
@@ -1477,25 +1474,29 @@ function AdminPage() {
 
             <TabsContent value="articles" className="mt-0 focus-visible:outline-none">
               <div id="article-editor-top">
-                <ArticlesAdmin
-                  initialView="list"
-                  onOpenImport={(type) => setImportModalType(type)}
-                  onGoToExport={() => setActiveTab("export")}
-                  onNavigateToNewPost={() => setActiveTab("articles-new")}
-                  onNavigateToList={() => setActiveTab("articles")}
-                />
+                <AdminTabErrorBoundary fallbackTitle="সাহিত্যকর্ম তালিকা লোড করতে সমস্যা হয়েছে">
+                  <ArticlesAdmin
+                    initialView="list"
+                    onOpenImport={(type) => setImportModalType(type)}
+                    onGoToExport={() => setActiveTab("export")}
+                    onNavigateToNewPost={() => setActiveTab("articles-new")}
+                    onNavigateToList={() => setActiveTab("articles")}
+                  />
+                </AdminTabErrorBoundary>
               </div>
             </TabsContent>
 
             <TabsContent value="articles-new" className="mt-0 focus-visible:outline-none">
               <div id="article-editor-new">
-                <ArticlesAdmin
-                  initialView="editor"
-                  onOpenImport={(type) => setImportModalType(type)}
-                  onGoToExport={() => setActiveTab("export")}
-                  onNavigateToNewPost={() => setActiveTab("articles-new")}
-                  onNavigateToList={() => setActiveTab("articles")}
-                />
+                <AdminTabErrorBoundary fallbackTitle="পোস্ট এডিটর লোড করতে সমস্যা হয়েছে">
+                  <ArticlesAdmin
+                    initialView="editor"
+                    onOpenImport={(type) => setImportModalType(type)}
+                    onGoToExport={() => setActiveTab("export")}
+                    onNavigateToNewPost={() => setActiveTab("articles-new")}
+                    onNavigateToList={() => setActiveTab("articles")}
+                  />
+                </AdminTabErrorBoundary>
               </div>
             </TabsContent>
 
@@ -2548,12 +2549,11 @@ function ArticlesAdmin({
       <Label htmlFor={key} className="text-xs font-semibold">{label}</Label>
       {long ? (
         key.startsWith("content") ? (
-          <React.Suspense fallback={<div className="p-4 text-center text-xs text-muted-foreground animate-pulse border rounded-md">এডিটর লোড হচ্ছে...</div>}>
-            <RichTextEditor
-              value={form[key]}
-              onChange={(val) => setForm((prev) => ({ ...prev, [key]: val }))}
-            />
-          </React.Suspense>
+          <RichTextEditor
+            label={label}
+            value={form[key]}
+            onChange={(val) => setForm((prev) => ({ ...prev, [key]: val }))}
+          />
         ) : (
           <Textarea
             id={key}
