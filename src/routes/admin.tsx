@@ -41,7 +41,6 @@ import {
   Tag as TagIcon,
   Sparkles,
   BookOpen,
-  Headphones,
   Gauge,
   Pin,
   Palette,
@@ -55,12 +54,12 @@ import {
   Layers,
   Activity,
   Smartphone,
-  Video,
-  FileImage,
   Cloud,
   Database,
+  PenTool,
+  Lock,
+  Share2,
 } from "lucide-react";
-import { FormattedTranslation } from "@/components/FormattedTranslation";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -72,7 +71,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin, useSession, signOutFast, getStoredAuthToken } from "@/lib/auth";
 import { STATIC_ARTICLES_META } from "@/lib/staticArticlesMeta";
 import { PRECOMPILED_DB_SLUG_MAP } from "@/lib/precompiledDbSlugMap";
-import { SURAH_META_MAP } from "@/lib/surahMeta";
 import { useCategories } from "@/lib/menu";
 import { queuePendingSync, cacheDynamicArticles, getCachedDynamicArticles } from "@/lib/dualSupportSync";
 import { useAppDesignSettings } from "@/lib/designSync";
@@ -107,9 +105,7 @@ import { PagesAdmin } from "@/components/PagesAdmin";
 import { SocialLinksAdmin } from "@/components/SocialLinksAdmin";
 import { NewsletterBroadcastModal } from "@/components/NewsletterBroadcastModal";
 import { MessagesAdmin } from "@/components/MessagesAdmin";
-import { QuranExportAdmin } from "@/components/QuranExportAdmin";
-import { SurahAudioAdmin } from "@/components/SurahAudioAdmin";
-import { WordPressDashboardOverview } from "@/components/WordPressDashboardOverview";
+import { AlamMDashboardOverview } from "@/components/admin/AlamMDashboardOverview";
 import { WordPressSettingsAdmin } from "@/components/WordPressSettingsAdmin";
 import { VisitorAnalyticsAdmin } from "@/components/VisitorAnalyticsAdmin";
 import { SeoCenterAdmin } from "@/components/SeoCenterAdmin";
@@ -118,8 +114,6 @@ import { CloudflareAnalyticsAdmin } from "@/components/CloudflareAnalyticsAdmin"
 import { RegisteredUsersAdmin } from "@/components/RegisteredUsersAdmin";
 import { PostsExportImportAdmin } from "@/components/PostsExportImportAdmin";
 import { TwoFactorAdmin } from "@/components/TwoFactorAdmin";
-import { VideoTranscriberAdmin } from "@/components/VideoTranscriberAdmin";
-import { ImageToTextAdmin } from "@/components/ImageToTextAdmin";
 import { QuranExplorerLogo } from "@/components/QuranExplorerLogo";
 import { PageHeroBackground } from "@/components/PageHeroBackground";
 import { ArticleDateTimeModal } from "@/components/admin/ArticleDateTimeModal";
@@ -136,7 +130,14 @@ import {
   downloadFile,
   downloadBlob,
 } from "@/lib/postExportImportEngine";
-import { saveSurahOffline } from "@/lib/offline";
+import {
+  BANGLA_DISCLAIMER,
+  ENGLISH_DISCLAIMER,
+  parseArticleDisclaimer,
+  injectArticleDisclaimer,
+  stripArticleDisclaimerComment,
+} from "@/components/ArticleDisclaimerBox";
+
 
 export const Route = createFileRoute("/admin")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -147,7 +148,7 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "অ্যাডমিন ড্যাশবোর্ড — Alam M" },
-      { name: "description", content: "আর্টিকেল ও কনটেন্ট ব্যবস্থাপনা প্যানেল।" },
+      { name: "description", content: "সাহিত্যকর্ম ও কনটেন্ট ব্যবস্থাপনা প্যানেল।" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -656,17 +657,13 @@ const RichTextEditor = React.lazy(() =>
     default: m.RichTextEditor,
   }))
 );
-import {
-  BANGLA_DISCLAIMER,
-  ENGLISH_DISCLAIMER,
-  parseArticleDisclaimer,
-  injectArticleDisclaimer,
-  stripArticleDisclaimerComment,
-} from "@/components/ArticleDisclaimerBox";
+
 
 
 /* ========================================================================== */
-/* MAIN ADMIN PAGE                                                            */
+
+/* ========================================================================== */
+/* MAIN ALAM M LITERARY ADMIN DASHBOARD PAGE                                 */
 /* ========================================================================== */
 function AdminPage() {
   const { user, loading } = useSession();
@@ -698,35 +695,31 @@ function AdminPage() {
     }
   };
 
-  // WordPress UI states
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("wp_admin_sidebar_collapsed") === "true";
+      return localStorage.getItem("alam_admin_sidebar_collapsed") === "true";
     }
     return false;
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [screenOptionsOpen, setScreenOptionsOpen] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
-  const [activeHelpTab, setActiveHelpTab] = useState<"overview" | "navigation">("overview");
-  const { settings: designSettings, updateSettings: updateDesignSettings } = useAppDesignSettings();
-  const mobileFloatingPopupEnabled = designSettings.mobileFloatingPopupEnabled;
-  const setMobileFloatingPopupEnabled = (val: boolean) => {
-    updateDesignSettings({ mobileFloatingPopupEnabled: val });
-  };
-
-  // Dropdown states for Top Admin Bar
-  const [siteDropdown, setSiteDropdown] = useState(false);
-  const [newDropdown, setNewDropdown] = useState(false);
   const [userDropdown, setUserDropdown] = useState(false);
   const [purgingCfHeader, setPurgingCfHeader] = useState(false);
-  const [flushingRedisHeader, setFlushingRedisHeader] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        localStorage.setItem("alam_admin_sidebar_collapsed", String(next));
+      }
+      return next;
+    });
+  };
 
   const handleHeaderPurgeCloudflare = async () => {
     if (purgingCfHeader) return;
     setPurgingCfHeader(true);
     try {
-      let responseMessage = "ক্লাউডফ্লেয়ার এজ ও ব্রাউজার ক্যাশ সফলভাবে ক্লিয়ার হয়েছে!";
+      let responseMessage = "ক্লাউডফ্লেয়ার এজ ও অ্যাপ ক্যাশ সফলভাবে ক্লিয়ার হয়েছে!";
       try {
         const res = await fetch("/api/admin/cache", {
           method: "POST",
@@ -738,7 +731,7 @@ function AdminPage() {
           responseMessage = data.message;
         }
       } catch {
-        // Fallback to local edge/browser cache purge
+        // Fallback
       }
       if (typeof window !== "undefined" && "caches" in window) {
         try {
@@ -749,86 +742,10 @@ function AdminPage() {
       await queryClient.invalidateQueries();
       toast.success(responseMessage);
     } catch (err: any) {
-      toast.error(err?.message || "ক্লাউডফ্লেয়ার ক্যাশ ক্লিয়ার ব্যর্থ হয়েছে");
+      toast.error(err?.message || "ক্যাশ ক্লিয়ার ব্যর্থ হয়েছে");
     } finally {
       setPurgingCfHeader(false);
     }
-  };
-
-  const handleHeaderFlushRedis = async () => {
-    if (flushingRedisHeader) return;
-    setFlushingRedisHeader(true);
-    try {
-      let responseMessage = "রেডিস ও ইন-মেমরি র‍্যাম ক্যাশ সফলভাবে ক্লিয়ার হয়েছে!";
-      try {
-        const res = await fetch("/api/admin/cache", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "flush" }),
-        });
-        const data = await res.json();
-        if (data?.message) {
-          responseMessage = data.message;
-        }
-      } catch {
-        // Fallback to local queryClient cache flush
-      }
-      queryClient.clear();
-      await queryClient.invalidateQueries();
-      toast.success(responseMessage);
-    } catch (err: any) {
-      toast.error(err?.message || "রেডিস ক্যাশ ক্লিয়ার ব্যর্থ হয়েছে");
-    } finally {
-      setFlushingRedisHeader(false);
-    }
-  };
-
-  // Widget visibility for WordPress Dashboard (persisted in localStorage)
-  const [visibleWidgets, setVisibleWidgets] = useState(() => {
-    const defaultWidgets = {
-      welcome: true,
-      atAGlance: true,
-      quickDraft: true,
-      recentActivity: true,
-      siteHealth: true,
-      visitorAnalytics: true,
-    };
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("wp_dashboard_widgets");
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          return {
-            ...defaultWidgets,
-            ...parsed,
-            visitorAnalytics: parsed.visitorAnalytics !== false,
-          };
-        } catch {
-          // fallback
-        }
-      }
-    }
-    return defaultWidgets;
-  });
-
-  const toggleWidget = (key: keyof typeof visibleWidgets) => {
-    setVisibleWidgets((prev: typeof visibleWidgets) => {
-      const next = { ...prev, [key]: !prev[key] };
-      if (typeof window !== "undefined") {
-        localStorage.setItem("wp_dashboard_widgets", JSON.stringify(next));
-      }
-      return next;
-    });
-  };
-
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed((prev) => {
-      const next = !prev;
-      if (typeof window !== "undefined") {
-        localStorage.setItem("wp_admin_sidebar_collapsed", String(next));
-      }
-      return next;
-    });
   };
 
   useEffect(() => {
@@ -867,214 +784,243 @@ function AdminPage() {
     refetchInterval: 20000,
   });
 
-  // Authentic WordPress Hierarchical Navigation Structure
-  const wpNavMenu = [
+  // Articles count for sidebar badge
+  const { data: articlesCount = 0 } = useQuery({
+    queryKey: ["admin-sidebar-articles-count"],
+    queryFn: async () => {
+      const { count } = await supabase.from("articles").select("id", { count: "exact", head: true });
+      const dbCount = count ?? 0;
+      return dbCount > 0 ? dbCount : STATIC_ARTICLES_META.length;
+    },
+  });
+
+  // Tailored, Clean Navigation Groups for Alam M (Personal Literary Blog)
+  const adminNavSections = [
     {
-      id: "dashboard",
-      title: "ড্যাশবোর্ড",
-      icon: Gauge,
-      defaultTab: "dashboard",
-      subItems: [
-        { tab: "dashboard", label: "হোম (Home)" },
-        { tab: "d1-status", label: "Cloudflare D1 ডেটাবেজ" },
-        { tab: "offline", label: "আপডেট (Updates)" },
+      group: "ওভারভিউ ও ট্রাফিক",
+      items: [
+        {
+          id: "dashboard",
+          title: "ড্যাশবোর্ড",
+          icon: Gauge,
+          defaultTab: "dashboard",
+          subItems: [
+            { tab: "dashboard", label: "প্রধান ড্যাশবোর্ড" },
+            { tab: "d1-status", label: "Cloudflare D1 ডেটাবেজ" },
+            { tab: "offline", label: "অফলাইন সিঙ্ক ও ক্যাশ" },
+          ],
+        },
+        {
+          id: "analytics",
+          title: "ভিজিটর ট্র্যাকিং",
+          icon: Activity,
+          defaultTab: "visitor-analytics",
+          badge: liveVisitorsCount > 0 ? liveVisitorsCount : undefined,
+          subItems: [
+            { tab: "visitor-analytics", label: "লাইভ ভিজিটর ট্র্যাকিং" },
+          ],
+        },
+        {
+          id: "cloudflare",
+          title: "ক্লাউড ট্রাফিক",
+          icon: Cloud,
+          defaultTab: "cloudflare-analytics",
+          subItems: [
+            { tab: "cloudflare-analytics", label: "এজ ট্রাফিক ও পারফরম্যান্স" },
+          ],
+        },
+        {
+          id: "seo",
+          title: "এসইও ও সার্চ ইঞ্জিন",
+          icon: Globe,
+          defaultTab: "seo-center",
+          subItems: [
+            { tab: "seo-center", label: "সার্চ কনসোল ও সাইটম্যাপ" },
+            { tab: "seo-gsc", label: "গুগল সার্চ পারফরম্যান্স" },
+          ],
+        },
       ],
     },
     {
-      id: "analytics",
-      title: "ভিজিটর অ্যানালিটিক্স",
-      icon: Activity,
-      defaultTab: "visitor-analytics",
-      badge: liveVisitorsCount > 0 ? liveVisitorsCount : undefined,
-      subItems: [
-        { tab: "visitor-analytics", label: "লাইভ ভিজিটর ও আইপি" },
-        { tab: "visitor-analytics", label: "ব্রাউজিং সময় ও গ্রাফ" },
+      group: "সাহিত্য ও লেখালেখি",
+      items: [
+        {
+          id: "articles",
+          title: "সকল সাহিত্যকর্ম",
+          icon: BookOpen,
+          defaultTab: "articles",
+          badge: articlesCount > 0 ? articlesCount : undefined,
+          subItems: [
+            { tab: "articles", label: "সকল লেখা ও ড্রাফট" },
+            { tab: "categories", label: "সাহিত্য বিভাগসমূহ" },
+            { tab: "tags", label: "ট্যাগসমূহ" },
+          ],
+        },
+        {
+          id: "categories",
+          title: "সাহিত্য বিভাগ",
+          icon: FolderTree,
+          defaultTab: "categories",
+          subItems: [
+            { tab: "categories", label: "গল্প, কবিতা, স্মৃতিকথা" },
+          ],
+        },
+        {
+          id: "tags",
+          title: "ট্যাগসমূহ",
+          icon: TagIcon,
+          defaultTab: "tags",
+          subItems: [
+            { tab: "tags", label: "সকল ট্যাগ" },
+          ],
+        },
+        {
+          id: "pages",
+          title: "স্থির পেজসমূহ",
+          icon: FileCode,
+          defaultTab: "pages",
+          subItems: [
+            { tab: "pages", label: "আমার পাতা (About Me)" },
+          ],
+        },
       ],
     },
     {
-      id: "cloudflare-traffic",
-      title: "ক্লাউডফ্লেয়ার ট্র্যাফিক",
-      icon: Cloud,
-      defaultTab: "cf-requests",
-      badge: "Edge",
-      subItems: [
-        { tab: "cf-requests", label: "অনুরোধ ও ট্রাফিক (Requests)" },
-        { tab: "cf-visitors", label: "ভিজিটর ও দেশ (Visitors)" },
-        { tab: "cf-performance", label: "পারফরম্যান্স ও স্পিড (Performance)" },
-        { tab: "cf-security", label: "নিরাপত্তা ও থ্রেট (Security)" },
-        { tab: "cf-cache", label: "ক্যাশ ও ব্যান্ডউইথ (Cache)" },
-        { tab: "cf-origin", label: "অরিজিন ও D1 (Origin & Workers)" },
-        { tab: "cf-dns", label: "ডিএনএস নেটওয়ার্ক (DNS)" },
+      group: "পাঠক ও সংযোগ",
+      items: [
+        {
+          id: "messages",
+          title: "পাঠকদের বার্তা",
+          icon: MessageSquare,
+          badge: unreadMessagesCount > 0 ? unreadMessagesCount : undefined,
+          defaultTab: "messages",
+          subItems: [
+            { tab: "messages", label: "সকল বার্তা ও প্রতিক্রিয়া" },
+          ],
+        },
+        {
+          id: "subscribers",
+          title: "নিউজলেটার গ্রাহক",
+          icon: Mail,
+          defaultTab: "subs",
+          subItems: [
+            { tab: "subs", label: "গ্রাহক তালিকা ও ব্রডকাস্ট" },
+          ],
+        },
+        {
+          id: "authors",
+          title: "লেখক পরিচিতি",
+          icon: Users,
+          defaultTab: "authors",
+          subItems: [
+            { tab: "authors", label: "আলম এম. প্রোফাইল ও বায়ো" },
+          ],
+        },
       ],
     },
     {
-      id: "seo",
-      title: "এসইও ও সার্চ ইঞ্জিন",
-      icon: Globe,
-      defaultTab: "seo-center",
-      subItems: [
-        { tab: "seo-gsc", label: "গুগল সার্চ কনসোল পারফরম্যান্স" },
-        { tab: "seo-center", label: "সার্চ কনসোল ও সাইটম্যাপ" },
-        { tab: "seo-center", label: "আর্টিকেল এসইও অডিট" },
-        { tab: "seo-center", label: "সার্চ ট্র্যাফিক ও রেফারেল" },
-      ],
-    },
-    {
-      id: "posts",
-      title: "পোস্টসমূহ",
-      icon: Pin,
-      defaultTab: "articles",
-      subItems: [
-        { tab: "articles", label: "সকল পোস্ট" },
-        { tab: "articles", label: "নতুন পোস্ট যোগ করুন" },
-        { tab: "categories", label: "ক্যাটাগরি" },
-        { tab: "tags", label: "ট্যাগসমূহ" },
-      ],
-    },
-    {
-      id: "quran",
-      title: "কুরআন ডেটা",
-      icon: BookOpen,
-      defaultTab: "translations",
-      subItems: [
-        { tab: "translations", label: "আয়াত ও অনুবাদ" },
-        { tab: "surah-audio", label: "সুরার অডিও" },
-        { tab: "quran-export", label: "PDF ও E-Book এক্সপোর্ট" },
-      ],
-    },
-    {
-      id: "reading-settings",
-      title: "পঠন ও লেয়ার অনুমতি",
-      icon: Layers,
-      defaultTab: "settings-reading",
-      subItems: [
-        { tab: "settings-reading", label: "লেয়ার ও এক্সেস কন্ট্রোল" },
-      ],
-    },
-    {
-      id: "pages",
-      title: "পেজসমূহ",
-      icon: FileCode,
-      defaultTab: "pages",
-      subItems: [
-        { tab: "pages", label: "সকল পেজ" },
-      ],
-    },
-    {
-      id: "messages",
-      title: "মন্তব্য ও বার্তা",
-      icon: MessageSquare,
-      badge: unreadMessagesCount,
-      defaultTab: "messages",
-      subItems: [
-        { tab: "messages", label: "সকল বার্তা" },
-      ],
-    },
-    {
-      id: "appearance",
-      title: "অ্যাপিয়ারেন্স",
-      icon: Palette,
-      defaultTab: "menu",
-      subItems: [
-        { tab: "menu", label: "মেনু কনফিগারেশন" },
-        { tab: "social", label: "সোশ্যাল মিডিয়া" },
-      ],
-    },
-    {
-      id: "users",
-      title: "ব্যবহারকারী",
-      icon: Users,
-      defaultTab: "registered-users",
-      subItems: [
-        { tab: "registered-users", label: "নিবন্ধিত অ্যাকাউন্ট ও লগইন" },
-        { tab: "roles", label: "ইউজার রোল ও পারমিশন" },
-        { tab: "2fa-security", label: "2FA সিকিউরিটি (Google Authenticator)" },
-        { tab: "subs", label: "নিউজলেটার গ্রাহক" },
-        { tab: "posts", label: "লেখক ও গবেষক" },
-      ],
-    },
-    {
-      id: "tools",
-      title: "টুলস",
-      icon: Wrench,
-      defaultTab: "import",
-      subItems: [
-        { tab: "video-transcriber", label: "ভিডিও ট্রান্সক্রিপশন ও টাইমস্ট্যাম্প" },
-        { tab: "image-to-text", label: "ইমেজ টু টেক্সট (OCR)" },
-        { tab: "import", label: "পোস্ট ইমপোর্ট ও এক্সপোর্ট" },
-        { tab: "export", label: "পোস্ট এক্সপোর্ট" },
-        { tab: "offline", label: "অফলাইন সিঙ্ক ও ক্যাশ" },
-        { tab: "d1-status", label: "Cloudflare D1 ও এজ স্ট্যাটাস" },
-      ],
-    },
-    {
-      id: "settings",
-      title: "সেটিংস",
-      icon: Settings,
-      defaultTab: "settings-general",
-      subItems: [
-        { tab: "settings-general", label: "সাধারণ (General)" },
-        { tab: "settings-header-footer", label: "হেডার ও ফুটার (Header & Footer)" },
-        { tab: "settings-social", label: "সোশ্যাল মিডিয়া ও শেয়ার (Social & Sharing)" },
-        { tab: "settings-audio", label: "অডিও ও মিডিয়া (Audio)" },
-        { tab: "settings-offline", label: "ক্লাউডফ্লেয়ার ও রেডিস ক্যাশ (Cloudflare & Redis)" },
-        { tab: "settings-discussion", label: "মন্তব্য ও যোগাযোগ (Discussion)" },
-        { tab: "turnstile", label: "টার্নস্টাইল সিকিউরিটি (Security)" },
-        { tab: "2fa-security", label: "2FA সিকিউরিটি (Google Authenticator)" },
+      group: "সেটিংস ও সিস্টেম",
+      items: [
+        {
+          id: "menu",
+          title: "নেভিগেশন মেনু",
+          icon: Palette,
+          defaultTab: "menu",
+          subItems: [
+            { tab: "menu", label: "হেডার ও ফুটার মেনু" },
+          ],
+        },
+        {
+          id: "settings",
+          title: "সাইট সেটিংস",
+          icon: Settings,
+          defaultTab: "settings-general",
+          subItems: [
+            { tab: "settings-general", label: "সাধারণ সেটিংস" },
+            { tab: "settings-header-footer", label: "হেডার ও ফুটার কনফিগারেশন" },
+            { tab: "settings-social", label: "সোশ্যাল শেয়ার সেটিংস" },
+            { tab: "settings-offline", label: "ক্যাশ ও এজ কন্ট্রোল" },
+            { tab: "2fa-security", label: "২-ফ্যাক্টর নিরাপত্তা" },
+          ],
+        },
+        {
+          id: "social",
+          title: "সোশ্যাল মিডিয়া",
+          icon: Share2,
+          defaultTab: "social",
+          subItems: [
+            { tab: "social", label: "সামাজিক যোগাযোগ লিংক" },
+          ],
+        },
+        {
+          id: "import-export",
+          title: "পোস্ট ব্যাকআপ",
+          icon: Download,
+          defaultTab: "import",
+          subItems: [
+            { tab: "import", label: "ইমপোর্ট ও এক্সপোর্ট" },
+          ],
+        },
+        {
+          id: "users",
+          title: "ব্যবহারকারী ও রোল",
+          icon: UserCheck,
+          defaultTab: "registered-users",
+          subItems: [
+            { tab: "registered-users", label: "অ্যাকাউন্ট তালিকা" },
+            { tab: "roles", label: "এডমিন রোল ও পারমিশন" },
+          ],
+        },
       ],
     },
   ];
 
   const tabTitleMap: Record<string, string> = {
     dashboard: "এডমিন ড্যাশবোর্ড ওভারভিউ",
-    "video-transcriber": "ভিডিও ট্রান্সক্রিপশন ও টাইমস্ট্যাম্প (Video Transcriber)",
-    "image-to-text": "ইমেজ টু টেক্সট ও ওসিআর (Image to Text OCR)",
-    "d1-status": "Cloudflare D1 SQLite ডেটাবেজ ও এজ স্ট্যাটাস (Cloudflare D1 Overview)",
-    "supabase-status": "Cloudflare D1 SQLite ডেটাবেজ ও এজ স্ট্যাটাস (Cloudflare D1 Overview)",
-    "visitor-analytics": "ভিজিটর ট্র্যাকিং ও অ্যানালিটিক্স (Visitor Analytics)",
-    "cloudflare-analytics": "ক্লাউডফ্লেয়ার এজ ও ট্র্যাফিক অ্যানালিটিক্স (Cloudflare Edge Analytics)",
-    "cf-requests": "ক্লাউডফ্লেয়ার: অনুরোধ ও ট্রাফিক (Requests & Traffic)",
-    "cf-visitors": "ক্লাউডফ্লেয়ার: ভিজিটর ও ভৌগোলিক অবস্থান (Visitors & Locations)",
-    "cf-performance": "ক্লাউডফ্লেয়ার: পারফরম্যান্স ও স্পিড (Performance & Speed)",
-    "cf-security": "ক্লাউডফ্লেয়ার: নিরাপত্তা ও থ্রেট প্রতিরোধ (Security & Threats)",
-    "cf-cache": "ক্লাউডফ্লেয়ার: ক্যাশ রেশিও ও ব্যান্ডউইথ (Cache & Bandwidth)",
-    "cf-origin": "ক্লাউডফ্লেয়ার: অরিজিন রেসপন্স ও D1 সীমা (Origin & Edge Workers)",
-    "cf-dns": "ক্লাউডফ্লেয়ার: এনিকাস্ট ডিএনএস নেটওয়ার্ক (Anycast DNS)",
-    "seo-center": "এসইও ও সার্চ ইঞ্জিন ম্যানেজমেন্ট (SEO Center)",
-    articles: "সকল পোস্ট ও প্রবন্ধ (Posts)",
-    import: "টুলস: পোস্ট ইমপোর্ট ও এক্সপোর্ট (Posts Import & Export)",
-    export: "টুলস: পোস্ট এক্সপোর্ট (Export Posts)",
-    translations: "কুরআন আয়াত ও অনুবাদ পরিচালনা",
-    "surah-audio": "সুরার অডিও কন্ট্রোল প্যানেল",
-    "quran-export": "কুরআন PDF ও E-Book এক্সপোর্টার",
-    posts: "লেখক ও গবেষকবৃন্দ (Authors)",
-    categories: "বিষয়ভিত্তিক ক্যাটাগরি (Categories)",
+    "visitor-analytics": "ভিজিটর ট্র্যাকিং ও অ্যানালিটিক্স",
+    "cloudflare-analytics": "ক্লাউডফ্লেয়ার ট্রাফিক ও এজ পারফরম্যান্স",
+    "cf-requests": "ক্লাউডফ্লেয়ার ট্রাফিক",
+    "cf-visitors": "ক্লাউডফ্লেয়ার ভিজিটর অবস্থান",
+    "cf-performance": "ক্লাউডফ্লেয়ার পারফরম্যান্স",
+    "cf-security": "ক্লাউডফ্লেয়ার নিরাপত্তা",
+    "cf-cache": "ক্লাউডফ্লেয়ার ক্যাশ ও ব্যান্ডউইথ",
+    "cf-origin": "ক্লাউডফ্লেয়ার অরিজিন ও D1",
+    "cf-dns": "ক্লাউডফ্লেয়ার ডিএনএস",
+    "seo-center": "এসইও ও সার্চ ইঞ্জিন ম্যানেজমেন্ট",
+    "seo-gsc": "গুগল সার্চ কনসোল পারফরম্যান্স",
+    articles: "সাহিত্যকর্ম ও পোস্ট পরিচালনা",
+    categories: "সাহিত্য বিভাগসমূহ (Categories)",
     tags: "ট্যাগসমূহ (Tags)",
     pages: "স্থির পেজসমূহ (Pages)",
-    messages: "ব্যবহারকারীর বার্তা ও ফিডব্যাক (Messages)",
-    menu: "হেডার ও নেভিগেশন মেনু (Menus)",
+    messages: "পাঠকদের বার্তা ও প্রতিক্রিয়া (Messages)",
+    subs: "নিউজলেটার গ্রাহকবৃন্দ (Subscribers)",
+    authors: "লেখক পরিচিতি ও প্রোফাইল (Authors)",
+    posts: "লেখক পরিচিতি ও প্রোফাইল (Authors)",
+    menu: "হেডার ও ফুটার মেনু (Menus)",
     social: "সোশ্যাল মিডিয়া প্রোফাইল লিংক",
-    "registered-users": "নিবন্ধিত অ্যাকাউন্ট ও সাইন-ইন তালিকা (Registered Users)",
-    roles: "অ্যাডমিন ও ইউজার রোল (Roles & Access)",
-    subs: "গ্রাহক ও ইউজার পারমিশন (Subscribers)",
     "settings-general": "সাধারণ সেটিংস (General Settings)",
-    "settings-header-footer": "হেডার ও ফুটার সেটিংস (Header & Footer Settings)",
-    "settings-social": "সোশ্যাল মিডিয়া ও শেয়ার সেটিংস (Social Media & Sharing)",
-    "settings-reading": "পঠন ও লেয়ার অনুমতি (Reading Settings)",
-    "settings-audio": "অডিও ও মিডিয়া সেটিংস (Audio Settings)",
-    "settings-offline": "ক্লাউডফ্লেয়ার ও রেডিস ক্যাশ সেটিংস (Cloudflare & Redis Cache)",
-    "settings-discussion": "মন্তব্য ও যোগাযোগ সেটিংস (Discussion Settings)",
-    turnstile: "ক্লাউডফ্লেয়ার টার্নস্টাইল সিকিউরিটি কী (Security Settings)",
-    "2fa-security": "২-ফ্যাক্টর নিরাপত্তা ও গুগল প্রমাণীকরণ (2FA / Google Authenticator)",
+    "settings-header-footer": "হেডার ও ফুটার সেটিংস (Header & Footer)",
+    "settings-social": "সোশ্যাল মিডিয়া ও শেয়ার সেটিংস",
+    "settings-reading": "পঠন ও রিডিং সেটিংস",
+    "settings-offline": "ক্যাশ ও অফলাইন সেটিংস",
+    "settings-discussion": "মন্তব্য ও যোগাযোগ সেটিংস",
+    turnstile: "টার্নস্টাইল সিকিউরিটি কী",
+    "2fa-security": "২-ফ্যাক্টর নিরাপত্তা (Google Authenticator)",
+    "registered-users": "নিবন্ধিত অ্যাকাউন্ট তালিকা",
+    roles: "অ্যাডমিন ও ইউজার রোল",
+    "d1-status": "Cloudflare D1 ডেটাবেজ ও এজ স্ট্যাটাস",
+    "supabase-status": "Cloudflare D1 ডেটাবেজ ও এজ স্ট্যাটাস",
+    import: "পোস্ট ইমপোর্ট ও ব্যাকআপ",
+    export: "পোস্ট এক্সপোর্ট",
     offline: "অফলাইন ডেটা সিঙ্ক ও ক্যাশ স্ট্যাটাস",
   };
 
   if (!authTimedOut && (loading || (user && roleLoading))) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#1d2327]">
+      <div className="flex h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <div className="size-10 rounded-full border-4 border-[#2271b1] border-t-transparent animate-spin" />
-          <p className="text-sm font-medium text-slate-300">এডমিন ড্যাশবোর্ড লোড হচ্ছে...</p>
+          <div className="size-10 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+          <p className="text-sm font-medium text-muted-foreground">এডমিন ড্যাশবোর্ড লোড হচ্ছে...</p>
         </div>
       </div>
     );
@@ -1082,14 +1028,16 @@ function AdminPage() {
 
   if (!user || !isAdmin) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#f0f0f1] px-4">
-        <div className="w-full max-w-sm rounded border border-[#c3c4c7] bg-white p-6 text-center shadow-xs">
-          <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-[#1d2327] p-2 shadow-xs">
-            <Lock className="size-6 text-[#ecd599]" />
+      <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
+        <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 text-center shadow-lg space-y-4">
+          <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-xs">
+            <Lock className="size-6" />
           </div>
-          <h2 className="text-lg font-semibold text-[#1d2327]">অ্যাডমিন প্রবেশাধিকার সংরক্ষিত</h2>
-          <p className="mt-1 text-xs text-[#646970]">শুধুমাত্র অনুমোদিত অ্যাডমিন এই প্যানেলে প্রবেশ করতে পারবেন।</p>
-          <Button asChild className="mt-5 w-full bg-[#2271b1] hover:bg-[#135e96] text-white">
+          <div>
+            <h2 className="text-lg font-bold text-foreground">অ্যাডমিন প্রবেশাধিকার সংরক্ষিত</h2>
+            <p className="mt-1 text-xs text-muted-foreground">শুধুমাত্র অনুমোদিত অ্যাডমিন এই প্যানেলে প্রবেশ করতে পারবেন।</p>
+          </div>
+          <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
             <Link to="/auth" search={{ redirect: "/admin" }}>লগইন করুন (Log In)</Link>
           </Button>
         </div>
@@ -1098,1153 +1046,539 @@ function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f0f1] text-[#2c3338] dark:bg-[#121212] dark:text-[#f0f0f1] font-sans antialiased w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground font-sans antialiased w-full max-w-full overflow-x-hidden">
       {importModalType && (
         <InlineImportModal type={importModalType} onClose={() => setImportModalType(null)} />
       )}
 
-      {/* 1. TOP WORDPRESS ADMIN BAR (#wpadminbar) */}
-      <div
-        id="wpadminbar"
-        className="fixed top-0 left-0 right-0 h-8 bg-[var(--gradient-hero)] text-stone-800 dark:text-stone-200 z-50 flex items-center justify-between px-2 text-[13px] border-b border-[#c4aa82]/60 dark:border-[#b88e58]/35 select-none backdrop-blur-md shadow-xs contain-paint"
-      >
-        <PageHeroBackground intensity="subtle" fadeBottom={false} />
-        {/* Left Side */}
-        <div className="flex items-center gap-1 relative z-10">
+      {/* 1. TOP HEADER BAR */}
+      <header className="sticky top-0 z-40 h-14 w-full border-b border-border/50 bg-card/85 backdrop-blur-md px-3 sm:px-6 flex items-center justify-between shadow-xs select-none">
+        <div className="flex items-center gap-3">
           {/* Mobile hamburger toggle */}
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden flex items-center justify-center h-8 px-2 hover:bg-white/40 dark:hover:bg-white/10 text-stone-700 dark:text-stone-300 hover:text-[#8e5a07] dark:hover:text-[#ecd599] cursor-pointer transition-colors"
+            className="md:hidden flex items-center justify-center size-9 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
             title="মেনু টগল"
           >
-            <MenuIcon className="size-4" />
+            <MenuIcon className="size-5" />
           </button>
 
-          {/* Qur'an Explorer Branded Logo with Dropdown */}
-          <div
-            className="relative flex items-center"
-            onMouseEnter={() => setSiteDropdown(true)}
-            onMouseLeave={() => setSiteDropdown(false)}
+          {/* Logo & Brand */}
+          <Link
+            to="/admin"
+            onClick={() => setActiveTab("dashboard")}
+            className="flex items-center gap-2 group select-none cursor-pointer"
+            title="Alam M — এডমিন ড্যাশবোর্ড"
           >
-            <Link
-              to="/"
-              className="flex items-center gap-1.5 h-8 px-2 hover:bg-white/10 cursor-pointer transition-colors group select-none"
-              title="Alam M — হোমপেজে যান (Visit Site)"
-            >
-              <div className="flex flex-col justify-center leading-none shrink-0 py-0.5">
-                <QuranExplorerLogo size="xs" />
-              </div>
-              <ChevronDown className="size-2.5 text-muted-foreground group-hover:text-primary transition-transform ml-0.5" />
-            </Link>
-            {siteDropdown && (
-              <div
-                className="absolute left-0 top-8 w-52 bg-[var(--gradient-hero)] text-stone-800 dark:text-stone-200 py-1 shadow-2xl border border-border/60 z-50 text-xs rounded-b backdrop-blur-md overflow-hidden"
-              >
-                <div className="px-3 py-1.5 font-bold border-b border-border/30 bg-black/20 flex items-center justify-between">
-                  <span className="text-primary font-['Kaushan_Script'] text-base">Alam M</span>
-                  <span className="text-[10px] text-muted-foreground font-mono">v4.0.0</span>
-                </div>
-                <Link
-                  to="/"
-                  className="flex items-center justify-between px-3 py-1.5 hover:bg-white/10 hover:text-primary transition-colors"
-                  onClick={() => setSiteDropdown(false)}
-                >
-                  <span className="flex items-center gap-1.5">
-                    <Home className="size-3 text-primary" />
-                    <span>ওয়েবসাইট দেখুন (Visit Site)</span>
-                  </span>
-                  <ExternalLink className="size-3 opacity-60" />
-                </Link>
-                <Link
-                  to="/about"
-                  className="block px-3 py-1.5 hover:bg-white/10 hover:text-primary transition-colors"
-                  onClick={() => setSiteDropdown(false)}
-                >
-                  আমাদের সম্পর্কে (About)
-                </Link>
-                <Link
-                  to="/articles"
-                  className="block px-3 py-1.5 hover:bg-white/10 hover:text-primary transition-colors"
-                  onClick={() => setSiteDropdown(false)}
-                >
-                  লেখালেখি (Articles)
-                </Link>
-                <Link
-                  to="/contact"
-                  className="block px-3 py-1.5 hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors"
-                  onClick={() => setSiteDropdown(false)}
-                >
-                  সহায়তা ফোরাম (Support)
-                </Link>
-              </div>
-            )}
-          </div>
+            <QuranExplorerLogo size="xs" />
+            <span className="hidden lg:inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary ml-1">
+              এডমিন কন্ট্রোল
+            </span>
+          </Link>
 
-          {/* Updates icon */}
-          <button
+          {/* Visit Live Website */}
+          <Link
+            to="/"
+            target="_blank"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/60 bg-muted/40 hover:bg-muted text-xs font-medium text-foreground transition-all hover:text-primary ml-2"
+          >
+            <Globe className="size-3.5 text-primary" />
+            <span>ওয়েবসাইট দেখুন</span>
+            <ExternalLink className="size-3 opacity-60" />
+          </Link>
+        </div>
+
+        {/* Right Actions */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Quick Write Button */}
+          <Button
             type="button"
-            onClick={() => setActiveTab("offline")}
-            className="flex items-center gap-1 h-8 px-2 hover:bg-white/40 dark:hover:bg-white/10 text-stone-700 dark:text-stone-300 hover:text-[#8e5a07] dark:hover:text-[#ecd599] cursor-pointer transition-colors"
-            title="আপডেট ও অফলাইন সিঙ্ক"
+            size="sm"
+            onClick={() => setActiveTab("articles")}
+            className="h-8 text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
           >
-            <RefreshCw className="size-3" />
-            <span className="hidden sm:inline text-[11px]">0</span>
-          </button>
+            <PenTool className="size-3.5" />
+            <span className="hidden sm:inline">নতুন লেখা</span>
+          </Button>
 
-          {/* Comments / Messages */}
+          {/* Quick Purge Cache */}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleHeaderPurgeCloudflare}
+            disabled={purgingCfHeader}
+            className="h-8 text-xs gap-1.5 border-border hover:bg-primary/10 hover:text-primary transition-all hidden md:inline-flex"
+            title="ক্লাউডফ্লেয়ার এজ ও অ্যাপ ক্যাশ তাৎক্ষণিক ক্লিয়ার করুন"
+          >
+            <RefreshCw className={`size-3.5 ${purgingCfHeader ? "animate-spin text-primary" : ""}`} />
+            <span>ক্যাশ ক্লিয়ার</span>
+          </Button>
+
+          {/* Messages icon with badge */}
           <button
             type="button"
             onClick={() => setActiveTab("messages")}
-            className="flex items-center gap-1 h-8 px-2 hover:bg-white/40 dark:hover:bg-white/10 text-stone-700 dark:text-stone-300 hover:text-[#8e5a07] dark:hover:text-[#ecd599] cursor-pointer transition-colors"
-            title="বার্তা ও ফিডব্যাক"
+            className="relative size-8 rounded-lg flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            title="পাঠকদের বার্তা"
           >
-            <MessageSquare className="size-3.5" />
+            <MessageSquare className="size-4" />
             {unreadMessagesCount > 0 && (
-              <span className="rounded-full bg-gradient-to-r from-red-600 to-rose-600 px-1.5 py-0.2 text-[10px] font-bold text-white leading-none shadow-xs">
+              <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-xs animate-pulse">
                 {unreadMessagesCount}
               </span>
             )}
           </button>
 
-          {/* + New dropdown */}
+          {/* User Profile dropdown */}
           <div className="relative">
             <button
               type="button"
-              onClick={() => setNewDropdown(!newDropdown)}
-              className="flex items-center gap-1 h-8 px-2.5 hover:bg-white/40 dark:hover:bg-white/10 text-stone-700 dark:text-stone-300 hover:text-[#8e5a07] dark:hover:text-[#ecd599] cursor-pointer transition-colors"
+              onClick={() => setUserDropdown(!userDropdown)}
+              className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-muted text-left transition-colors cursor-pointer"
             >
-              <Plus className="size-3.5 text-[#b07818] dark:text-[#ecd599]" />
-              <span className="text-xs">নতুন</span>
+              <div className="size-7 rounded-full bg-primary/20 text-primary font-bold text-xs flex items-center justify-center border border-primary/30">
+                {user?.email?.charAt(0).toUpperCase() || "A"}
+              </div>
+              <div className="hidden sm:block text-left leading-tight">
+                <p className="text-xs font-semibold text-foreground truncate max-w-[120px]">
+                  {user?.email?.split("@")[0] || "আলম এম."}
+                </p>
+                <p className="text-[10px] text-primary font-medium">অ্যাডমিন</p>
+              </div>
+              <ChevronDown className="size-3 text-muted-foreground" />
             </button>
-            {newDropdown && (
+
+            {userDropdown && (
               <div
-                className="absolute left-0 top-8 w-44 bg-[var(--gradient-hero)] text-stone-800 dark:text-stone-200 py-1 shadow-2xl border border-[#c4aa82]/60 dark:border-[#b88e58]/35 border-t-2 border-t-[#b88e58] z-50 text-xs rounded-b backdrop-blur-md overflow-hidden"
-                onMouseLeave={() => setNewDropdown(false)}
+                className="absolute right-0 top-10 w-56 rounded-xl border border-border bg-card p-2 shadow-xl z-50 text-xs space-y-1 animate-in fade-in zoom-in-95 duration-150"
+                onMouseLeave={() => setUserDropdown(false)}
               >
+                <div className="p-2 border-b border-border/60">
+                  <p className="font-semibold text-foreground truncate">{user?.email}</p>
+                  <p className="text-[10px] text-muted-foreground">এডমিনিস্ট্রেটর অ্যাক্সেস</p>
+                </div>
                 <button
                   type="button"
                   onClick={() => {
-                    setActiveTab("articles");
-                    setNewDropdown(false);
+                    setActiveTab("authors");
+                    setUserDropdown(false);
                   }}
-                  className="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-muted text-foreground transition-colors text-left"
                 >
-                  <Pin className="size-3 text-[#b07818] dark:text-[#ecd599]" />
-                  <span>পোস্ট (Post)</span>
+                  <Users className="size-3.5 text-primary" />
+                  <span>লেখক প্রোফাইল</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => {
-                    setActiveTab("surah-audio");
-                    setNewDropdown(false);
+                    setActiveTab("settings-general");
+                    setUserDropdown(false);
                   }}
-                  className="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-muted text-foreground transition-colors text-left"
                 >
-                  <Headphones className="size-3 text-[#b07818] dark:text-[#ecd599]" />
-                  <span>সুরার অডিও</span>
+                  <Settings className="size-3.5 text-primary" />
+                  <span>সাইট সেটিংস</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab("pages");
-                    setNewDropdown(false);
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors cursor-pointer"
-                >
-                  <FileCode className="size-3 text-[#b07818] dark:text-[#ecd599]" />
-                  <span>পেজ (Page)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab("posts");
-                    setNewDropdown(false);
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors cursor-pointer"
-                >
-                  <Users className="size-3 text-[#b07818] dark:text-[#ecd599]" />
-                  <span>লেখক ও গবেষক</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab("categories");
-                    setNewDropdown(false);
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors cursor-pointer"
-                >
-                  <FolderTree className="size-3 text-[#b07818] dark:text-[#ecd599]" />
-                  <span>ক্যাটাগরি</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab("tags");
-                    setNewDropdown(false);
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-1.5 text-left hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors cursor-pointer"
-                >
-                  <TagIcon className="size-3 text-[#b07818] dark:text-[#ecd599]" />
-                  <span>ট্যাগ (Tag)</span>
-                </button>
+                <div className="border-t border-border/60 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-destructive/10 text-destructive transition-colors text-left font-medium"
+                  >
+                    <LogOut className="size-3.5" />
+                    <span>লগআউট (Log Out)</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
         </div>
-
-        {/* Center/Right - Cloudflare & Redis Cache Quick Clear + Mobile Floating Popup Quick Toggle */}
-        <div className="flex items-center gap-1.5 ml-auto mr-3 relative z-10">
-          <button
-            type="button"
-            onClick={handleHeaderPurgeCloudflare}
-            disabled={purgingCfHeader}
-            className="flex items-center gap-1.5 h-6.5 px-2.5 rounded text-xs font-semibold cursor-pointer transition-all border bg-orange-500/20 text-orange-800 dark:text-orange-300 border-orange-500/40 hover:bg-orange-500/30 disabled:opacity-60"
-            title="ক্লাউডফ্লেয়ার এজ ক্যাশ এবং ব্রাউজার ক্যাশ ক্লিয়ার করুন (Purge Cloudflare Cache)"
-          >
-            {purgingCfHeader ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <Cloud className="size-3.5" />
-            )}
-            <span className="hidden sm:inline">ক্লাউডফ্লেয়ার ক্যাশ ক্লিয়ার</span>
-            <span className="sm:hidden">CF ক্যাশ</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleHeaderFlushRedis}
-            disabled={flushingRedisHeader}
-            className="flex items-center gap-1.5 h-6.5 px-2.5 rounded text-xs font-semibold cursor-pointer transition-all border bg-rose-500/20 text-rose-800 dark:text-rose-300 border-rose-500/40 hover:bg-rose-500/30 disabled:opacity-60"
-            title="রেডিস ক্যাশ এবং ইন-মেমরি র‍্যাম ক্যাশ ক্লিয়ার করুন (Flush Redis Cache)"
-          >
-            {flushingRedisHeader ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <Database className="size-3.5" />
-            )}
-            <span className="hidden sm:inline">রেডিস ক্যাশ ক্লিয়ার</span>
-            <span className="sm:hidden">Redis ক্যাশ</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              const next = !mobileFloatingPopupEnabled;
-              setMobileFloatingPopupEnabled(next);
-              try {
-                localStorage.setItem("admin_mobile_floating_popup_enabled", String(next));
-              } catch {}
-              toast.success(
-                next
-                  ? "মোবাইলে ভাসমান পপআপ চালু করা হয়েছে"
-                  : "মোবাইলে ভাসমান পপআপ বন্ধ করা হয়েছে (পড়ার সুবিধা নিশ্চিত)"
-              );
-            }}
-            className={`hidden md:flex items-center gap-1.5 h-6.5 px-2.5 rounded text-xs font-semibold cursor-pointer transition-all border ${
-              mobileFloatingPopupEnabled
-                ? "bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/40 hover:bg-amber-500/30"
-                : "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30"
-            }`}
-            title="মোবাইল ভিউতে আর্টিকেলে ফ্লোটিং অ্যাডমিন পপআপ চালু বা বন্ধ করুন"
-          >
-            <Smartphone className="size-3.5" />
-            <span>মোবাইল পপআপ: {mobileFloatingPopupEnabled ? "চালু (ON)" : "বন্ধ (OFF)"}</span>
-          </button>
-        </div>
-
-        {/* Right Side - Howdy, Admin */}
-        <div className="relative z-10">
-          <button
-            type="button"
-            onClick={() => setUserDropdown(!userDropdown)}
-            className="flex items-center gap-2 h-8 px-2 hover:bg-white/40 dark:hover:bg-white/10 text-stone-700 dark:text-stone-300 hover:text-[#8e5a07] dark:hover:text-[#ecd599] cursor-pointer transition-colors"
-          >
-            <span className="text-xs hidden sm:inline">
-              হ্যালো, <strong className="text-stone-900 dark:text-stone-100 font-semibold">{user.email?.split("@")[0] || "admin"}</strong>
-            </span>
-            <div className="size-5 rounded-sm bg-gradient-to-br from-[#b07818] to-[#b88e58] text-white flex items-center justify-center text-[10px] font-bold uppercase select-none shadow-xs">
-              {(user.email?.[0] || "A").toUpperCase()}
-            </div>
-          </button>
-          {userDropdown && (
-            <div
-              className="absolute right-0 top-8 w-60 bg-[var(--gradient-hero)] text-stone-800 dark:text-stone-200 p-3 shadow-2xl border border-[#c4aa82]/60 dark:border-[#b88e58]/35 border-t-2 border-t-[#b88e58] z-50 text-xs rounded-b backdrop-blur-md overflow-hidden"
-              onMouseLeave={() => setUserDropdown(false)}
-            >
-              <div className="flex items-center gap-2.5 pb-2.5 border-b border-[#c4aa82]/30 dark:border-[#b88e58]/25">
-                <div className="size-9 rounded-sm bg-gradient-to-br from-[#b07818] to-[#b88e58] text-white flex items-center justify-center text-sm font-bold uppercase select-none shadow-xs">
-                  {(user.email?.[0] || "A").toUpperCase()}
-                </div>
-                <div className="overflow-hidden">
-                  <p className="font-semibold text-stone-900 dark:text-stone-100 truncate text-xs">{user.email}</p>
-                  <p className="text-[11px] text-[#8e5a07] dark:text-[#ecd599] font-medium">সুপার অ্যাডমিনিস্ট্রেটর</p>
-                </div>
-              </div>
-              <div className="pt-2.5 space-y-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab("2fa-security");
-                    setUserDropdown(false);
-                  }}
-                  className="w-full text-left px-2 py-1.5 rounded hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors cursor-pointer text-xs flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-medium"
-                >
-                  <ShieldCheck className="size-3" />
-                  <span>২-ফ্যাক্টর নিরাপত্তা (2FA Settings)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab("roles");
-                    setUserDropdown(false);
-                  }}
-                  className="w-full text-left px-2 py-1.5 rounded hover:bg-white/40 dark:hover:bg-white/10 hover:text-[#8e5a07] dark:hover:text-[#ecd599] transition-colors cursor-pointer text-xs"
-                >
-                  প্রোফাইল ও পারমিশন দেখুন
-                </button>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="w-full text-left px-2 py-1.5 rounded text-red-500 hover:bg-red-500/15 hover:text-red-600 dark:hover:text-red-400 transition-colors cursor-pointer text-xs flex items-center gap-1.5"
-                >
-                  <LogOut className="size-3" />
-                  <span>লগআউট (Log Out)</span>
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      </header>
 
       {/* 2. MAIN LAYOUT: SIDEBAR + BODY */}
-      <div className="flex pt-8 min-h-screen w-full max-w-full overflow-x-hidden">
-        {/* DESKTOP WORDPRESS ADMIN MENU (#adminmenuwrap) */}
+      <div className="flex min-h-[calc(100vh-56px)] w-full">
+        {/* DESKTOP SIDEBAR */}
         <aside
-          id="adminmenuwrap"
-          className={`fixed top-8 bottom-0 left-0 bg-[var(--gradient-hero)] text-stone-800 dark:text-stone-200 z-40 hidden md:flex flex-col justify-between select-none border-r border-[#c4aa82]/60 dark:border-[#b88e58]/35 shadow-xl transition-all duration-150 contain-paint ${
-            isSidebarCollapsed ? "w-12" : "w-[160px]"
+          className={`shrink-0 border-r border-border/50 bg-card/60 backdrop-blur-md hidden md:flex flex-col justify-between transition-all duration-200 select-none ${
+            isSidebarCollapsed ? "w-16 p-2" : "w-64 p-3"
           }`}
         >
-          <PageHeroBackground intensity="subtle" fadeBottom={false} />
-          <ul id="adminmenu" className="relative z-10 py-2 overflow-y-auto overflow-x-hidden flex-1">
-            {wpNavMenu.map((item) => {
-              const Icon = item.icon;
-              const isCurrent =
-                item.subItems.some((s) => s.tab === activeTab) ||
-                (item.id === "dashboard" && activeTab === "dashboard") ||
-                (item.id === "cloudflare-traffic" && (activeTab === "cloudflare-analytics" || (typeof activeTab === "string" && activeTab.startsWith("cf-"))));
+          <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-120px)] pr-1">
+            {adminNavSections.map((sec, secIdx) => (
+              <div key={secIdx} className="space-y-1">
+                {!isSidebarCollapsed && (
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 px-2 py-1">
+                    {sec.group}
+                  </p>
+                )}
+                {sec.items.map((item) => {
+                  const Icon = item.icon;
+                  const isCurrent =
+                    item.subItems.some((s) => s.tab === activeTab) ||
+                    item.defaultTab === activeTab;
+                  return (
+                    <div key={item.id} className="relative group">
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab(item.defaultTab)}
+                        className={`w-full flex items-center transition-all duration-150 rounded-xl cursor-pointer ${
+                          isSidebarCollapsed
+                            ? "justify-center size-10 mx-auto"
+                            : "justify-between px-3 py-2 text-xs"
+                        } ${
+                          isCurrent
+                            ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                            : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+                        }`}
+                        title={isSidebarCollapsed ? item.title : undefined}
+                      >
+                        <div className="flex items-center gap-2.5 truncate">
+                          <Icon className={`size-4 shrink-0 ${isCurrent ? "text-primary-foreground" : "text-primary/80"}`} />
+                          {!isSidebarCollapsed && <span className="truncate">{item.title}</span>}
+                        </div>
+                        {!isSidebarCollapsed && typeof item.badge === "number" && item.badge > 0 && (
+                          <span
+                            className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold leading-none shadow-xs ${
+                              isCurrent
+                                ? "bg-primary-foreground text-primary"
+                                : "bg-red-600 text-white"
+                            }`}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                      </button>
 
-              return (
-                <li key={item.id} className="relative group">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab(item.defaultTab)}
-                    className={`relative flex w-full items-center transition-all duration-150 cursor-pointer ${
-                      isSidebarCollapsed ? "justify-center h-10 px-0" : "justify-between h-9 px-3"
-                    } ${
-                      isCurrent
-                        ? "bg-gradient-to-r from-[#b07818] to-[#b88e58] text-white font-semibold shadow-xs after:content-[''] after:absolute after:right-0 after:top-1/2 after:-translate-y-1/2 after:border-y-[5px] after:border-y-transparent after:border-r-[5px] after:border-r-[#f0f0f1] dark:after:border-r-[#121212]"
-                        : "text-stone-700 dark:text-stone-300 hover:bg-white/45 dark:hover:bg-white/5 hover:text-[#8e5a07] dark:hover:text-[#ecd599]"
-                    }`}
-                    title={isSidebarCollapsed ? item.title : undefined}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Icon className={`size-4 shrink-0 transition-colors ${isCurrent ? "text-white" : "text-[#94764d] dark:text-[#c4aa82]/85 group-hover:text-[#8e5a07] dark:group-hover:text-[#ecd599]"}`} />
-                      {!isSidebarCollapsed && (
-                        <span className="text-xs truncate">{item.title}</span>
-                      )}
-                    </div>
-                    {!isSidebarCollapsed && typeof item.badge === "number" && item.badge > 0 && (
-                      <span className="rounded-full bg-gradient-to-r from-red-600 to-rose-600 px-1.5 py-0.2 text-[10px] font-bold text-white leading-none shadow-xs">
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-
-                  {/* Expanded Submenu */}
-                  {!isSidebarCollapsed && isCurrent && item.subItems.length > 0 && (
-                    <ul className="bg-white/35 dark:bg-[#12171f]/65 backdrop-blur-md py-1 border-y border-[#c4aa82]/30 dark:border-[#b88e58]/20">
-                      {item.subItems.map((sub, sIdx) => {
-                        const isSubActive = activeTab === sub.tab;
-                        return (
-                          <li key={sIdx}>
+                      {/* Tooltip / Floating Menu on collapsed */}
+                      {isSidebarCollapsed && (
+                        <div className="absolute left-14 top-0 hidden group-hover:block w-44 rounded-xl border border-border bg-card p-1 shadow-xl z-50 text-xs">
+                          <div className="px-2.5 py-1 font-bold text-foreground border-b border-border/40">
+                            {item.title}
+                          </div>
+                          {item.subItems.map((sub, sIdx) => (
                             <button
+                              key={sIdx}
                               type="button"
                               onClick={() => setActiveTab(sub.tab)}
-                              className={`flex w-full items-center pl-7 pr-3 py-1.5 text-left text-[11px] transition-all cursor-pointer ${
-                                isSubActive
-                                  ? "text-[#8e5a07] dark:text-[#ecd599] font-bold bg-[#b88e58]/15 border-l-2 border-[#b88e58]"
-                                  : "text-stone-600 dark:text-stone-400 hover:text-[#8e5a07] dark:hover:text-[#ecd599] hover:bg-white/35 dark:hover:bg-white/5"
-                              }`}
-                            >
-                              <span>{sub.label}</span>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-
-                  {/* Hover Floating Flyout in Collapsed Mode */}
-                  {isSidebarCollapsed && (
-                    <div className="absolute left-12 top-0 hidden group-hover:block w-48 bg-[var(--gradient-hero)] text-stone-800 dark:text-stone-200 shadow-2xl border border-[#c4aa82]/60 dark:border-[#b88e58]/35 border-l-2 border-l-[#b88e58] z-50 rounded-r-lg py-1 backdrop-blur-md overflow-hidden">
-                      <div className="px-3 py-1.5 font-bold text-xs text-[#8e5a07] dark:text-[#ecd599] border-b border-[#c4aa82]/30 dark:border-[#b88e58]/25 bg-white/20 dark:bg-black/20">
-                        {item.title}
-                      </div>
-                      <ul>
-                        {item.subItems.map((sub, sIdx) => (
-                          <li key={sIdx}>
-                            <button
-                              type="button"
-                              onClick={() => setActiveTab(sub.tab)}
-                              className={`block w-full text-left px-3 py-1.5 text-xs transition-colors cursor-pointer ${
-                                activeTab === sub.tab
-                                  ? "bg-gradient-to-r from-[#b07818] to-[#b88e58] text-white font-semibold"
-                                  : "hover:bg-white/40 dark:hover:bg-white/5 hover:text-[#8e5a07] dark:hover:text-[#ecd599]"
+                              className={`w-full text-left px-2 py-1.5 rounded-lg text-xs hover:bg-muted ${
+                                activeTab === sub.tab ? "text-primary font-bold" : "text-muted-foreground"
                               }`}
                             >
                               {sub.label}
                             </button>
-                          </li>
-                        ))}
-                      </ul>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
 
-          {/* WordPress Collapse Menu Button */}
-          <div className="relative z-10 border-t border-[#c4aa82]/40 dark:border-[#b88e58]/25 p-1.5 bg-white/20 dark:bg-black/20 backdrop-blur-xs">
+          {/* Sidebar Collapse Toggle */}
+          <div className="pt-2 border-t border-border/50">
             <button
               type="button"
               onClick={toggleSidebar}
-              className={`flex w-full items-center gap-2 px-2.5 py-1.5 text-[11px] text-stone-600 dark:text-stone-400 hover:text-[#8e5a07] dark:hover:text-[#ecd599] hover:bg-white/40 dark:hover:bg-white/10 rounded transition-colors cursor-pointer ${
-                isSidebarCollapsed ? "justify-center" : ""
+              className={`w-full flex items-center gap-2 p-2 rounded-xl text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer ${
+                isSidebarCollapsed ? "justify-center" : "justify-between"
               }`}
               title={isSidebarCollapsed ? "মেনু প্রসারিত করুন" : "মেনু সংকুচিত করুন"}
             >
-              {isSidebarCollapsed ? (
-                <ChevronRight className="size-4" />
-              ) : (
-                <>
-                  <ChevronLeft className="size-4" />
-                  <span>মেনু সংকুচিত করুন</span>
-                </>
-              )}
+              {!isSidebarCollapsed && <span>মেনু সংকুচিত করুন</span>}
+              {isSidebarCollapsed ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
             </button>
           </div>
         </aside>
 
-        {/* MOBILE DRAWER OVERLAY & MENU */}
+        {/* MOBILE DRAWER */}
         {isMobileMenuOpen && (
           <div className="fixed inset-0 z-50 md:hidden flex">
             <div
               className="fixed inset-0 bg-black/60 backdrop-blur-xs"
               onClick={() => setIsMobileMenuOpen(false)}
             />
-            <div className="relative w-64 bg-[var(--gradient-hero)] text-stone-800 dark:text-stone-200 h-full overflow-y-auto flex flex-col justify-between z-10 border-r border-[#c4aa82]/60 dark:border-[#b88e58]/35 shadow-2xl contain-paint">
-              <PageHeroBackground intensity="subtle" fadeBottom={false} />
-              <div className="relative z-10">
-                <div className="flex items-center justify-between p-3 border-b border-[#c4aa82]/30 dark:border-[#b88e58]/25 bg-white/20 dark:bg-black/30 backdrop-blur-xs">
-                  <Link
-                    to="/"
-                    className="flex items-center gap-2 select-none group"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    title="Alam M — হোমপেজে যান"
-                  >
-                    <div className="flex flex-col justify-center leading-none">
-                      <QuranExplorerLogo size="sm" />
-                    </div>
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="p-1 hover:bg-black/10 dark:hover:bg-white/10 text-stone-600 dark:text-stone-300 rounded transition-colors"
-                  >
-                    <X className="size-4" />
-                  </button>
-                </div>
-                <ul className="py-2">
-                  {wpNavMenu.map((item) => {
-                    const Icon = item.icon;
-                    const isCurrent =
-                      item.subItems.some((s) => s.tab === activeTab) ||
-                      (item.id === "dashboard" && activeTab === "dashboard") ||
-                      (item.id === "cloudflare-traffic" && (activeTab === "cloudflare-analytics" || (typeof activeTab === "string" && activeTab.startsWith("cf-"))));
-                    return (
-                      <li key={item.id}>
+            <div className="relative w-72 bg-card text-foreground h-full overflow-y-auto flex flex-col justify-between z-10 border-r border-border shadow-2xl p-4 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-border/60">
+                <QuranExplorerLogo size="xs" />
+                <button
+                  type="button"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="size-8 rounded-lg flex items-center justify-center hover:bg-muted text-muted-foreground"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+
+              <div className="space-y-4 overflow-y-auto flex-1">
+                {adminNavSections.map((sec, secIdx) => (
+                  <div key={secIdx} className="space-y-1">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 px-2 py-1">
+                      {sec.group}
+                    </p>
+                    {sec.items.map((item) => {
+                      const Icon = item.icon;
+                      const isCurrent =
+                        item.subItems.some((s) => s.tab === activeTab) ||
+                        item.defaultTab === activeTab;
+                      return (
                         <button
+                          key={item.id}
                           type="button"
                           onClick={() => {
                             setActiveTab(item.defaultTab);
                             setIsMobileMenuOpen(false);
                           }}
-                          className={`flex w-full items-center justify-between px-3.5 py-2 text-xs transition-all cursor-pointer ${
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs transition-colors ${
                             isCurrent
-                              ? "bg-gradient-to-r from-[#b07818] to-[#b88e58] text-white font-semibold shadow-xs"
-                              : "text-stone-700 dark:text-stone-300 hover:bg-white/40 dark:hover:bg-white/5 hover:text-[#8e5a07] dark:hover:text-[#ecd599]"
+                              ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground"
                           }`}
                         >
                           <div className="flex items-center gap-2.5">
-                            <Icon className={`size-4 ${isCurrent ? "text-white" : "text-[#94764d] dark:text-[#c4aa82]/85"}`} />
+                            <Icon className={`size-4 ${isCurrent ? "text-primary-foreground" : "text-primary"}`} />
                             <span>{item.title}</span>
                           </div>
                           {typeof item.badge === "number" && item.badge > 0 && (
-                            <span className="rounded-full bg-gradient-to-r from-red-600 to-rose-600 px-1.5 py-0.2 text-[10px] font-bold text-white shadow-xs">
+                            <span className="rounded-full bg-red-600 px-1.5 py-0.2 text-[10px] font-bold text-white shadow-xs">
                               {item.badge}
                             </span>
                           )}
                         </button>
-                        {isCurrent && item.subItems.length > 0 && (
-                          <ul className="bg-white/35 dark:bg-[#12171f]/65 backdrop-blur-md py-1 border-y border-[#c4aa82]/30 dark:border-[#b88e58]/20">
-                            {item.subItems.map((sub, sIdx) => (
-                              <li key={sIdx}>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setActiveTab(sub.tab);
-                                    setIsMobileMenuOpen(false);
-                                  }}
-                                  className={`block w-full text-left pl-9 pr-3 py-1.5 text-[11px] transition-colors ${
-                                    activeTab === sub.tab
-                                      ? "text-[#8e5a07] dark:text-[#ecd599] font-bold bg-[#b88e58]/15 border-l-2 border-[#b88e58]"
-                                      : "text-stone-600 dark:text-stone-400 hover:text-[#8e5a07] dark:hover:text-[#ecd599] hover:bg-white/35 dark:hover:bg-white/5"
-                                  }`}
-                                >
-                                  {sub.label}
-                                </button>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
+                      );
+                    })}
+                  </div>
+                ))}
               </div>
-              <div className="relative z-10 p-3 border-t border-[#c4aa82]/30 dark:border-[#b88e58]/20 text-[11px] text-stone-500 dark:text-stone-400 text-center bg-white/10 dark:bg-black/20">
-                এডমিন ড্যাশবোর্ড &bull; v4.0.0
+
+              <div className="pt-3 border-t border-border/60 text-center text-xs text-muted-foreground">
+                Alam M &bull; শব্দ আমার ক্যানভাস
               </div>
             </div>
           </div>
         )}
 
-        {/* 3. MAIN WORDPRESS CONTENT BODY (#wpbody) */}
-        <div
-          id="wpbody"
-          className={`flex-1 min-w-0 w-full max-w-full overflow-x-hidden transition-all duration-150 ${
-            isSidebarCollapsed ? "md:ml-12" : "md:ml-[160px]"
-          }`}
-        >
-          {/* SCREEN META: SCREEN OPTIONS & HELP TOGGLE BUTTONS */}
-          <div className="flex justify-end gap-1 px-4 sm:px-6 pt-1 select-none flex-wrap">
-            <button
-              type="button"
-              onClick={() => {
-                const next = !mobileFloatingPopupEnabled;
-                setMobileFloatingPopupEnabled(next);
-                try {
-                  localStorage.setItem("admin_mobile_floating_popup_enabled", String(next));
-                } catch {}
-                toast.success(
-                  next
-                    ? "মোবাইলে ভাসমান পপআপ চালু করা হয়েছে"
-                    : "মোবাইলে ভাসমান পপআপ বন্ধ করা হয়েছে (পড়ার সুবিধা নিশ্চিত)"
-                );
-              }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-semibold border border-t-0 border-[#c3c4c7] dark:border-[#3c434a] rounded-b transition-colors cursor-pointer shadow-2xs ${
-                mobileFloatingPopupEnabled
-                  ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 hover:bg-amber-500/25"
-                  : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/25"
-              }`}
-              title="মোবাইল ভিউতে আর্টিকেলে ভাসমান অ্যাডমিন পপআপ প্রদর্শন নিয়ন্ত্রণ করুন"
-            >
-              <Smartphone className="size-3" />
-              <span>মোবাইল পপআপ: {mobileFloatingPopupEnabled ? "চালু (ON)" : "বন্ধ (OFF)"}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setHelpOpen(!helpOpen);
-                if (screenOptionsOpen) setScreenOptionsOpen(false);
-              }}
-              className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium border border-t-0 border-[#c3c4c7] dark:border-[#3c434a] rounded-b transition-colors cursor-pointer ${
-                helpOpen
-                  ? "bg-white dark:bg-[#1e1e1e] text-[#2271b1] shadow-xs"
-                  : "bg-[#f0f0f1] dark:bg-[#2c3338] text-[#50575e] dark:text-[#a7aaad] hover:bg-white dark:hover:bg-[#1e1e1e]"
-              }`}
-            >
-              <span>সহায়তা (Help)</span>
-              {helpOpen ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setScreenOptionsOpen(!screenOptionsOpen);
-                if (helpOpen) setHelpOpen(false);
-              }}
-              className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium border border-t-0 border-[#c3c4c7] dark:border-[#3c434a] rounded-b transition-colors cursor-pointer ${
-                screenOptionsOpen
-                  ? "bg-white dark:bg-[#1e1e1e] text-[#2271b1] shadow-xs"
-                  : "bg-[#f0f0f1] dark:bg-[#2c3338] text-[#50575e] dark:text-[#a7aaad] hover:bg-white dark:hover:bg-[#1e1e1e]"
-              }`}
-            >
-              <span>স্ক্রিন অপশন (Screen Options)</span>
-              {screenOptionsOpen ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
-            </button>
+        {/* MAIN BODY CONTENT */}
+        <main className="flex-1 min-w-0 overflow-x-hidden p-4 sm:p-6 lg:p-8 space-y-6">
+          {/* Active Tab Banner & Breadcrumb */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border/40">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                {tabTitleMap[activeTab] || "এডমিন ড্যাশবোর্ড"}
+              </h1>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                শব্দ আমার ক্যানভাস &bull; {activeTab === "dashboard" ? "ওভারভিউ ও কুইক কন্ট্রোল" : tabTitleMap[activeTab]}
+              </p>
+            </div>
+
+            {activeTab === "articles" && (
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setImportModalType("wordpress")}
+                  className="h-8 text-xs gap-1.5"
+                >
+                  <Upload className="size-3.5" />
+                  ইমপোর্ট
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setActiveTab("export")}
+                  className="h-8 text-xs gap-1.5"
+                >
+                  <Download className="size-3.5" />
+                  এক্সপোর্ট
+                </Button>
+              </div>
+            )}
           </div>
 
-          {/* SLIDE DOWN HELP PANEL */}
-          {helpOpen && (
-            <div className="bg-white dark:bg-[#1e1e1e] border-b border-[#c3c4c7] dark:border-[#3c434a] p-4 shadow-sm mx-4 sm:mx-6 mb-4 rounded-b text-xs transition-all">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="sm:w-48 border-b sm:border-b-0 sm:border-r border-[#dcdcde] dark:border-[#3c434a] pr-3 space-y-1">
-                  <button
-                    type="button"
-                    onClick={() => setActiveHelpTab("overview")}
-                    className={`block w-full text-left px-2 py-1.5 rounded text-xs cursor-pointer ${
-                      activeHelpTab === "overview"
-                        ? "bg-[#2271b1] text-white font-medium"
-                        : "text-[#50575e] dark:text-[#a7aaad] hover:bg-slate-100 dark:hover:bg-slate-800"
-                    }`}
-                  >
-                    সংক্ষিপ্ত বিবরণ (Overview)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveHelpTab("navigation")}
-                    className={`block w-full text-left px-2 py-1.5 rounded text-xs cursor-pointer ${
-                      activeHelpTab === "navigation"
-                        ? "bg-[#2271b1] text-white font-medium"
-                        : "text-[#50575e] dark:text-[#a7aaad] hover:bg-slate-100 dark:hover:bg-slate-800"
-                    }`}
-                  >
-                    ন্যাভিগেশন নির্দেশিকা
-                  </button>
-                </div>
-                <div className="flex-1 space-y-2 text-[#50575e] dark:text-[#c3c4c7] leading-relaxed">
-                  {activeHelpTab === "overview" ? (
-                    <div>
-                      <h3 className="font-bold text-[#1d2327] dark:text-white mb-1">
-                        এডমিন ড্যাশবোর্ড ওভারভিউ
-                      </h3>
-                      <p>
-                        Alam M-এর এডমিন ড্যাশবোর্ডে আপনাকে স্বাগতম। এই প্যানেল থেকে আপনি সম্পূর্ণ ওয়েবসাইট, গল্প, কবিতা, স্মৃতিকথা, প্রবন্ধ ও ব্যবহারকারী রোল নিয়ন্ত্রণ করতে পারবেন।
-                      </p>
-                    </div>
-                  ) : (
-                    <div>
-                      <h3 className="font-bold text-[#1d2327] dark:text-white mb-1">
-                        ন্যাভিগেশন ও ব্যবহার পদ্ধতি
-                      </h3>
-                      <p>
-                        বামের সাইডবার মেনু থেকে যেকোনো সেকশনে প্রবেশ করতে পারেন। উপরের কালো অ্যাডমিন বার দিয়ে দ্রুত নতুন পোস্ট যুক্ত করা, বার্তা দেখা ও সরাসরি লাইভ ওয়েবসাইট ব্রাউজ করা যায়।
-                      </p>
-                    </div>
-                  )}
-                </div>
+          {/* TABS CONTENT */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsContent value="dashboard" className="mt-0 focus-visible:outline-none">
+              <AlamMDashboardOverview setActiveTab={setActiveTab} />
+            </TabsContent>
+
+            <TabsContent value="visitor-analytics" className="mt-0 focus-visible:outline-none">
+              <VisitorAnalyticsAdmin />
+            </TabsContent>
+
+            <TabsContent value="cloudflare-analytics" className="mt-0 focus-visible:outline-none">
+              <CloudflareAnalyticsAdmin initialTab="requests" onTabChange={() => {}} />
+            </TabsContent>
+            <TabsContent value="cf-requests" className="mt-0 focus-visible:outline-none">
+              <CloudflareAnalyticsAdmin initialTab="requests" onTabChange={() => {}} />
+            </TabsContent>
+            <TabsContent value="cf-visitors" className="mt-0 focus-visible:outline-none">
+              <CloudflareAnalyticsAdmin initialTab="visitors" onTabChange={() => {}} />
+            </TabsContent>
+            <TabsContent value="cf-performance" className="mt-0 focus-visible:outline-none">
+              <CloudflareAnalyticsAdmin initialTab="performance" onTabChange={() => {}} />
+            </TabsContent>
+            <TabsContent value="cf-security" className="mt-0 focus-visible:outline-none">
+              <CloudflareAnalyticsAdmin initialTab="security" onTabChange={() => {}} />
+            </TabsContent>
+            <TabsContent value="cf-cache" className="mt-0 focus-visible:outline-none">
+              <CloudflareAnalyticsAdmin initialTab="cache" onTabChange={() => {}} />
+            </TabsContent>
+            <TabsContent value="cf-origin" className="mt-0 focus-visible:outline-none">
+              <CloudflareAnalyticsAdmin initialTab="origin" onTabChange={() => {}} />
+            </TabsContent>
+            <TabsContent value="cf-dns" className="mt-0 focus-visible:outline-none">
+              <CloudflareAnalyticsAdmin initialTab="dns" onTabChange={() => {}} />
+            </TabsContent>
+
+            <TabsContent value="seo-gsc" className="mt-0 focus-visible:outline-none">
+              <div className="space-y-4">
+                <GoogleSearchConsolePerformance />
               </div>
-            </div>
-          )}
+            </TabsContent>
 
-          {/* SLIDE DOWN SCREEN OPTIONS PANEL */}
-          {screenOptionsOpen && (
-            <div className="bg-white dark:bg-[#1e1e1e] border-b border-[#c3c4c7] dark:border-[#3c434a] p-4 shadow-sm mx-4 sm:mx-6 mb-4 rounded-b text-xs transition-all">
-              <h4 className="font-bold text-[#1d2327] dark:text-white mb-2">
-                স্ক্রিনে উপাদান প্রদর্শন করুন (Show on screen)
-              </h4>
-              <div className="flex flex-wrap gap-4 text-xs">
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={visibleWidgets.welcome}
-                    onChange={() => toggleWidget("welcome")}
-                    className="rounded border-[#8c8f94] text-[#2271b1] focus:ring-[#2271b1]"
-                  />
-                  <span>স্বাগতম প্যানেল (Welcome Panel)</span>
-                </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={visibleWidgets.atAGlance}
-                    onChange={() => toggleWidget("atAGlance")}
-                    className="rounded border-[#8c8f94] text-[#2271b1] focus:ring-[#2271b1]"
-                  />
-                  <span>এক নজরে (At a Glance)</span>
-                </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={visibleWidgets.quickDraft}
-                    onChange={() => toggleWidget("quickDraft")}
-                    className="rounded border-[#8c8f94] text-[#2271b1] focus:ring-[#2271b1]"
-                  />
-                  <span>দ্রুত খসড়া (Quick Draft)</span>
-                </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={visibleWidgets.recentActivity}
-                    onChange={() => toggleWidget("recentActivity")}
-                    className="rounded border-[#8c8f94] text-[#2271b1] focus:ring-[#2271b1]"
-                  />
-                  <span>সাম্প্রতিক কার্যকলাপ (Activity)</span>
-                </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={visibleWidgets.siteHealth}
-                    onChange={() => toggleWidget("siteHealth")}
-                    className="rounded border-[#8c8f94] text-[#2271b1] focus:ring-[#2271b1]"
-                  />
-                  <span>সাইট হেলথ ও সার্ভার স্ট্যাটাস</span>
-                </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={visibleWidgets.visitorAnalytics}
-                    onChange={() => toggleWidget("visitorAnalytics")}
-                    className="rounded border-[#8c8f94] text-[#2271b1] focus:ring-[#2271b1]"
-                  />
-                  <span>লাইভ ভিজিটর ও ব্রাউজিং সময়</span>
-                </label>
-                <label className="flex items-center gap-1.5 cursor-pointer border-l border-[#dcdcde] dark:border-[#3c434a] pl-3 ml-2 font-medium">
-                  <input
-                    type="checkbox"
-                    checked={mobileFloatingPopupEnabled}
-                    onChange={(e) => {
-                      const next = e.target.checked;
-                      setMobileFloatingPopupEnabled(next);
-                      try {
-                        localStorage.setItem("admin_mobile_floating_popup_enabled", String(next));
-                      } catch {}
-                      toast.success(
-                        next
-                          ? "মোবাইলে ভাসমান পপআপ চালু করা হয়েছে"
-                          : "মোবাইলে ভাসমান পপআপ বন্ধ করা হয়েছে (পড়ার সুবিধা নিশ্চিত)"
-                      );
-                    }}
-                    className="rounded border-[#8c8f94] text-[#2271b1] focus:ring-[#2271b1]"
-                  />
-                  <span>মোবাইল ভিউতে ভাসমান পপআপ (Mobile Popup)</span>
-                </label>
+            <TabsContent value="seo-center" className="mt-0 focus-visible:outline-none">
+              <SeoCenterAdmin />
+            </TabsContent>
+
+            <TabsContent value="articles" className="mt-0 focus-visible:outline-none">
+              <div id="article-editor-top">
+                <ArticlesAdmin
+                  onOpenImport={(type) => setImportModalType(type)}
+                  onGoToExport={() => setActiveTab("export")}
+                />
               </div>
-            </div>
-          )}
+            </TabsContent>
 
-          {/* MAIN CONTENT AREA CONTAINER */}
-          <main className="p-3 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full min-w-0 pb-20 sm:pb-24 lg:pb-8">
-            {/* LUXURY HERO-STYLE DUAL CTA ACTIONS (ভিডিও ট্রান্সক্রিপশন ও ইমেজ টু টেক্সট) */}
-            <div className="mb-6 relative overflow-hidden rounded-2xl border border-[#c4aa82]/60 dark:border-[#b88e58]/35 bg-[var(--gradient-hero)] p-5 shadow-xl contain-paint transition-colors duration-300">
-              <PageHeroBackground intensity="subtle" fadeBottom={false} />
+            <TabsContent value="import" className="mt-0 focus-visible:outline-none">
+              <PostsExportImportAdmin
+                initialSubTab="import"
+                onNavigateToArticles={() => setActiveTab("articles")}
+              />
+            </TabsContent>
 
-              <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div className="space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-[11px] font-bold text-amber-800 dark:text-[#ecd599] shadow-2xs">
-                    <Sparkles className="size-3 text-amber-500 dark:text-[#ecd599] animate-pulse" />
-                    <span>আলম এম — এআই ও মাল্টিমিডিয়া কনভার্টার</span>
-                  </div>
-                  <h2 className="text-base sm:text-lg font-bold text-[#1e150f] dark:text-white font-serif">
-                    ভিডিও ট্রান্সক্রিপশন ও ইমেজ টু টেক্সট (OCR)
-                  </h2>
-                  <p className="text-xs text-[#50575e] dark:text-[#c3c4c7] max-w-xl">
-                    ইউটিউব ও ফেসবুক ভিডিওর টাইমস্ট্যাম্পসহ নিখুঁত স্ক্রিপ্ট এবং যেকোনো পাতার ছবি থেকে তাত্ক্ষণিক বাংলা, আরবি ও ইংরেজি টেক্সট এক্সট্রাক্ট করুন।
+            <TabsContent value="export" className="mt-0 focus-visible:outline-none">
+              <PostsExportImportAdmin
+                initialSubTab="export"
+                onNavigateToArticles={() => setActiveTab("articles")}
+              />
+            </TabsContent>
+
+            <TabsContent value="authors" className="mt-0 focus-visible:outline-none">
+              <div className="space-y-4">
+                <div className="border-b border-border/50 pb-2">
+                  <h2 className="text-base font-semibold">লেখক পরিচিতি ও প্রোফাইল</h2>
+                  <p className="text-xs text-muted-foreground">
+                    আলম এম. এর প্রোফাইল তথ্য, ছবি ও জীবনী পরিচালনা করুন।
                   </p>
                 </div>
-
-                {/* 2 PROMINENT CTA BUTTONS */}
-                <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full md:w-auto shrink-0">
-                  {/* CTA BUTTON 1: VIDEO TRANSCRIBER */}
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("video-transcriber")}
-                    className={`group relative flex-1 sm:flex-initial flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all duration-200 cursor-pointer shadow-md hover:shadow-xl active:scale-[0.98] ${
-                      activeTab === "video-transcriber"
-                        ? "bg-gradient-to-r from-[#b07818] to-[#b88e58] text-white border-transparent ring-2 ring-[#b88e58]/50"
-                        : "bg-white/45 dark:bg-[#12171f]/60 backdrop-blur-md text-[#1e150f] dark:text-white border-[#c4aa82]/50 dark:border-[#b88e58]/35 border-t-[1.5px] border-t-[#dfc7a5] dark:border-t-[#ecd599]/70 border-b-2 border-b-[#b3946a]/35 dark:border-b-black/60 hover:border-[#b88e58] dark:hover:border-[#ecd599]"
-                    }`}
-                  >
-                    <div className="p-2 rounded-lg bg-amber-500/15 dark:bg-amber-500/20 text-[#a16e03] dark:text-[#ecd599] shrink-0 group-hover:scale-110 transition-transform">
-                      <Video className="size-5" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs sm:text-sm font-bold tracking-tight text-[#1e150f] dark:text-white">
-                          ভিডিও ট্রান্সক্রিপশন ও টাইমস্ট্যাম্প
-                        </span>
-                        <Sparkles className="size-3 text-[#b07818] dark:text-[#ecd599] animate-pulse shrink-0" />
-                      </div>
-                      <p className="text-[10px] text-[#675b4c] dark:text-[#ecd599]/90 truncate">
-                        YouTube ও FB ভিডিও • ১+ ঘণ্টা • সব ভাষা
-                      </p>
-                    </div>
-                  </button>
-
-                  {/* CTA BUTTON 2: IMAGE TO TEXT OCR */}
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("image-to-text")}
-                    className={`group relative flex-1 sm:flex-initial flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all duration-200 cursor-pointer shadow-md hover:shadow-xl active:scale-[0.98] ${
-                      activeTab === "image-to-text"
-                        ? "bg-gradient-to-r from-[#b07818] to-[#b88e58] text-white border-transparent ring-2 ring-[#b88e58]/50"
-                        : "bg-white/45 dark:bg-[#12171f]/60 backdrop-blur-md text-[#1e150f] dark:text-white border-[#c4aa82]/50 dark:border-[#b88e58]/35 border-t-[1.5px] border-t-[#dfc7a5] dark:border-t-[#ecd599]/70 border-b-2 border-b-[#b3946a]/35 dark:border-b-black/60 hover:border-[#b88e58] dark:hover:border-[#ecd599]"
-                    }`}
-                  >
-                    <div className="p-2 rounded-lg bg-amber-500/15 dark:bg-amber-500/20 text-[#a16e03] dark:text-[#ecd599] shrink-0 group-hover:scale-110 transition-transform">
-                      <FileImage className="size-5" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs sm:text-sm font-bold tracking-tight text-[#1e150f] dark:text-white">
-                          ইমেজ টু টেক্সট (OCR)
-                        </span>
-                        <Sparkles className="size-3 text-[#b07818] dark:text-[#ecd599] animate-pulse shrink-0" />
-                      </div>
-                      <p className="text-[10px] text-[#675b4c] dark:text-muted-foreground truncate">
-                        ছবি আপলোড / Ctrl+V • বাংলা, আরবি ও ইংরেজি
-                      </p>
-                    </div>
-                  </button>
+                <AuthorsAdmin />
+              </div>
+            </TabsContent>
+            <TabsContent value="posts" className="mt-0 focus-visible:outline-none">
+              <div className="space-y-4">
+                <div className="border-b border-border/50 pb-2">
+                  <h2 className="text-base font-semibold">লেখক পরিচিতি ও প্রোফাইল</h2>
+                  <p className="text-xs text-muted-foreground">
+                    আলম এম. এর প্রোফাইল তথ্য, ছবি ও জীবনী পরিচালনা করুন।
+                  </p>
                 </div>
+                <AuthorsAdmin />
               </div>
-            </div>
+            </TabsContent>
 
-            {/* WORDPRESS PAGE HEADER */}
-            <div className="mb-5 flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-[#c3c4c7]/60 dark:border-[#3c434a]">
-              <div className="flex items-center gap-3">
-                <h1 className="text-[23px] font-normal leading-[1.3] text-[#1d2327] dark:text-[#f0f0f1]">
-                  {tabTitleMap[activeTab] || "ড্যাশবোর্ড"}
-                </h1>
-                {activeTab === "articles" && (
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const el = document.getElementById("article-editor-top");
-                        if (el) {
-                          el.scrollIntoView({ behavior: "smooth" });
-                        }
-                      }}
-                      className="border border-[#2271b1] text-[#2271b1] hover:bg-[#2271b1] hover:text-white text-xs px-2.5 py-1 rounded bg-[#f6f7f7] dark:bg-[#2c3338] font-medium transition-colors cursor-pointer shadow-2xs"
-                    >
-                      নতুন যোগ করুন (Add New)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const next = !mobileFloatingPopupEnabled;
-                        setMobileFloatingPopupEnabled(next);
-                        try {
-                          localStorage.setItem("admin_mobile_floating_popup_enabled", String(next));
-                        } catch {}
-                        toast.success(
-                          next
-                            ? "মোবাইলে ভাসমান পপআপ চালু করা হয়েছে"
-                            : "মোবাইলে ভাসমান পপআপ বন্ধ করা হয়েছে (পড়ার সুবিধা নিশ্চিত)"
-                        );
-                      }}
-                      className="border border-border text-xs px-2.5 py-1 rounded bg-[#f6f7f7] dark:bg-[#2c3338] text-foreground hover:bg-muted font-medium transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
-                      title="মোবাইল ভিউতে আর্টিকেলে ফ্লোটিং অ্যাডমিন পপআপ নিয়ন্ত্রণ"
-                    >
-                      <Smartphone className="size-3.5 text-primary" />
-                      <span>মোবাইল ফ্লোটিং পপআপ: {mobileFloatingPopupEnabled ? "চালু" : "বন্ধ"}</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-              <div className="flex flex-wrap items-center gap-2 text-xs text-[#646970] dark:text-[#8c8f94]">
-                <button
-                  type="button"
-                  onClick={handleHeaderPurgeCloudflare}
-                  disabled={purgingCfHeader}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-orange-500/40 bg-orange-500/10 hover:bg-orange-500/20 text-orange-700 dark:text-orange-300 font-medium transition-colors cursor-pointer shadow-2xs disabled:opacity-60"
-                  title="ক্লাউডফ্লেয়ার এজ ক্যাশ এবং ব্রাউজার ক্যাশ ক্লিয়ার করুন"
-                >
-                  {purgingCfHeader ? (
-                    <Loader2 className="size-3.5 animate-spin" />
-                  ) : (
-                    <Cloud className="size-3.5" />
-                  )}
-                  <span>ক্লাউডফ্লেয়ার ক্যাশ ক্লিয়ার</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleHeaderFlushRedis}
-                  disabled={flushingRedisHeader}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-300 font-medium transition-colors cursor-pointer shadow-2xs disabled:opacity-60"
-                  title="রেডিস ক্যাশ এবং ইন-মেমরি র‍্যাম ক্যাশ ক্লিয়ার করুন"
-                >
-                  {flushingRedisHeader ? (
-                    <Loader2 className="size-3.5 animate-spin" />
-                  ) : (
-                    <Database className="size-3.5" />
-                  )}
-                  <span>রেডিস ক্যাশ ক্লিয়ার</span>
-                </button>
-                <span className="hidden lg:inline">&bull;</span>
-                <span className="hidden lg:inline">Admin Dashboard Interface</span>
-                <span className="hidden sm:inline">&bull;</span>
-                <span className="font-mono text-[11px] bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded">
-                  v4.0.0
-                </span>
-              </div>
-            </div>
+            <TabsContent value="categories" className="mt-0 focus-visible:outline-none">
+              <CategoriesAdmin />
+            </TabsContent>
 
-            {/* TAB CONTENTS */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              {/* 1. DASHBOARD OVERVIEW */}
-              <TabsContent value="dashboard" className="mt-0 focus-visible:outline-none">
-                <WordPressDashboardOverview
-                  setActiveTab={setActiveTab}
-                  visibleWidgets={visibleWidgets}
-                />
-              </TabsContent>
+            <TabsContent value="tags" className="mt-0 focus-visible:outline-none">
+              <TagsAdmin />
+            </TabsContent>
 
-              {/* 1.A VIDEO TRANSCRIBER WITH TIMESTAMPS */}
-              <TabsContent value="video-transcriber" className="mt-0 focus-visible:outline-none">
-                <VideoTranscriberAdmin
-                  onSendToArticleDraft={(content, title) => {
-                    try {
-                      sessionStorage.setItem("admin_draft_content", content);
-                      if (title) sessionStorage.setItem("admin_draft_title", title);
-                    } catch {}
-                    setActiveTab("articles");
-                    toast.success("ট্রান্সক্রিপশন টেক্সট আর্টিকেল এডিটরে পাঠানো হয়েছে!");
-                  }}
-                  onBackToDashboard={() => setActiveTab("dashboard")}
-                />
-              </TabsContent>
+            <TabsContent value="registered-users" className="mt-0 focus-visible:outline-none">
+              <RegisteredUsersAdmin onGoToRoles={() => setActiveTab("roles")} />
+            </TabsContent>
 
-              {/* 1.B IMAGE TO TEXT OCR */}
-              <TabsContent value="image-to-text" className="mt-0 focus-visible:outline-none">
-                <ImageToTextAdmin
-                  onSendToArticleDraft={(content, title) => {
-                    try {
-                      sessionStorage.setItem("admin_draft_content", content);
-                      if (title) sessionStorage.setItem("admin_draft_title", title);
-                    } catch {}
-                    setActiveTab("articles");
-                    toast.success("ওসিআর টেক্সট আর্টিকেল এডিটরে পাঠানো হয়েছে!");
-                  }}
-                  onBackToDashboard={() => setActiveTab("dashboard")}
-                />
-              </TabsContent>
+            <TabsContent value="roles" className="mt-0 focus-visible:outline-none">
+              <RolesAdmin />
+            </TabsContent>
 
-              {/* 1.1 VISITOR ANALYTICS */}
-              <TabsContent value="visitor-analytics" className="mt-0 focus-visible:outline-none">
-                <VisitorAnalyticsAdmin />
-              </TabsContent>
+            <TabsContent value="menu" className="mt-0 focus-visible:outline-none">
+              <MenuAdmin />
+            </TabsContent>
 
-{/* 1.1.B CLOUDFLARE EDGE ANALYTICS (7 TABS) */}
-              <TabsContent value="cloudflare-analytics" className="mt-0 focus-visible:outline-none">
-                <CloudflareAnalyticsAdmin initialTab="requests" onTabChange={(t) => setActiveTab(`cf-${t}`)} />
-              </TabsContent>
-              <TabsContent value="cf-requests" className="mt-0 focus-visible:outline-none">
-                <CloudflareAnalyticsAdmin initialTab="requests" onTabChange={(t) => setActiveTab(`cf-${t}`)} />
-              </TabsContent>
-              <TabsContent value="cf-visitors" className="mt-0 focus-visible:outline-none">
-                <CloudflareAnalyticsAdmin initialTab="visitors" onTabChange={(t) => setActiveTab(`cf-${t}`)} />
-              </TabsContent>
-              <TabsContent value="cf-performance" className="mt-0 focus-visible:outline-none">
-                <CloudflareAnalyticsAdmin initialTab="performance" onTabChange={(t) => setActiveTab(`cf-${t}`)} />
-              </TabsContent>
-              <TabsContent value="cf-security" className="mt-0 focus-visible:outline-none">
-                <CloudflareAnalyticsAdmin initialTab="security" onTabChange={(t) => setActiveTab(`cf-${t}`)} />
-              </TabsContent>
-              <TabsContent value="cf-cache" className="mt-0 focus-visible:outline-none">
-                <CloudflareAnalyticsAdmin initialTab="cache" onTabChange={(t) => setActiveTab(`cf-${t}`)} />
-              </TabsContent>
-              <TabsContent value="cf-origin" className="mt-0 focus-visible:outline-none">
-                <CloudflareAnalyticsAdmin initialTab="origin" onTabChange={(t) => setActiveTab(`cf-${t}`)} />
-              </TabsContent>
-              <TabsContent value="cf-dns" className="mt-0 focus-visible:outline-none">
-                <CloudflareAnalyticsAdmin initialTab="dns" onTabChange={(t) => setActiveTab(`cf-${t}`)} />
-              </TabsContent>
+            <TabsContent value="pages" className="mt-0 focus-visible:outline-none">
+              <PagesAdmin />
+            </TabsContent>
 
-              {/* 1.2 SEO & SEARCH ENGINE CENTER */}
-                            {/* 1.1 GOOGLE SEARCH CONSOLE PERFORMANCE */}
-              <TabsContent value="seo-gsc" className="mt-0 focus-visible:outline-none">
-                <div className="space-y-4">
-                  <GoogleSearchConsolePerformance />
-                </div>
-              </TabsContent>
+            <TabsContent value="social" className="mt-0 focus-visible:outline-none">
+              <SocialLinksAdmin />
+            </TabsContent>
 
-<TabsContent value="seo-center" className="mt-0 focus-visible:outline-none">
-                <SeoCenterAdmin />
-              </TabsContent>
+            <TabsContent value="settings-general" className="mt-0 focus-visible:outline-none">
+              <WordPressSettingsAdmin initialSubTab="settings-general" setActiveTab={setActiveTab} />
+            </TabsContent>
 
-              {/* 2. ALL ARTICLES */}
-              <TabsContent value="articles" className="mt-0 focus-visible:outline-none">
-                <div id="article-editor-top">
-                  <ArticlesAdmin
-                    onOpenImport={(type) => setImportModalType(type)}
-                    onGoToExport={() => setActiveTab("export")}
-                  />
-                </div>
-              </TabsContent>
+            <TabsContent value="settings-header-footer" className="mt-0 focus-visible:outline-none">
+              <WordPressSettingsAdmin initialSubTab="settings-header-footer" setActiveTab={setActiveTab} />
+            </TabsContent>
 
-              {/* 3. IMPORT & EXPORT POSTS */}
-              <TabsContent value="import" className="mt-0 focus-visible:outline-none">
-                <PostsExportImportAdmin
-                  initialSubTab="import"
-                  onNavigateToArticles={() => setActiveTab("articles")}
-                />
-              </TabsContent>
+            <TabsContent value="settings-social" className="mt-0 focus-visible:outline-none">
+              <WordPressSettingsAdmin initialSubTab="settings-social" setActiveTab={setActiveTab} />
+            </TabsContent>
 
-              <TabsContent value="export" className="mt-0 focus-visible:outline-none">
-                <PostsExportImportAdmin
-                  initialSubTab="export"
-                  onNavigateToArticles={() => setActiveTab("articles")}
-                />
-              </TabsContent>
+            <TabsContent value="settings-reading" className="mt-0 focus-visible:outline-none">
+              <WordPressSettingsAdmin initialSubTab="settings-reading" setActiveTab={setActiveTab} hideSubTabSelector={true} />
+            </TabsContent>
 
-              {/* 4. TRANSLATIONS */}
-              <TabsContent value="translations" className="mt-0 focus-visible:outline-none">
-                <TranslationsAdmin />
-              </TabsContent>
+            <TabsContent value="settings-offline" className="mt-0 focus-visible:outline-none">
+              <WordPressSettingsAdmin initialSubTab="settings-offline" setActiveTab={setActiveTab} />
+            </TabsContent>
 
-              {/* 5. SURAH AUDIO */}
-              <TabsContent value="surah-audio" className="mt-0 focus-visible:outline-none">
-                <SurahAudioAdmin />
-              </TabsContent>
+            <TabsContent value="settings-discussion" className="mt-0 focus-visible:outline-none">
+              <WordPressSettingsAdmin initialSubTab="settings-discussion" setActiveTab={setActiveTab} />
+            </TabsContent>
 
-              {/* 6. QURAN EXPORT */}
-              <TabsContent value="quran-export" className="mt-0 focus-visible:outline-none">
-                <QuranExportAdmin />
-              </TabsContent>
+            <TabsContent value="turnstile" className="mt-0 focus-visible:outline-none">
+              <WordPressSettingsAdmin initialSubTab="turnstile" setActiveTab={setActiveTab} />
+            </TabsContent>
 
-              {/* 7. AUTHORS */}
-              <TabsContent value="posts" className="mt-0 focus-visible:outline-none">
-                <div className="space-y-4">
-                  <div className="border-b border-border/50 pb-2">
-                    <h2 className="text-base font-semibold">লেখক ও গবেষক ব্যবস্থাপনা</h2>
-                    <p className="text-xs text-muted-foreground">
-                      নতুন লেখক যুক্ত করুন এবং প্রোফাইল তথ্য পরিচালনা করুন।
-                    </p>
-                  </div>
-                  <AuthorsAdmin />
-                </div>
-              </TabsContent>
+            <TabsContent value="2fa-security" className="mt-0 focus-visible:outline-none">
+              <TwoFactorAdmin />
+            </TabsContent>
 
-              {/* 8. CATEGORIES */}
-              <TabsContent value="categories" className="mt-0 focus-visible:outline-none">
-                <CategoriesAdmin />
-              </TabsContent>
+            <TabsContent value="messages" className="mt-0 focus-visible:outline-none">
+              <MessagesAdmin />
+            </TabsContent>
 
-              {/* 9. TAGS */}
-              <TabsContent value="tags" className="mt-0 focus-visible:outline-none">
-                <TagsAdmin />
-              </TabsContent>
+            <TabsContent value="offline" className="mt-0 focus-visible:outline-none">
+              <OfflineSyncAdmin onGoToCacheSettings={() => setActiveTab("settings-offline")} />
+            </TabsContent>
 
-              {/* 10. REGISTERED USERS & SIGN-IN LIST */}
-              <TabsContent value="registered-users" className="mt-0 focus-visible:outline-none">
-                <RegisteredUsersAdmin onGoToRoles={() => setActiveTab("roles")} />
-              </TabsContent>
+            <TabsContent value="subs" className="mt-0 focus-visible:outline-none">
+              <SubscribersAdmin />
+            </TabsContent>
 
-              {/* 11. ROLES */}
-              <TabsContent value="roles" className="mt-0 focus-visible:outline-none">
-                <RolesAdmin />
-              </TabsContent>
+            <TabsContent value="d1-status" className="mt-0 focus-visible:outline-none">
+              <CloudflareD1StatusAdmin />
+            </TabsContent>
+            <TabsContent value="supabase-status" className="mt-0 focus-visible:outline-none">
+              <CloudflareD1StatusAdmin />
+            </TabsContent>
+          </Tabs>
 
-              {/* 11. MENUS */}
-              <TabsContent value="menu" className="mt-0 focus-visible:outline-none">
-                <MenuAdmin />
-              </TabsContent>
-
-              {/* 12. PAGES */}
-              <TabsContent value="pages" className="mt-0 focus-visible:outline-none">
-                <PagesAdmin />
-              </TabsContent>
-
-              {/* 13. SOCIAL LINKS */}
-              <TabsContent value="social" className="mt-0 focus-visible:outline-none">
-                <SocialLinksAdmin />
-              </TabsContent>
-
-              {/* 14. SETTINGS (WORDPRESS DASHBOARD SETTINGS) */}
-              <TabsContent value="settings-general" className="mt-0 focus-visible:outline-none">
-                <WordPressSettingsAdmin initialSubTab="settings-general" setActiveTab={setActiveTab} />
-              </TabsContent>
-
-              <TabsContent value="settings-header-footer" className="mt-0 focus-visible:outline-none">
-                <WordPressSettingsAdmin initialSubTab="settings-header-footer" setActiveTab={setActiveTab} />
-              </TabsContent>
-
-              <TabsContent value="settings-social" className="mt-0 focus-visible:outline-none">
-                <WordPressSettingsAdmin initialSubTab="settings-social" setActiveTab={setActiveTab} />
-              </TabsContent>
-
-              <TabsContent value="settings-reading" className="mt-0 focus-visible:outline-none">
-                <WordPressSettingsAdmin initialSubTab="settings-reading" setActiveTab={setActiveTab} hideSubTabSelector={true} />
-              </TabsContent>
-
-              <TabsContent value="settings-audio" className="mt-0 focus-visible:outline-none">
-                <WordPressSettingsAdmin initialSubTab="settings-audio" setActiveTab={setActiveTab} />
-              </TabsContent>
-
-              <TabsContent value="settings-offline" className="mt-0 focus-visible:outline-none">
-                <WordPressSettingsAdmin initialSubTab="settings-offline" setActiveTab={setActiveTab} />
-              </TabsContent>
-
-              <TabsContent value="settings-discussion" className="mt-0 focus-visible:outline-none">
-                <WordPressSettingsAdmin initialSubTab="settings-discussion" setActiveTab={setActiveTab} />
-              </TabsContent>
-
-              <TabsContent value="turnstile" className="mt-0 focus-visible:outline-none">
-                <WordPressSettingsAdmin initialSubTab="turnstile" setActiveTab={setActiveTab} />
-              </TabsContent>
-
-              <TabsContent value="2fa-security" className="mt-0 focus-visible:outline-none">
-                <TwoFactorAdmin />
-              </TabsContent>
-
-              {/* 15. MESSAGES */}
-              <TabsContent value="messages" className="mt-0 focus-visible:outline-none">
-                <MessagesAdmin />
-              </TabsContent>
-
-              {/* 16. OFFLINE SYNC */}
-              <TabsContent value="offline" className="mt-0 focus-visible:outline-none">
-                <OfflineSyncAdmin onGoToCacheSettings={() => setActiveTab("settings-offline")} />
-              </TabsContent>
-
-              {/* 17. SUBSCRIBERS */}
-              <TabsContent value="subs" className="mt-0 focus-visible:outline-none">
-                <SubscribersAdmin />
-              </TabsContent>
-
-              {/* 18. CLOUDFLARE D1 SQLITE STATUS & OVERVIEW */}
-              <TabsContent value="d1-status" className="mt-0 focus-visible:outline-none">
-                <CloudflareD1StatusAdmin />
-              </TabsContent>
-              <TabsContent value="supabase-status" className="mt-0 focus-visible:outline-none">
-                <CloudflareD1StatusAdmin />
-              </TabsContent>
-            </Tabs>
-
-            {/* 4. WORDPRESS FOOTER (#wpfooter) */}
-            <footer
-              id="wpfooter"
-              className="mt-12 border-t border-[#c3c4c7] dark:border-[#3c434a] py-3 text-xs text-[#646970] dark:text-[#8c8f94] flex flex-wrap items-center justify-between gap-2 px-1 select-none"
-            >
-              <div>
-                <span>Alam M দিয়ে তৈরি করার জন্য ধন্যবাদ। (Thank you for creating with Alam M.)</span>
-              </div>
-              <div>
-                <span>ভার্সন ৩.৩.০ (Version 3.3.0)</span>
-              </div>
-            </footer>
-          </main>
-        </div>
+          {/* FOOTER */}
+          <footer className="mt-12 border-t border-border/40 py-4 text-xs text-muted-foreground flex flex-wrap items-center justify-between gap-3">
+            <span>Alam M — শব্দ আমার ক্যানভাস &bull; ব্যক্তিগত সাহিত্যিক পোর্টাল</span>
+            <span>সর্বস্বত্ব সংরক্ষিত &copy; {new Date().getFullYear()}</span>
+          </footer>
+        </main>
       </div>
     </div>
   );
 }
-
-
 
 /* ========================================================================== */
 /* ARTICLES ADMIN WITH TRASH, RESTORE, TAGS & BULK SELECTION                  */
@@ -4160,1729 +3494,6 @@ function ArticlesAdmin({
         article={dateTimeModalArticle}
       />
     </div>
-  );
-}
-
-const TRANSLATION_LABELS: Record<string, string> = {
-  bn_std: "১. আক্ষরিক অনুবাদ (বাংলা)",
-  en_std: "২. Surface Translation (English)",
-  bn: "৩. কুরআন অন্বেষা — আধুনিক অনুবাদ (বাংলা)",
-  en: "৪. Qur'an Explorer — Modern Translation (English)",
-  scientific_bn: "৫. বৈজ্ঞানিক অনুবাদ (বাংলা)",
-  scientific_en: "৬. Scientific Translation (English)",
-  modern_bn: "৩. কুরআন অন্বেষা — আধুনিক অনুবাদ (বাংলা)",
-  modern_en: "৪. Qur'an Explorer — Modern Translation (English)",
-  conventional_bn: "১. আক্ষরিক অনুবাদ (বাংলা)",
-  conventional_en: "২. Surface Translation (English)",
-};
-
-type TranslationType = "bn_std" | "en_std" | "bn" | "en" | "scientific_bn" | "scientific_en";
-
-function TranslationsAdmin() {
-  const { user } = useSession();
-  const queryClient = useQueryClient();
-  const [surah, setSurah] = useState("1");
-  const [ayah, setAyah] = useState("1");
-  const [lng, setLng] = useState<TranslationType>("bn_std");
-  const [metaBn, setMetaBn] = useState("");
-  const [metaEn, setMetaEn] = useState("");
-  const [text, setText] = useState("");
-  const [note, setNote] = useState("");
-  const [refUrl, setRefUrl] = useState("");
-  const [refMarker, setRefMarker] = useState("১");
-  const [editingTranslationId, setEditingTranslationId] = useState<string | null>(null);
-
-  const [activeListTab, setActiveListTab] = useState<"overrides" | "dataset">("dataset");
-  const [isSyncingSurah, setIsSyncingSurah] = useState(false);
-
-  // Load published articles to allow quick reference selection
-  const articlesQuery = useQuery({
-    queryKey: ["admin-articles-for-reference"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("articles")
-        .select("id, title_bn, title_en, slug")
-        .order("created_at", { ascending: false })
-        .limit(50);
-      return data || [];
-    },
-  });
-
-  const handleInsertReference = () => {
-    const cleanMarker = refMarker.trim() || "১";
-    const cleanUrl = refUrl.trim();
-    const snippet = cleanUrl ? ` [${cleanMarker}](${cleanUrl})` : ` [${cleanMarker}]`;
-
-    setText((prev) => (prev ? prev.trimEnd() + snippet : snippet.trim()));
-    if (cleanUrl && !note.trim()) {
-      setNote(`রেফারেন্স: [${cleanMarker}] ${cleanUrl}`);
-    }
-
-    toast.success(
-      cleanUrl
-        ? `রেফারেন্স লিঙ্ক [${cleanMarker}] অনুবাদ টেক্সটে যুক্ত হয়েছে!`
-        : `রেফারেন্স মার্কার [${cleanMarker}] অনুবাদ টেক্সটে যুক্ত হয়েছে!`
-    );
-
-    // Auto increment marker for next reference
-    const banglaNums = ["১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯", "১০"];
-    const bIdx = banglaNums.indexOf(cleanMarker);
-    if (bIdx >= 0 && bIdx < banglaNums.length - 1) {
-      setRefMarker(banglaNums[bIdx + 1]);
-    } else if (/^[A-Y]$/.test(cleanMarker)) {
-      setRefMarker(String.fromCharCode(cleanMarker.charCodeAt(0) + 1));
-    } else if (/^\d+$/.test(cleanMarker)) {
-      setRefMarker(String(Number(cleanMarker) + 1));
-    }
-  };
-
-  const list = useQuery({
-    queryKey: ["admin-verse-translations", surah],
-    queryFn: async () => {
-      const sNum = Number(surah) || 1;
-      let d1Trans: any[] = [];
-      try {
-        const res = await fetch(`/api/public/verse-translations?surah=${sNum}`);
-        if (res.ok) {
-          const json = await res.json();
-          if (Array.isArray(json?.translations)) d1Trans = json.translations;
-        }
-      } catch {}
-
-      let sbTrans: any[] = [];
-      try {
-        const { data, error } = await supabase
-          .from("verse_translations")
-          .select("*")
-          .eq("surah", sNum)
-          .order("ayah");
-        if (!error && data) sbTrans = data;
-      } catch {}
-
-      const mergedMap = new Map<string, any>();
-      for (const t of sbTrans) mergedMap.set(`${t.ayah}_${t.lang}`, t);
-      for (const t of d1Trans) mergedMap.set(`${t.ayah}_${t.lang}`, t);
-      return Array.from(mergedMap.values());
-    },
-  });
-
-  const surahDatasetQuery = useQuery({
-    queryKey: ["admin-surah-dataset", surah],
-    queryFn: async () => {
-      const sNum = Number(surah) || 1;
-      const res = await fetch(`/data/quran/surahs/${sNum}.json`);
-      if (!res.ok) return null;
-      return res.json();
-    },
-  });
-
-  const cloudVersesQuery = useQuery({
-    queryKey: ["admin-cloud-verses-status", surah],
-    queryFn: async () => {
-      const sNum = Number(surah) || 1;
-      const { data, error } = await supabase
-        .from("quran_verses")
-        .select("ayah, modern_translation_bn, modern_translation_en, conventional_bn, conventional_en, meta_bn, meta_en")
-        .eq("surah", sNum)
-        .order("ayah");
-      if (error) return [];
-      return data || [];
-    },
-  });
-
-  const currentAyahData = useMemo(() => {
-    const sNum = Number(surah) || 1;
-    const aNum = Number(ayah) || 1;
-    const baseAyah = surahDatasetQuery.data?.ayahs?.find((x: any) => Number(x.ayah) === aNum) || {
-      surah: sNum,
-      ayah: aNum,
-      words: [],
-    };
-
-    const merged = { ...baseAyah };
-
-    // 1. Cloud verses table overrides
-    const cloudV = cloudVersesQuery.data?.find((v: any) => Number(v.ayah) === aNum);
-    if (cloudV) {
-      if (cloudV.modern_translation_bn) merged.modern_translation_bn = cloudV.modern_translation_bn;
-      if (cloudV.modern_translation_en) merged.modern_translation_en = cloudV.modern_translation_en;
-      if (cloudV.conventional_bn) merged.conventional_bn = cloudV.conventional_bn;
-      if (cloudV.conventional_en) merged.conventional_en = cloudV.conventional_en;
-      if (cloudV.meta_bn) merged.meta_bn = cloudV.meta_bn;
-      if (cloudV.meta_en) merged.meta_en = cloudV.meta_en;
-    }
-
-    // 2. verse_translations overrides
-    const trans = list.data?.filter((t: any) => Number(t.ayah) === aNum) || [];
-    for (const t of trans) {
-      if ((t.lang === "bn" || t.lang === "modern_bn") && t.text) {
-        merged.modern_translation_bn = t.text;
-      } else if ((t.lang === "en" || t.lang === "modern_en") && t.text) {
-        merged.modern_translation_en = t.text;
-      } else if ((t.lang === "bn_std" || t.lang === "conventional_bn") && t.text) {
-        merged.conventional_bn = t.text;
-      } else if ((t.lang === "en_std" || t.lang === "conventional_en") && t.text) {
-        merged.conventional_en = t.text;
-      } else if (t.lang === "scientific_bn" && t.text) {
-        merged.scientific_translation_bn = t.text;
-      } else if (t.lang === "scientific_en" && t.text) {
-        merged.scientific_translation_en = t.text;
-      }
-    }
-
-    // 3. Local storage overrides
-    try {
-      const saved = localStorage.getItem(`quran_ayah_meta_${sNum}_${aNum}`);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.modern_translation_bn) merged.modern_translation_bn = parsed.modern_translation_bn;
-        if (parsed.modern_translation_en) merged.modern_translation_en = parsed.modern_translation_en;
-        if (parsed.conventional_bn) merged.conventional_bn = parsed.conventional_bn;
-        if (parsed.conventional_en) merged.conventional_en = parsed.conventional_en;
-        if (parsed.scientific_translation_bn) merged.scientific_translation_bn = parsed.scientific_translation_bn;
-        if (parsed.scientific_translation_en) merged.scientific_translation_en = parsed.scientific_translation_en;
-        if (parsed.meta_bn) merged.meta_bn = parsed.meta_bn;
-        if (parsed.meta_en) merged.meta_en = parsed.meta_en;
-      }
-    } catch {}
-
-    return merged;
-  }, [surahDatasetQuery.data, cloudVersesQuery.data, list.data, surah, ayah]);
-
-  // Load existing metadata and translation text whenever surah, ayah, or translation type changes
-  useEffect(() => {
-    let cancelled = false;
-
-    const loadData = async () => {
-      const sNum = Number(surah);
-      const aNum = Number(ayah);
-      if (!sNum || !aNum) return;
-
-      // 1. Check local storage first
-      let localObj: any = null;
-      try {
-        const saved = localStorage.getItem(`quran_ayah_meta_${sNum}_${aNum}`);
-        if (saved) {
-          localObj = JSON.parse(saved);
-        }
-      } catch {}
-
-      const hasBengali = (text?: string | null) => (text ? /[\u0980-\u09FF]/.test(text) : false);
-
-      if (localObj && !cancelled) {
-        if (localObj.meta_bn && hasBengali(localObj.meta_bn)) {
-          setMetaBn(localObj.meta_bn);
-        }
-        if (localObj.meta_en && !localObj.meta_en.includes("Root Directory Authentication")) {
-          setMetaEn(localObj.meta_en);
-        }
-      }
-
-      // Check if dataset is already in memory
-      const memAyah = surahDatasetQuery.data?.ayahs?.find((x: any) => Number(x.ayah) === aNum);
-      if (memAyah && !cancelled) {
-        if (!localObj?.meta_bn || !hasBengali(localObj.meta_bn)) {
-          setMetaBn(memAyah.meta_bn || "");
-        }
-        if (!localObj?.meta_en || localObj.meta_en.includes("Root Directory Authentication")) {
-          setMetaEn(memAyah.meta_en || "");
-        }
-      }
-
-      // 2. Check if a translation was saved in database for this surah, ayah & lng
-      const matchedTrans = list.data?.find((t) => t.surah === sNum && t.ayah === aNum && t.lang === lng);
-      if (matchedTrans && !cancelled) {
-        setText(matchedTrans.text || "");
-        setNote(matchedTrans.note || "");
-        return;
-      }
-
-      const matchedCloudVerse = cloudVersesQuery.data?.find((v) => Number(v.ayah) === aNum);
-      if (matchedCloudVerse && !cancelled) {
-        let cvText = "";
-        if (lng === "bn") cvText = matchedCloudVerse.modern_translation_bn || "";
-        else if (lng === "en") cvText = matchedCloudVerse.modern_translation_en || "";
-        else if (lng === "bn_std") cvText = matchedCloudVerse.conventional_bn || "";
-        else if (lng === "en_std") cvText = matchedCloudVerse.conventional_en || "";
-        if (cvText) {
-          setText(cvText);
-          return;
-        }
-      }
-
-      // 3. Check local storage specific translation fields
-      if (localObj) {
-        let fieldText = "";
-        if (lng === "bn_std") fieldText = localObj.conventional_bn || localObj.bn_text || "";
-        else if (lng === "en_std") fieldText = localObj.conventional_en || localObj.en_text || "";
-        else if (lng === "bn") fieldText = localObj.modern_translation_bn || "";
-        else if (lng === "en") fieldText = localObj.modern_translation_en || "";
-        else if (lng === "scientific_bn") fieldText = localObj.scientific_translation_bn || "";
-        else if (lng === "scientific_en") fieldText = localObj.scientific_translation_en || "";
-
-        if (fieldText && !cancelled) {
-          setText(fieldText);
-          return;
-        }
-      }
-
-      // 4. Fetch from static surah JSON dataset if not yet loaded in memory
-      try {
-        const r = await fetch(`/data/quran/surahs/${sNum}.json`);
-        if (!r.ok || cancelled) return;
-        const d = await r.json();
-        const a = d?.ayahs?.find((x: any) => Number(x.ayah) === aNum);
-        if (a && !cancelled) {
-          if (!localObj?.meta_bn || !hasBengali(localObj.meta_bn)) {
-            setMetaBn(a.meta_bn || "");
-          }
-          if (!localObj?.meta_en || localObj.meta_en.includes("Root Directory Authentication")) {
-            setMetaEn(a.meta_en || "");
-          }
-
-          let tVal = "";
-          if (lng === "bn_std") tVal = a.conventional_bn || a.translation_bn || a.bn_text || "";
-          else if (lng === "en_std") tVal = a.conventional_en || a.translation_en || a.en_text || "";
-          else if (lng === "bn") tVal = a.modern_translation_bn || "";
-          else if (lng === "en") tVal = a.modern_translation_en || "";
-          else if (lng === "scientific_bn") tVal = a.scientific_translation_bn || "";
-          else if (lng === "scientific_en") tVal = a.scientific_translation_en || "";
-
-          setText(tVal);
-        }
-      } catch {}
-    };
-
-    loadData();
-    return () => {
-      cancelled = true;
-    };
-  }, [surah, ayah, lng, list.data]);
-
-  const handleSelectLayerToEdit = (type: TranslationType) => {
-    setLng(type);
-    if (currentAyahData) {
-      let tVal = "";
-      if (type === "bn_std") tVal = currentAyahData.conventional_bn || currentAyahData.translation_bn || currentAyahData.bn_text || "";
-      else if (type === "en_std") tVal = currentAyahData.conventional_en || currentAyahData.translation_en || currentAyahData.en_text || "";
-      else if (type === "bn") tVal = currentAyahData.modern_translation_bn || "";
-      else if (type === "en") tVal = currentAyahData.modern_translation_en || "";
-      else if (type === "scientific_bn") tVal = currentAyahData.scientific_translation_bn || "";
-      else if (type === "scientific_en") tVal = currentAyahData.scientific_translation_en || "";
-
-      const sNum = Number(surah);
-      const aNum = Number(ayah);
-      const matchedTrans = list.data?.find((t: any) => t.surah === sNum && t.ayah === aNum && t.lang === type);
-      if (matchedTrans?.text) {
-        setText(matchedTrans.text);
-      } else {
-        setText(tVal);
-      }
-    }
-    const formElement = document.getElementById("admin-translation-editor-form");
-    if (formElement) formElement.scrollIntoView({ behavior: "smooth" });
-    toast.info(`${TRANSLATION_LABELS[type]} ফর্মে সম্পাদনার জন্য প্রস্তুত`);
-  };
-
-  const handleSyncSurahToCloud = async () => {
-    const sNum = Number(surah) || 1;
-    const ayahs = surahDatasetQuery.data?.ayahs;
-    if (!ayahs || ayahs.length === 0) {
-      toast.error("সূরার ডেটা এখনও লোড হয়নি");
-      return;
-    }
-
-    try {
-      setIsSyncingSurah(true);
-      const batch = ayahs.map((a: any) => {
-        const convBn = a.conventional_bn || a.translation_bn || "";
-        const convEn = a.conventional_en || a.translation_en || "";
-        const modBn = a.modern_translation_bn || null;
-        const modEn = a.modern_translation_en || null;
-        const mBn = a.meta_bn || null;
-        const mEn = a.meta_en || null;
-        let lexNotes = "";
-        if (a.lexicon_modern_notes) {
-          lexNotes = typeof a.lexicon_modern_notes === "string" ? a.lexicon_modern_notes : JSON.stringify(a.lexicon_modern_notes);
-        }
-        const sPad = String(sNum).padStart(3, "0");
-        const aPad = String(a.ayah).padStart(3, "0");
-
-        return {
-          surah: sNum,
-          ayah: a.ayah,
-          text_uthmani: a.text_uthmani || a.words?.map((w: any) => w.text_uthmani).join(" ") || "",
-          words: a.words || [],
-          bn_text: convBn,
-          en_text: convEn,
-          conventional_bn: convBn,
-          conventional_en: convEn,
-          modern_translation_bn: modBn,
-          modern_translation_en: modEn,
-          meta_bn: mBn,
-          meta_en: mEn,
-          lexicon_modern_notes: lexNotes || null,
-          audio_url: `https://everyayah.com/data/Alafasy_128kbps/${sPad}${aPad}.mp3`,
-          updated_at: new Date().toISOString(),
-        };
-      });
-
-      const chunkSize = 25;
-      for (let i = 0; i < batch.length; i += chunkSize) {
-        const chunk = batch.slice(i, i + chunkSize);
-        const { error } = await (supabase as any).from("quran_verses").upsert(chunk, { onConflict: "surah,ayah" });
-        if (error) throw error;
-      }
-
-      const metaBatch = batch
-        .filter((v: any) => v.meta_bn || v.meta_en)
-        .map((v: any) => ({
-          surah: v.surah,
-          ayah: v.ayah,
-          meta_bn: v.meta_bn,
-          meta_en: v.meta_en,
-        }));
-      if (metaBatch.length > 0) {
-        await (supabase as any).from("ayah_metadata").upsert(metaBatch, { onConflict: "surah,ayah" });
-      }
-
-      queryClient.invalidateQueries({ queryKey: ["admin-cloud-verses-status", surah] });
-      queryClient.invalidateQueries({ queryKey: ["admin-cloud-verses", surah] });
-      toast.success(`সূরা ${sNum}-এর মোট ${ayahs.length}টি আয়াতের সকল স্তর সফলভাবে ক্লাউড ডাটাবেজে (Supabase) সিঙ্ক করা হয়েছে!`);
-    } catch (err: any) {
-      console.error("Sync error:", err);
-      toast.error(`সিঙ্ক করতে সমস্যা হয়েছে: ${err.message || err}`);
-    } finally {
-      setIsSyncingSurah(false);
-    }
-  };
-
-  const save = useMutation({
-    mutationFn: async () => {
-      const sNum = Number(surah);
-      const aNum = Number(ayah);
-      if (!sNum || sNum < 1 || sNum > 114) throw new Error("সঠিক সূরা নম্বর দিন (১-১১৪)");
-      if (!aNum || aNum < 1 || aNum > 300) throw new Error("সঠিক আয়াত নম্বর দিন");
-
-      let metaSaved = false;
-
-      // ১. মেটা ডাটা লোকাল ও ক্লাউডে সংরক্ষণ
-      if (metaBn.trim() || metaEn.trim()) {
-        try {
-          const existingSaved = localStorage.getItem(`quran_ayah_meta_${sNum}_${aNum}`);
-          const currentObj = existingSaved ? JSON.parse(existingSaved) : {};
-          if (metaBn.trim()) currentObj.meta_bn = metaBn.trim();
-          if (metaEn.trim()) currentObj.meta_en = metaEn.trim();
-          currentObj.saved_at = Date.now();
-          localStorage.setItem(`quran_ayah_meta_${sNum}_${aNum}`, JSON.stringify(currentObj));
-          metaSaved = true;
-        } catch {}
-
-        try {
-          await supabase.from("ayah_metadata").upsert({
-            surah: sNum,
-            ayah: aNum,
-            meta_bn: metaBn.trim() || null,
-            meta_en: metaEn.trim() || null,
-            created_by: user?.id || null,
-            updated_at: new Date().toISOString(),
-          }, { onConflict: "surah,ayah" });
-        } catch (mErr) {
-          console.warn("ayah_metadata sync notice:", mErr);
-        }
-      }
-
-      // ২. অনুবাদ টেক্সট সংরক্ষণ (যদি প্রদান করা হয়)
-      if (text.trim()) {
-        const transSchema = z.object({
-          surah: z.coerce.number().int().min(1).max(114),
-          ayah: z.coerce.number().int().min(1).max(300),
-          lang: z.enum(["bn", "en", "bn_std", "en_std", "modern_bn", "modern_en", "scientific_bn", "scientific_en"]),
-          text: z.string().trim().min(1, "অনুবাদ টেক্সট প্রদান করুন").max(8000),
-          note: z.string().trim().max(4000).optional().default(""),
-        });
-
-        const parsed = transSchema.safeParse({ surah: sNum, ayah: aNum, lang: lng, text, note });
-        if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "সঠিক অনুবাদ তথ্য দিন");
-
-        // ৩. Sync to quran_verses master table (primary live store for reader & all visitors)
-        const verseUpdate: any = {
-          surah: parsed.data.surah,
-          ayah: parsed.data.ayah,
-          updated_at: new Date().toISOString(),
-        };
-        if (parsed.data.lang === "bn_std") {
-          verseUpdate.conventional_bn = parsed.data.text;
-          verseUpdate.bn_text = parsed.data.text;
-        } else if (parsed.data.lang === "en_std") {
-          verseUpdate.conventional_en = parsed.data.text;
-          verseUpdate.en_text = parsed.data.text;
-        } else if (parsed.data.lang === "bn" || parsed.data.lang === "modern_bn") {
-          verseUpdate.modern_translation_bn = parsed.data.text;
-        } else if (parsed.data.lang === "en" || parsed.data.lang === "modern_en") {
-          verseUpdate.modern_translation_en = parsed.data.text;
-        }
-        if (metaBn.trim()) verseUpdate.meta_bn = metaBn.trim();
-        if (metaEn.trim()) verseUpdate.meta_en = metaEn.trim();
-
-        // Only upsert to quran_verses if any standard verse fields were modified
-        if (
-          verseUpdate.conventional_bn ||
-          verseUpdate.conventional_en ||
-          verseUpdate.modern_translation_bn ||
-          verseUpdate.modern_translation_en ||
-          verseUpdate.meta_bn ||
-          verseUpdate.meta_en
-        ) {
-          try {
-            const { error: qvErr } = await (supabase as any)
-              .from("quran_verses")
-              .upsert(verseUpdate, { onConflict: "surah,ayah" });
-            if (qvErr) console.warn("Failed to sync quran_verses in admin:", qvErr);
-          } catch (qvErr) {
-            console.warn("Failed to sync quran_verses in admin:", qvErr);
-          }
-        }
-
-                // ৪. Primary Sync to Cloudflare Edge D1 via /api/public/verse-translations
-        try {
-          const token = getStoredAuthToken();
-          await fetch("/api/public/verse-translations", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
-            body: JSON.stringify({
-              surah: parsed.data.surah,
-              ayah: parsed.data.ayah,
-              lang: parsed.data.lang,
-              text: parsed.data.text,
-              note: parsed.data.note || null,
-              meta_bn: metaBn.trim() || undefined,
-              meta_en: metaEn.trim() || undefined,
-            }),
-          });
-        } catch (edgeErr) {
-          console.warn("Edge D1 save notice in admin:", edgeErr);
-        }
-
-        // Secondary optional sync to Supabase (catch error so RLS does not fail the save)
-        try {
-          if (editingTranslationId) {
-            await supabase
-              .from("verse_translations")
-              .update({
-                surah: parsed.data.surah,
-                ayah: parsed.data.ayah,
-                lang: parsed.data.lang,
-                text: parsed.data.text,
-                note: parsed.data.note || null,
-                created_by: user?.id || null,
-                updated_at: new Date().toISOString(),
-              })
-              .eq("id", editingTranslationId);
-          } else {
-            const { data: existingTrans } = await supabase
-              .from("verse_translations")
-              .select("id")
-              .eq("surah", parsed.data.surah)
-              .eq("ayah", parsed.data.ayah)
-              .eq("lang", parsed.data.lang)
-              .maybeSingle();
-
-            if (existingTrans?.id) {
-              await supabase
-                .from("verse_translations")
-                .update({
-                  text: parsed.data.text,
-                  note: parsed.data.note || null,
-                  created_by: user?.id || null,
-                  updated_at: new Date().toISOString(),
-                })
-                .eq("id", existingTrans.id);
-            } else {
-              await supabase
-                .from("verse_translations")
-                .insert({
-                  surah: parsed.data.surah,
-                  ayah: parsed.data.ayah,
-                  lang: parsed.data.lang,
-                  text: parsed.data.text,
-                  note: parsed.data.note || null,
-                  created_by: user?.id || null,
-                  updated_at: new Date().toISOString(),
-                });
-            }
-          }
-        } catch (sbErr) {
-          console.warn("Supabase verse_translations save notice:", sbErr);
-        }
-        // ৫. Local storage sync with full translation fields
-        try {
-          const existingSaved = localStorage.getItem(`quran_ayah_meta_${sNum}_${aNum}`);
-          const currentObj = existingSaved ? JSON.parse(existingSaved) : {};
-          if (metaBn.trim()) currentObj.meta_bn = metaBn.trim();
-          if (metaEn.trim()) currentObj.meta_en = metaEn.trim();
-          if (parsed.data.lang === "bn_std") {
-            currentObj.conventional_bn = parsed.data.text;
-            currentObj.bn_text = parsed.data.text;
-          } else if (parsed.data.lang === "en_std") {
-            currentObj.conventional_en = parsed.data.text;
-            currentObj.en_text = parsed.data.text;
-          } else if (parsed.data.lang === "bn" || parsed.data.lang === "modern_bn") {
-            currentObj.modern_translation_bn = parsed.data.text;
-          } else if (parsed.data.lang === "en" || parsed.data.lang === "modern_en") {
-            currentObj.modern_translation_en = parsed.data.text;
-          } else if (parsed.data.lang === "scientific_bn") {
-            currentObj.scientific_translation_bn = parsed.data.text;
-          } else if (parsed.data.lang === "scientific_en") {
-            currentObj.scientific_translation_en = parsed.data.text;
-          }
-          currentObj.saved_at = Date.now();
-          localStorage.setItem(`quran_ayah_meta_${sNum}_${aNum}`, JSON.stringify(currentObj));
-        } catch {}
-      } else if (!metaSaved) {
-        throw new Error("অনুবাদ টেক্সট অথবা মেটা ডাটা প্রদান করুন");
-      }
-    },
-    onSuccess: () => {
-      const sNum = Number(surah);
-      const aNum = Number(ayah);
-      setEditingTranslationId(null);
-
-      // React Query ও অফলাইন ক্যাশে তাৎক্ষণিক সিঙ্ক যাতে রিডার পেজ ০ মিলিসেকেন্ডে আপডেট পায়
-      try {
-        const updateSurahImmutably = (old: any) => {
-          if (!old?.ayahs) return old;
-          return {
-            ...old,
-            ayahs: old.ayahs.map((a: any) => {
-              if (a.ayah !== aNum) return a;
-              const updated = { ...a };
-              if (lng === "bn" || lng === "modern_bn") updated.modern_translation_bn = text.trim();
-              else if (lng === "en" || lng === "modern_en") updated.modern_translation_en = text.trim();
-              else if (lng === "scientific_bn") updated.scientific_translation_bn = text.trim();
-              else if (lng === "scientific_en") updated.scientific_translation_en = text.trim();
-              else if (lng === "bn_std") {
-                updated.conventional_bn = text.trim();
-                updated.translation_bn = text.trim();
-                updated.bn_text = text.trim();
-              } else if (lng === "en_std") {
-                updated.conventional_en = text.trim();
-                updated.translation_en = text.trim();
-                updated.en_text = text.trim();
-              }
-              if (metaBn.trim()) updated.meta_bn = metaBn.trim();
-              if (metaEn.trim()) updated.meta_en = metaEn.trim();
-              return updated;
-            }),
-          };
-        };
-
-        queryClient.setQueryData(["local-surah-cache", sNum], updateSurahImmutably);
-        queryClient.setQueryData(["local-surah-init", sNum], updateSurahImmutably);
-
-        const updatedFull = queryClient.getQueryData(["local-surah-cache", sNum]);
-        if (updatedFull) {
-          saveSurahOffline(sNum, updatedFull).catch(() => {});
-        }
-      } catch (cacheErr) {
-        console.warn("Direct cache update notice:", cacheErr);
-      }
-
-      queryClient.invalidateQueries({ queryKey: ["admin-verse-translations", surah] });
-      queryClient.invalidateQueries({ queryKey: ["verse-translations"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-cloud-verses-status", surah] });
-      queryClient.invalidateQueries({ queryKey: ["local-surah-cache", sNum] });
-      queryClient.invalidateQueries({ queryKey: ["local-surah-init", sNum] });
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(
-          new CustomEvent("quran:verses-synced", {
-            detail: { surahs: [sNum] },
-          })
-        );
-      }
-      toast.success("আয়াতের তথ্য ও অনুবাদ সফলভাবে সংরক্ষণ করা হয়েছে");
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-
-  const remove = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("verse_translations").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      const sNum = Number(surah);
-      queryClient.invalidateQueries({ queryKey: ["admin-verse-translations", surah] });
-      queryClient.invalidateQueries({ queryKey: ["verse-translations"] });
-      queryClient.invalidateQueries({ queryKey: ["admin-cloud-verses-status", surah] });
-      if (sNum) {
-        queryClient.invalidateQueries({ queryKey: ["local-surah-cache", sNum] });
-        queryClient.invalidateQueries({ queryKey: ["local-surah-init", sNum] });
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(
-            new CustomEvent("quran:verses-synced", {
-              detail: { surahs: [sNum] },
-            })
-          );
-        }
-      }
-      toast.success("অনুবাদ মুছে ফেলা হয়েছে");
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
-
-  const handleEditRow = (v: any) => {
-    setEditingTranslationId(v.id);
-    setSurah(String(v.surah));
-    setAyah(String(v.ayah));
-    setLng(v.lang as any);
-    setText(v.text);
-    setNote(v.note || "");
-    const formElement = document.getElementById("admin-translation-editor-form");
-    if (formElement) formElement.scrollIntoView({ behavior: "smooth" });
-    toast.info(`সূরা ${v.surah} : আয়াত ${v.ayah} (${TRANSLATION_LABELS[v.lang] || v.lang}) সম্পাদনার জন্য লোড করা হয়েছে`);
-  };
-
-  const handleCancelEditRow = () => {
-    setEditingTranslationId(null);
-    setText("");
-    setNote("");
-    toast.info("সম্পাদনা মোড বাতিল করা হয়েছে");
-  };
-
-  const currentSurahNum = Math.min(114, Math.max(1, Number(surah) || 1));
-  const currentSurahInfo = SURAH_META_MAP[currentSurahNum] || { name_bn: `সূরা ${currentSurahNum}`, name_ar: "", total: 7, type: "" };
-  const totalAyahsInSurah = surahDatasetQuery.data?.ayahs?.length || currentSurahInfo.total || 7;
-  const cloudSyncedCount = cloudVersesQuery.data?.length || 0;
-
-  const handlePrevSurah = () => {
-    if (currentSurahNum > 1) {
-      setSurah(String(currentSurahNum - 1));
-      setAyah("1");
-    }
-  };
-
-  const handleNextSurah = () => {
-    if (currentSurahNum < 114) {
-      setSurah(String(currentSurahNum + 1));
-      setAyah("1");
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* ১. শীর্ষ সূরা নির্বাচন ও কুইক নেভিগেশন বার */}
-      <div className="rounded-xl border border-border bg-card p-3 sm:p-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-gradient-to-r from-primary/5 via-background to-emerald-500/5">
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handlePrevSurah}
-            disabled={currentSurahNum <= 1}
-            className="h-9 px-3 text-xs font-semibold cursor-pointer shrink-0"
-            title="পূর্ববর্তী সূরা"
-          >
-            <ChevronLeft className="size-4 mr-1" /> পূর্ববর্তী
-          </Button>
-
-          <div className="flex-1 md:flex-initial">
-            <select
-              aria-label="সূরা নির্বাচন করুন"
-              value={surah}
-              onChange={(e) => {
-                setSurah(e.target.value);
-                setAyah("1");
-              }}
-              className="h-9 w-full md:w-84 rounded-lg border border-primary/50 bg-background px-3 text-xs font-bold text-foreground shadow-2xs focus:ring-2 focus:ring-primary/30 cursor-pointer"
-            >
-              {Array.from({ length: 114 }, (_, i) => i + 1).map((num) => {
-                const info = SURAH_META_MAP[num];
-                return (
-                  <option key={num} value={num}>
-                    {num}. {info?.name_bn || `সূরা ${num}`} ({info?.name_ar || ""}) — {info?.total || 0}টি আয়াত ({info?.type || ""})
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleNextSurah}
-            disabled={currentSurahNum >= 114}
-            className="h-9 px-3 text-xs font-semibold cursor-pointer shrink-0"
-            title="পরবর্তী সূরা"
-          >
-            পরবর্তী <ChevronRight className="size-4 ml-1" />
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap text-xs">
-          <span className="bg-primary/10 text-primary font-bold px-2.5 py-1 rounded-md">
-            সূরা {currentSurahNum}: {currentSurahInfo.name_bn}
-          </span>
-          <span className="font-arabic text-sm text-foreground bg-muted px-2.5 py-0.5 rounded-md">
-            {currentSurahInfo.name_ar}
-          </span>
-          <span className="text-muted-foreground bg-muted/60 px-2 py-1 rounded-md font-medium">
-            {currentSurahInfo.type} · {totalAyahsInSurah}টি আয়াত
-          </span>
-        </div>
-      </div>
-
-      {/* ২. ওভারভিউ ও সিস্টেম স্ট্যাটাস কার্ড */}
-      <div className="rounded-xl border border-border bg-card p-4 sm:p-5 shadow-sm space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/60 pb-3.5">
-          <div className="flex items-start sm:items-center gap-3">
-            <div className="rounded-xl bg-emerald-500/10 p-2.5 text-emerald-600 dark:text-emerald-400 shrink-0">
-              <CheckCircle2 className="size-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-base font-bold text-foreground">কুরআন অনুবাদ ও ডেটাসেট নিয়ন্ত্রণ কেন্দ্র</h2>
-                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 text-[11px] font-semibold">
-                  সম্পূর্ণ ১১৪টি সূরা ও ৬,২৩৬টি আয়াত সক্রিয়
-                </Badge>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                মূল এজ ডেটাসেটে (Edge JSON) সম্পূর্ণ ১১৪টি সূরার <strong>সংশোধিত অনুবাদ (Revised Translation)</strong> ও <strong>কুরআন অন্বেষা / Qur'an Explorer</strong> সংরক্ষিত রয়েছে। যেকোনো সূরা ব্রাউজ ও সম্পাদন করতে উপরের ড্রপডাউন ব্যবহার করুন।
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0 pt-1 sm:pt-0">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={isSyncingSurah || !surahDatasetQuery.data}
-              onClick={handleSyncSurahToCloud}
-              className="h-8 text-xs font-semibold border-emerald-500/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/10 cursor-pointer shadow-2xs"
-              title="এই সূরার সকল আয়াত ও অনুবাদ ক্লাউড ডাটাবেজে (Supabase) সংরক্ষণ করুন"
-            >
-              {isSyncingSurah ? (
-                <>
-                  <Loader2 className="size-3.5 mr-1.5 animate-spin" /> সিঙ্ক হচ্ছে...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="size-3.5 mr-1.5 text-emerald-600 dark:text-emerald-400" />
-                  সূরা {currentSurahNum} ক্লাউড ডাটাবেজে সিঙ্ক করুন
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-
-        {/* ৩টি মেজরিং কাউন্টার বক্স */}
-        <div className="grid gap-2.5 sm:grid-cols-3 text-xs">
-          <div className="flex items-center justify-between rounded-lg bg-muted/40 p-3 border border-border/60">
-            <span className="text-muted-foreground font-medium">কুরআন কোর ইঞ্জিন:</span>
-            <span className="font-bold text-emerald-600 dark:text-emerald-400">১১৪ সূরা (৬,২৩৬ আয়াত)</span>
-          </div>
-          <div className="flex items-center justify-between rounded-lg bg-muted/40 p-3 border border-border/60">
-            <span className="text-muted-foreground font-medium">সূরা {currentSurahNum} ক্লাউড স্ট্যাটাস:</span>
-            <span className={`font-bold ${cloudSyncedCount > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
-              {cloudSyncedCount} / {totalAyahsInSurah} আয়াত
-            </span>
-          </div>
-          <div className="flex items-center justify-between rounded-lg bg-muted/40 p-3 border border-border/60">
-            <span className="text-muted-foreground font-medium">ম্যানুয়াল কাস্টম ওভাররাইড:</span>
-            <span className="font-bold text-foreground">
-              {list.data?.length || 0}টি আয়াত পরিবর্তিত
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* ৩. বর্তমান নির্বাচিত আয়াতের মাল্টি-লেয়ার লাইভ প্রিভিউ কার্ড */}
-      {currentAyahData && (
-        <div className="rounded-xl border border-border/80 bg-card p-4 sm:p-5 shadow-sm space-y-3.5">
-          <div className="flex items-center justify-between flex-wrap gap-2 border-b border-border/50 pb-2.5">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-sm text-foreground">
-                সূরা {currentSurahNum} ({currentSurahInfo.name_bn}) : আয়াত {ayah} — মূল ডেটাসেটের অনুবাদসমূহ
-              </span>
-              {currentAyahData.meta_bn && (
-                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 text-[11px] font-medium">
-                  {currentAyahData.meta_bn}
-                </Badge>
-              )}
-            </div>
-            <span className="text-[11px] text-muted-foreground font-medium">
-              ক্লিক করে নিচের ফর্মে যেকোনো স্তর সম্পাদনা করুন
-            </span>
-          </div>
-
-          {/* আরবি আয়াত টেক্সট */}
-          <div className="rounded-lg bg-muted/30 p-3.5 border border-border/60 text-right">
-            <p className="font-arabic text-xl sm:text-2xl leading-loose text-foreground" dir="rtl">
-              {currentAyahData.text_uthmani || currentAyahData.words?.map((w: any) => w.text_uthmani).join(" ")}
-            </p>
-          </div>
-
-          {/* ৪টি স্তর গ্রিড */}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 pt-1">
-            {/* ১. আক্ষরিক অনুবাদ */}
-            <div className="rounded-lg border border-border/80 bg-background p-3 space-y-2 flex flex-col justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-muted-foreground">১. আক্ষরিক অনুবাদ</span>
-                  <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded font-medium">বাংলা</span>
-                </div>
-                <p className="text-xs text-foreground leading-relaxed">
-                  <FormattedTranslation text={currentAyahData.conventional_bn || currentAyahData.translation_bn || "—"} />
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-7 text-xs w-full mt-2 cursor-pointer"
-                onClick={() => handleSelectLayerToEdit("bn_std")}
-              >
-                <Pencil className="size-3 mr-1" /> আক্ষরিক এডিট করুন
-              </Button>
-            </div>
-
-            {/* ২. কুরআন অন্বেষা */}
-            <div className="rounded-lg border border-purple-500/30 bg-purple-500/5 dark:bg-purple-500/10 p-3 space-y-2 flex flex-col justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-purple-700 dark:text-purple-300">২. কুরআন অন্বেষা</span>
-                  <span className="text-[10px] bg-purple-500/20 text-purple-700 dark:text-purple-300 px-1.5 py-0.5 rounded font-bold">বাংলা</span>
-                </div>
-                <p className="text-xs text-foreground leading-relaxed italic">
-                  <FormattedTranslation text={currentAyahData.modern_translation_bn || "—"} />
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-7 text-xs w-full mt-2 border-purple-500/40 text-purple-700 dark:text-purple-300 hover:bg-purple-500/15 cursor-pointer font-medium"
-                onClick={() => handleSelectLayerToEdit("bn")}
-              >
-                <Pencil className="size-3 mr-1" /> কুরআন অন্বেষা এডিট
-              </Button>
-            </div>
-
-            {/* ৩. Qur'an Explorer (English) */}
-            <div className="rounded-lg border border-indigo-500/30 bg-indigo-500/5 dark:bg-indigo-500/10 p-3 space-y-2 flex flex-col justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300">৩. Qur'an Explorer</span>
-                  <span className="text-[10px] bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded font-bold">English</span>
-                </div>
-                <p className="text-xs text-foreground leading-relaxed font-serif italic">
-                  <FormattedTranslation text={currentAyahData.modern_translation_en || "—"} />
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-7 text-xs w-full mt-2 border-indigo-500/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-500/15 cursor-pointer font-medium"
-                onClick={() => handleSelectLayerToEdit("en")}
-              >
-                <Pencil className="size-3 mr-1" /> Explorer Edit
-              </Button>
-            </div>
-
-            {/* ৪. বৈজ্ঞানিক অনুবাদ */}
-            <div className="rounded-lg border border-teal-500/30 bg-teal-500/5 dark:bg-teal-500/10 p-3 space-y-2 flex flex-col justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-teal-700 dark:text-teal-300">৪. বৈজ্ঞানিক অনুবাদ</span>
-                  <span className="text-[10px] bg-teal-500/20 text-teal-700 dark:text-teal-300 px-1.5 py-0.5 rounded font-bold">Scientific</span>
-                </div>
-                <p className="text-xs text-foreground leading-relaxed italic">
-                  <FormattedTranslation text={currentAyahData.scientific_translation_bn || "—"} />
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-7 text-xs w-full mt-2 border-teal-500/40 text-teal-700 dark:text-teal-300 hover:bg-teal-500/15 cursor-pointer font-medium"
-                onClick={() => handleSelectLayerToEdit("scientific_bn")}
-              >
-                <Pencil className="size-3 mr-1" /> বৈজ্ঞানিক এডিট
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ৩. অনুবাদ ও মেটাডাটা সম্পাদনা ফর্ম */}
-      <form
-        id="admin-translation-editor-form"
-        className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          save.mutate();
-        }}
-      >
-        <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
-          <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-            <Pencil className="size-4 text-primary" />
-            <span>আয়াত ও অনুবাদ সম্পাদনা ফর্ম — সূরা {currentSurahNum}: {currentSurahInfo.name_bn}</span>
-          </h3>
-          <span className="text-xs text-muted-foreground">
-            যেকোনো স্তরের অনুবাদ পরিবর্তন করে ডাটাবেজে ওভাররাইড সংরক্ষণ করুন
-          </span>
-        </div>
-
-        {editingTranslationId && (
-          <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-2.5 flex items-center justify-between text-xs text-amber-700 dark:text-amber-400">
-            <div className="flex items-center gap-1.5 font-semibold">
-              <Pencil className="size-3.5" />
-              <span>বিদ্যমান অনুবাদ সম্পাদনা মোড সক্রিয় (আয়াত নম্বর বা টেক্সট সংশোধন করে সংরক্ষণ করুন)</span>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleCancelEditRow}
-              className="h-6 text-[11px] border-amber-500/40 hover:bg-amber-500/15 cursor-pointer"
-            >
-              বাতিল / নতুন এন্ট্রি মোড
-            </Button>
-          </div>
-        )}
-
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="surah" className="text-xs font-semibold flex items-center justify-between">
-              <span>সূরা নির্বাচন (১১৪টি সূরা)</span>
-              <span className="text-[10px] text-muted-foreground font-normal">১-১১৪</span>
-            </Label>
-            <select
-              id="surah"
-              value={surah}
-              onChange={(e) => {
-                setSurah(e.target.value);
-                setAyah("1");
-              }}
-              className="h-9 w-full rounded border border-input bg-background px-3 text-xs font-semibold cursor-pointer"
-            >
-              {Array.from({ length: 114 }, (_, i) => i + 1).map((num) => {
-                const info = SURAH_META_MAP[num];
-                return (
-                  <option key={num} value={num}>
-                    {num}. {info?.name_bn || `সূরা ${num}`} ({info?.name_ar || ""}) — {info?.total || 0} আয়াত
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="ayah" className="text-xs font-semibold flex items-center justify-between">
-              <span>আয়াত নম্বর</span>
-              <span className="text-[10px] text-muted-foreground font-normal">মোট {totalAyahsInSurah}টি</span>
-            </Label>
-            <div className="flex items-center gap-1.5">
-              <Input
-                id="ayah"
-                type="number"
-                min={1}
-                max={totalAyahsInSurah}
-                value={ayah}
-                onChange={(e) => setAyah(e.target.value)}
-                className="h-9 text-xs flex-1"
-              />
-              <select
-                aria-label="আয়াত দ্রুত নির্বাচন"
-                value={ayah}
-                onChange={(e) => setAyah(e.target.value)}
-                className="h-9 rounded border border-input bg-background px-2 text-xs font-medium w-24 shrink-0 cursor-pointer"
-              >
-                {Array.from({ length: totalAyahsInSurah }, (_, i) => i + 1).map((aNum) => (
-                  <option key={aNum} value={aNum}>
-                    আয়াত {aNum}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="lng" className="text-xs font-semibold">অনুবাদ স্তর (৬টির যেকোনোটি)</Label>
-            <select
-              id="lng"
-              value={lng}
-              onChange={(e) => setLng(e.target.value as any)}
-              className="h-9 w-full rounded border border-input bg-background px-3 text-xs font-medium"
-            >
-              <option value="bn_std">১. আক্ষরিক অনুবাদ (বাংলা)</option>
-              <option value="en_std">২. Surface Translation (English)</option>
-              <option value="bn">৩. কুরআন অন্বেষা — আধুনিক অনুবাদ (বাংলা)</option>
-              <option value="en">৪. Qur'an Explorer — Modern Translation (English)</option>
-              <option value="scientific_bn">৫. বৈজ্ঞানিক অনুবাদ (বাংলা)</option>
-              <option value="scientific_en">৬. Scientific Translation (English)</option>
-            </select>
-          </div>
-        </div>
-
-        {/* মেটা ডাটা (Meta Data) বক্স */}
-        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-500/10 p-4 space-y-3">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
-            <Sparkles className="size-3.5" />
-            <span>আয়াতের মেটা ডাটা / Meta Data (নম্বরের পাশে দৃশ্যমান হবে)</span>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="metaBn" className="text-xs font-medium text-muted-foreground">
-                মেটা ডাটা (বাংলা)
-              </Label>
-              <Input
-                id="metaBn"
-                value={metaBn}
-                onChange={(e) => setMetaBn(e.target.value)}
-                placeholder="যেমন: মহাজাগতিক সোর্স কোড ও সার্বজনীন অনুগ্রহ"
-                className="h-9 text-xs bg-background"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="metaEn" className="text-xs font-medium text-muted-foreground">
-                Meta Data (English)
-              </Label>
-              <Input
-                id="metaEn"
-                value={metaEn}
-                onChange={(e) => setMetaEn(e.target.value)}
-                placeholder="e.g. Cosmic Source Code & Universal Boundless Grace"
-                className="h-9 text-xs bg-background"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* নির্বাচিত আয়াতের লাইভ প্রিভিউ কার্ড (এডমিন নিশ্চিতভাবে দেখতে পাবেন কোন আয়াতটি এডিট করছেন) */}
-        {currentAyahData && (
-          <div className="rounded-lg bg-muted/40 border border-border/70 p-3 space-y-1.5">
-            <div className="flex items-center justify-between text-xs font-bold text-foreground">
-              <span className="text-primary font-bold">
-                চলতি নির্বাচিত আয়াত: সূরা {currentSurahNum} : আয়াত {ayah}
-              </span>
-              {currentAyahData.meta_bn && (
-                <span className="text-[11px] font-normal text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                  {currentAyahData.meta_bn}
-                </span>
-              )}
-            </div>
-            <p className="font-arabic text-right text-base text-foreground leading-relaxed" dir="rtl">
-              {currentAyahData.text_uthmani || currentAyahData.words?.map((w: any) => w.text_uthmani).join(" ")}
-            </p>
-            {(currentAyahData.conventional_bn || currentAyahData.translation_bn) && (
-              <p className="text-[11px] text-muted-foreground line-clamp-2">
-                <span className="font-semibold text-foreground/80">আক্ষরিক: </span>
-                {currentAyahData.conventional_bn || currentAyahData.translation_bn}
-              </p>
-            )}
-          </div>
-        )}
-
-        <div className="space-y-1.5">
-          <Label htmlFor="text" className="text-xs font-semibold">
-            {TRANSLATION_LABELS[lng] || "অনুবাদ"} টেক্সট
-          </Label>
-          <Textarea 
-            id="text" 
-            rows={4} 
-            value={text} 
-            onChange={(e) => setText(e.target.value)} 
-            placeholder="এখানে আয়াতের নির্বাচিত অনুবাদটি সম্পাদনা বা নতুন করে লিখুন..."
-            className="text-xs" 
-          />
-        </div>
-
-        {/* রেফারেন্স লিংক যুক্ত করার টুল (Reference Link & Citation Assistant) */}
-        <div className="rounded-xl border border-primary/25 bg-primary/[0.03] p-4 space-y-3">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2 text-xs font-bold text-primary">
-              <ExternalLink className="size-4" />
-              <span>রেফারেন্স লিংক ও সাইটেশন যুক্ত করুন (Clickable Reference Link)</span>
-            </div>
-            <span className="text-[11px] text-muted-foreground font-medium">
-              অনুবাদে ক্লিক করলে নতুন ট্যাবে রেফারেন্স পোস্ট ওপেন হবে
-            </span>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-12 items-end">
-            {/* ১. মার্কার নির্বাচন */}
-            <div className="sm:col-span-4 space-y-1.5">
-              <Label className="text-[11px] font-semibold text-muted-foreground flex items-center justify-between">
-                <span>মার্কার / লেবেল</span>
-                <span className="text-[10px] text-primary font-bold">[{refMarker}]</span>
-              </Label>
-              <div className="flex items-center gap-1.5">
-                <Input
-                  value={refMarker}
-                  onChange={(e) => setRefMarker(e.target.value)}
-                  placeholder="১ বা A"
-                  className="h-8.5 text-xs font-bold w-16 text-center bg-background"
-                />
-                <div className="flex items-center gap-1 flex-wrap">
-                  {["১", "২", "৩", "৪", "A", "B", "C"].map((m) => (
-                    <button
-                      key={m}
-                      type="button"
-                      onClick={() => setRefMarker(m)}
-                      className={`px-1.5 py-0.5 text-[11px] rounded border transition-colors cursor-pointer ${
-                        refMarker === m
-                          ? "bg-primary text-primary-foreground border-primary font-bold shadow-2xs"
-                          : "bg-background hover:bg-muted text-muted-foreground border-input"
-                      }`}
-                    >
-                      [{m}]
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* ২. রেফারেন্স URL / পোস্ট নির্বাচন */}
-            <div className="sm:col-span-8 space-y-1.5">
-              <Label className="text-[11px] font-semibold text-muted-foreground flex items-center justify-between">
-                <span>রেফারেন্স পোস্টের লিংক / URL <span className="font-normal text-muted-foreground/70">(ঐচ্ছিক)</span></span>
-                {articlesQuery.data && articlesQuery.data.length > 0 && (
-                  <span className="text-[10px] text-primary/80 font-normal">
-                    ড্রপডাউন থেকে আর্টিকেলের লিংক সহজে নিতে পারেন
-                  </span>
-                )}
-              </Label>
-              <div className="flex items-center gap-1.5">
-                <Input
-                  value={refUrl}
-                  onChange={(e) => setRefUrl(e.target.value)}
-                  placeholder="ঐচ্ছিক: https://example.com/post অথবা /articles/slug"
-                  className="h-8.5 text-xs flex-1 bg-background"
-                />
-                {articlesQuery.data && articlesQuery.data.length > 0 && (
-                  <select
-                    aria-label="ওয়েবসাইটের প্রকাশিত আর্টিকেল"
-                    value=""
-                    onChange={(e) => {
-                      if (e.target.value) setRefUrl(e.target.value);
-                    }}
-                    className="h-8.5 rounded border border-input bg-background px-2 text-xs w-36 sm:w-44 shrink-0 cursor-pointer text-muted-foreground"
-                  >
-                    <option value="">পোস্ট নির্বাচন...</option>
-                    {articlesQuery.data.map((art: any) => (
-                      <option key={art.id} value={`/articles/${art.slug}`}>
-                        {art.title_bn || art.title_en || art.slug}
-                      </option>
-                    ))}
-                  </select>
-                )}
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={handleInsertReference}
-                  className="h-8.5 text-xs shrink-0 cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-2xs"
-                >
-                  <Plus className="size-3.5 mr-1" /> অনুবাদে যোগ করুন
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="note" className="text-xs font-semibold">বিশেষ টীকা / নোট (ঐচ্ছিক)</Label>
-          <Textarea 
-            id="note" 
-            rows={2} 
-            value={note} 
-            onChange={(e) => setNote(e.target.value)} 
-            placeholder="প্রাসঙ্গিক ব্যাখ্যা বা তথ্যসূত্র..."
-            className="text-xs" 
-          />
-        </div>
-        <Button type="submit" disabled={save.isPending} size="sm" className="bg-[#2271b1] hover:bg-[#135e96] text-white cursor-pointer shadow-xs">
-          <Plus className="size-3.5 mr-1" /> সংরক্ষণ করুন
-        </Button>
-      </form>
-
-      {/* ৫. তালিকা সেকশন: ডুয়াল ট্যাব (কাস্টম ওভাররাইড বনাম মূল ডেটাসেট) */}
-      <div className="space-y-3 pt-1">
-        {/* তথ্য ও দ্রুত সূরা পরিভ্রমণ বার */}
-        <div className="flex items-center justify-between flex-wrap gap-2 text-xs bg-muted/40 p-2.5 rounded-lg border border-border/60">
-          <div className="flex items-center gap-1.5 text-muted-foreground">
-            <BookOpen className="size-4 text-primary shrink-0" />
-            <span>
-              কুরআনের মোট <strong>১১৪টি সূরা ও ৬,২৩৬টি আয়াত</strong> সিস্টেমে সংরক্ষিত। বর্তমানে <strong>সূরা {currentSurahNum}: {currentSurahInfo.name_bn} ({currentSurahInfo.name_ar})</strong>-এর {totalAyahsInSurah}টি আয়াত প্রদর্শিত হচ্ছে।
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="h-6 text-[11px] px-2.5 cursor-pointer"
-              disabled={currentSurahNum <= 1}
-              onClick={handlePrevSurah}
-            >
-              <ChevronLeft className="size-3 mr-0.5" /> পূর্ববর্তী সূরা
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="h-6 text-[11px] px-2.5 cursor-pointer"
-              disabled={currentSurahNum >= 114}
-              onClick={handleNextSurah}
-            >
-              পরবর্তী সূরা <ChevronRight className="size-3 ml-0.5" />
-            </Button>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between border-b border-border/60 pb-2">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setActiveListTab("overrides")}
-              className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
-                activeListTab === "overrides"
-                  ? "bg-[#2271b1] text-white shadow-2xs"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              কাস্টম ওভাররাইড তালিকা ({list.data?.length || 0})
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveListTab("dataset")}
-              className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
-                activeListTab === "dataset"
-                  ? "bg-[#2271b1] text-white shadow-2xs"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              সূরা {currentSurahNum} ({currentSurahInfo.name_bn})-এর আয়াতসমূহ ({totalAyahsInSurah})
-            </button>
-          </div>
-          <span className="text-xs font-bold text-primary">
-            সূরা {currentSurahNum}: {currentSurahInfo.name_bn} ({currentSurahInfo.name_ar})
-          </span>
-        </div>
-
-        {activeListTab === "overrides" ? (
-          <div className="divide-y divide-border rounded-xl border border-border bg-card shadow-sm">
-            {list.data?.length ? (
-              list.data.map((v) => (
-                <div key={v.id} className="flex items-start gap-3 p-3.5 hover:bg-muted/30 transition-colors">
-                  <span className="rounded bg-[#2271b1]/10 px-2 py-0.5 text-[11px] font-bold text-[#2271b1] shrink-0">
-                    সূরা {v.surah} : আয়াত {v.ayah} · {TRANSLATION_LABELS[v.lang] || v.lang}
-                  </span>
-                  <p className="min-w-0 flex-1 text-xs text-foreground leading-relaxed">{v.text}</p>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-primary hover:bg-primary/10 cursor-pointer"
-                      aria-label="সম্পাদনা করুন"
-                      title="ফর্মে লোড করে সম্পাদনা করুন"
-                      onClick={() => handleEditRow(v)}
-                    >
-                      <Pencil className="size-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-destructive hover:bg-destructive/10 cursor-pointer"
-                      aria-label="মুছে ফেলুন"
-                      title="মুছে ফেলুন"
-                      onClick={() => remove.mutate(v.id)}
-                    >
-                      <Trash2 className="size-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="p-6 text-center space-y-2.5">
-                <div className="flex items-center justify-center gap-2 text-emerald-700 dark:text-emerald-400 font-semibold text-xs">
-                  <CheckCircle2 className="size-4 text-emerald-600" />
-                  <span>সূরা {surah}-এর সকল আয়াত মূল ডেটাসেটের আধুনিক ও সংশোধিত অনুবাদ দ্বারা লাইভ পরিচালিত হচ্ছে</span>
-                </div>
-                <p className="text-xs text-muted-foreground max-w-xl mx-auto leading-relaxed">
-                  ডাটাবেজে আলাদা কোনো কাস্টম ওভাররাইডের প্রয়োজন পড়েনি। মূল ডেটাসেটে সকল আয়াতের সংশোধিত অনুবাদ ও কুরআন অন্বেষা সংরক্ষিত রয়েছে। কোনো আয়াতে বিশেষ পরিবর্তন করতে চাইলে ওপরের ফর্মটি ব্যবহার করে সংরক্ষণ করতে পারেন।
-                </p>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="divide-y divide-border rounded-xl border border-border bg-card shadow-sm max-h-[600px] overflow-y-auto">
-            {surahDatasetQuery.data?.ayahs?.map((a: any) => (
-              <div key={a.ayah} className="p-3.5 space-y-2 hover:bg-muted/20 transition-colors">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
-                      আয়াত {a.ayah}
-                    </span>
-                    {a.meta_bn && (
-                      <span className="text-[11px] text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-medium">
-                        {a.meta_bn}
-                      </span>
-                    )}
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="h-6 text-[10px] cursor-pointer"
-                    onClick={() => {
-                      setAyah(String(a.ayah));
-                      const formElement = document.getElementById("admin-translation-editor-form");
-                      if (formElement) formElement.scrollIntoView({ behavior: "smooth" });
-                      toast.info(`সূরা ${surah} : আয়াত ${a.ayah} নির্বাচিত হয়েছে`);
-                    }}
-                  >
-                    <Pencil className="size-2.5 mr-1" /> এই আয়াত এডিট করুন
-                  </Button>
-                </div>
-                <div className="text-xs space-y-1">
-                  <p className="font-arabic text-base text-foreground text-right" dir="rtl">
-                    {a.text_uthmani || a.words?.map((w: any) => w.text_uthmani).join(" ")}
-                  </p>
-                  {a.modern_translation_bn && (
-                    <p className="text-muted-foreground leading-relaxed italic">
-                      <span className="font-bold text-purple-700 dark:text-purple-400 not-italic">আধুনিক: </span>
-                      {a.modern_translation_bn}
-                    </p>
-                  )}
-                  {a.conventional_bn && (
-                    <p className="text-muted-foreground leading-relaxed text-[11px]">
-                      <span className="font-semibold text-muted-foreground">আক্ষরিক: </span>
-                      {a.conventional_bn}
-                    </p>
-                  )}
-                  {a.scientific_translation_bn && (
-                    <p className="text-muted-foreground leading-relaxed italic text-[11px]">
-                      <span className="font-bold text-teal-700 dark:text-teal-400 not-italic">বৈজ্ঞানিক: </span>
-                      {a.scientific_translation_bn}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function UserPermissionsDialog({
-  user,
-  onClose,
-}: {
-  user: { id: string; email?: string } | null;
-  onClose: () => void;
-}) {
-  const queryClient = useQueryClient();
-  const [loading, setLoading] = useState(false);
-  const [notes, setNotes] = useState("");
-  const [permissions, setPermissions] = useState<Record<string, boolean>>({
-    showArabic: true,
-    showWordByWord: true,
-    showTransliteration: true,
-    showConventionalBn: true,
-    showConventionalEn: true,
-    showSahih: true,
-    showPickthall: true,
-    showYusufAli: true,
-    showShakir: true,
-    showSarwar: true,
-    showMohsinKhan: true,
-    showArberry: true,
-    showModernBn: true,
-    showModernEn: true,
-    showScientificBn: true,
-    showScientificEn: true,
-    showLexicon: true,
-    showLexiconModern: true,
-    showLexiconScientific: true,
-    showMetaData: true,
-    showSurahScientificMeaning: true,
-    showLogicalConsistency: true,
-  });
-  const [hasCustomRecord, setHasCustomRecord] = useState(false);
-
-  useEffect(() => {
-    if (!user?.id) return;
-    setLoading(true);
-    supabase
-      .from("user_display_permissions" as any)
-      .select("*")
-      .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data, error }) => {
-        if (data && (data as any).permissions) {
-          setPermissions({
-            showArabic: true,
-            showWordByWord: true,
-            showTransliteration: true,
-            showConventionalBn: true,
-            showConventionalEn: true,
-            showSahih: true,
-            showPickthall: true,
-            showYusufAli: true,
-            showShakir: true,
-            showSarwar: true,
-            showMohsinKhan: true,
-            showArberry: true,
-            showModernBn: true,
-            showModernEn: true,
-            showScientificBn: true,
-            showScientificEn: true,
-            showLexicon: true,
-            showLexiconModern: true,
-            showLexiconScientific: true,
-            showMetaData: true,
-            showSurahScientificMeaning: true,
-            showLogicalConsistency: true,
-            ...((data as any).permissions || {}),
-          });
-          setNotes((data as any).notes || "");
-          setHasCustomRecord(true);
-        } else {
-          setHasCustomRecord(false);
-        }
-        setLoading(false);
-      });
-  }, [user?.id]);
-
-  const saveMutation = useMutation({
-    mutationFn: async () => {
-      if (!user?.id) return;
-      const { error } = await supabase
-        .from("user_display_permissions" as any)
-        .upsert({
-          user_id: user.id,
-          email: user.email ? user.email.trim().toLowerCase() : null,
-          permissions,
-          notes: notes.trim() || null,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: "user_id" });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-user-display-permissions"] });
-      toast.success(`ইউজার ${user?.email || user?.id} এর জন্য কাস্টম ডিসপ্লে পারমিশন সংরক্ষিত হয়েছে!`);
-      onClose();
-    },
-    onError: (err: any) => toast.error(err.message),
-  });
-
-  const resetMutation = useMutation({
-    mutationFn: async () => {
-      if (!user?.id) return;
-      const { error } = await supabase
-        .from("user_display_permissions" as any)
-        .delete()
-        .eq("user_id", user.id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-user-display-permissions"] });
-      toast.success("কাস্টম পারমিশন মুছে গ্লোবাল ডিফল্টে ফিরিয়ে নেওয়া হয়েছে");
-      onClose();
-    },
-    onError: (err: any) => toast.error(err.message),
-  });
-
-  if (!user) return null;
-
-  const displayLayersList: { key: string; title: string; desc: string; highlight?: boolean }[] = [
-    { key: "showSurahScientificMeaning", title: "১. সুরার নামের প্রচলিত ও আধুনিক বিজ্ঞানভিত্তিক অর্থ", desc: "প্রতিটি সুরার শীর্ষে প্রচলিত অর্থ ও আধুনিক বিজ্ঞানভিত্তিক অর্থ", highlight: true },
-    { key: "showArabic", title: "২. মূল আরবি পাঠ (Original Arabic)", desc: "প্রতিটি আয়াতের মূল নূরানী/উসমানি আরবি হরফ ও বিশুদ্ধ পাঠ প্রদর্শন", highlight: true },
-    { key: "showMetaData", title: "৩. আয়াত মেটাডাটা ও বিষয়ভিত্তিক ট্যাগ (Meta Data)", desc: "আয়াতের পাশে প্রাসঙ্গিক বিষয়ভিত্তিক মেটা ডাটা ও টপিক ট্যাগ", highlight: true },
-    { key: "showWordByWord", title: "৪. শব্দে শব্দে অর্থ (Word by Word)", desc: "প্রতিটি শব্দের নিচে স্বতন্ত্র অর্থ ও ব্যাকরণিক উচ্চারণ" },
-    { key: "showTransliteration", title: "৫. আয়াত উচ্চারণ নির্দেশিকা (Transliteration)", desc: "সহজে পড়ার জন্য আয়াতের বাংলা ফোনেটিক উচ্চারণ" },
-    { key: "showModernBn", title: "৬. কুরআন অন্বেষা (আধুনিক বাংলা অনুবাদ)", desc: "আমাদের সমসাময়িক গবেষণালব্ধ কুরআন অন্বেষা বাংলা অনুবাদ", highlight: true },
-    { key: "showModernEn", title: "৭. Qur'an Explorer (Modern English Translation)", desc: "আমাদের সমসাময়িক Qur'an Explorer ইংরেজি অনুবাদ", highlight: true },
-    { key: "showScientificBn", title: "৮. বৈজ্ঞানিক অনুবাদ (বাংলা)", desc: "মহাবিশ্ব, প্রকৃতি ও বিজ্ঞানের গবেষণালব্ধ বৈজ্ঞানিক অনুবাদ", highlight: true },
-    { key: "showScientificEn", title: "৯. Scientific Translation (English)", desc: "Contemporary scientific, cosmological & natural world English translation", highlight: true },
-    { key: "showConventionalBn", title: "১০. আক্ষরিক বাংলা অনুবাদ (Literal Bengali)", desc: "মুহিউদ্দীন খান / তাইসিরুল কুরআন স্ট্যান্ডার্ড অনুবাদ" },
-    { key: "showSahih", title: "১১.১ Sahih International (সহীহ ইন্টারন্যাশনাল ইংরেজি)", desc: "Corpus Quran স্ট্যান্ডার্ড সহীহ ইন্টারন্যাশনাল ইংরেজি অনুবাদ" },
-    { key: "showPickthall", title: "১১.২ Marmaduke Pickthall (মোহাম্মদ মারমাডিউক পিকথল)", desc: "মারমাডিউক পিকথলের প্রামাণ্য ইংরেজি অনুবাদ" },
-    { key: "showYusufAli", title: "১১.৩ Abdullah Yusuf Ali (আব্দুল্লাহ ইউসুফ আলী)", desc: "আব্দুল্লাহ ইউসুফ আলীর সাহিত্যমানসমৃদ্ধ ঐতিহ্যবাহী ইংরেজি অনুবাদ" },
-    { key: "showShakir", title: "১১.৪ M. H. Shakir (মোহাম্মদ হাবিব শাকির)", desc: "এম. এইচ. শাকিরের প্রাঞ্জল ইংরেজি অনুবাদ" },
-    { key: "showSarwar", title: "১১.৫ Muhammad Sarwar (শেখ মুহাম্মদ সারওয়ার)", desc: "শেখ মুহাম্মদ সারওয়ারের আধুনিক ইংরেজি অনুবাদ" },
-    { key: "showMohsinKhan", title: "১১.৬ Al-Hilali & Mohsin Khan (মুহসিন খান ও আল-হিলালী)", desc: "ড. মুহসিন খান ও ড. হিলালীর ইংরেজি অনুবাদ" },
-    { key: "showArberry", title: "১১.৭ Arthur John Arberry (আর্থার জন আর্বেরি)", desc: "এ. জে. আর্বেরির ছন্দময় উচ্চাঙ্গ ইংরেজি অনুবাদ" },
-    { key: "showLexicon", title: "১২.১ প্রচলিত আক্ষরিক অভিধান ও শব্দকোষ", desc: "শব্দকোষ, মূল ধাতু (Root) ও ব্যাকরণ" },
-    { key: "showLexiconModern", title: "১২.২ কুরআন অন্বেষা আধুনিক অভিধান", desc: "গবেষণাধর্মী আধুনিক পারিভাষিক অর্থ ও বিশ্লেষণ", highlight: true },
-    { key: "showLexiconScientific", title: "১২.৩ বিজ্ঞানভিত্তিক অভিধান ও লেক্সিকন নোট", desc: "অভিধানে আধুনিক বিজ্ঞানভিত্তিক গভীর ব্যাখ্যা ও প্রেক্ষাপট", highlight: true },
-    { key: "showLogicalConsistency", title: "১৪. লজিক্যাল কন্সিসট্যান্সি ফ্রেমওয়ার্ক (৪:৮২)", desc: "কুরআনের সার্বজনীন ইনফরমেশন আর্কিটেকচার ও অভ্যন্তরীণ সামঞ্জস্য", highlight: true },
-    { key: "showAudioPlayback", title: "১৫. সুরার অডিও প্লেব্যাক ও কন্ট্রোল (Audio Recitation & Player)", desc: "আরবি তেলাওয়াত ও বহুভাষিক AI অনুবাদ পাঠের সার্বজনীন প্লেয়ার", highlight: true },
-  ];
-
-  return (
-    <Dialog open={!!user} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-base font-bold">
-            <SlidersHorizontal className="size-5 text-primary" />
-            স্বতন্ত্র ইউজার ডিসপ্লে ও অ্যাক্সেস পারমিশন
-          </DialogTitle>
-          <DialogDescription className="text-xs">
-            ইউজার: <span className="font-semibold text-foreground">{user.email || "অজ্ঞাত"}</span>{" "}
-            (আইডি: <span className="font-mono">{user.id}</span>)
-          </DialogDescription>
-        </DialogHeader>
-
-        {loading ? (
-          <div className="py-8 flex justify-center items-center text-muted-foreground text-xs">
-            <Loader2 className="size-5 animate-spin mr-2" /> পারমিশন লোড হচ্ছে...
-          </div>
-        ) : (
-          <div className="space-y-4 py-2">
-            {/* কুইক প্রিসেট বাটন */}
-            <div className="flex flex-wrap items-center gap-2 pb-2 border-b border-border/60">
-              <span className="text-[11px] font-semibold text-muted-foreground">কুইক প্রিসেট:</span>
-              <button
-                type="button"
-                onClick={() => {
-                  const allOn: Record<string, boolean> = {};
-                  displayLayersList.forEach((l) => (allOn[l.key] = true));
-                  setPermissions(allOn);
-                  toast.info("সবগুলো লেয়ার উন্মুক্ত করা হলো");
-                }}
-                className="px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 border border-emerald-500/30 cursor-pointer"
-              >
-                🌟 সম্পূর্ণ উন্মুক্ত (Full Access)
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setPermissions({
-                    showArabic: true,
-                    showWordByWord: true,
-                    showTransliteration: true,
-                    showConventionalBn: true,
-                    showConventionalEn: true,
-                    showModernBn: false,
-                    showModernEn: false,
-                    showScientificBn: false,
-                    showScientificEn: false,
-                    showLexicon: true,
-                    showLexiconModern: false,
-                    showLexiconScientific: false,
-                    showMetaData: false,
-                  });
-                  toast.info("শুধুমাত্র প্রচলিত কুরআন লেয়ারসমূহ সক্রিয় করা হলো");
-                }}
-                className="px-2 py-0.5 rounded text-[11px] font-medium bg-blue-500/10 text-blue-600 hover:bg-blue-500/20 border border-blue-500/30 cursor-pointer"
-              >
-                📖 শুধুমাত্র প্রচলিত কুরআন (Standard)
-              </button>
-            </div>
-
-            {/* ১০টি লেয়ারের চেকলিস্ট */}
-            <div className="space-y-2">
-              <span className="text-xs font-semibold text-foreground block">
-                এই ইউজারের জন্য কুরআনের কোন কোন অংশ দৃশ্যমান হবে:
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {displayLayersList.map((layer) => {
-                  const isChecked = permissions[layer.key] ?? true;
-                  return (
-                    <div
-                      key={layer.key}
-                      className={`flex items-start justify-between gap-2.5 p-3 rounded-lg border transition-all cursor-pointer ${
-                        layer.highlight
-                          ? isChecked
-                            ? "border-emerald-500/40 bg-emerald-500/5 dark:bg-emerald-500/10"
-                            : "border-border/60 bg-card opacity-70"
-                          : isChecked
-                          ? "border-border bg-card"
-                          : "border-border/40 bg-muted/20 opacity-60"
-                      }`}
-                      onClick={() => setPermissions({ ...permissions, [layer.key]: !isChecked })}
-                    >
-                      <div className="space-y-0.5 select-none flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-semibold text-foreground truncate">{layer.title}</span>
-                          {layer.highlight && (
-                            <span className="text-[9px] px-1 py-0.2 rounded bg-amber-500/15 text-amber-600 font-bold">
-                              বিশেষ
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[10px] text-muted-foreground line-clamp-1">{layer.desc}</p>
-                      </div>
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <Switch
-                          id={`user-perm-${layer.key}`}
-                          checked={isChecked}
-                          onCheckedChange={(val) => setPermissions({ ...permissions, [layer.key]: val })}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* এডমিন নোটস */}
-            <div className="space-y-1 pt-2 border-t border-border/50">
-              <Label htmlFor="admin-perm-notes" className="text-xs font-semibold">
-                এডমিন নোট (ঐচ্ছিক):
-              </Label>
-              <Input
-                id="admin-perm-notes"
-                placeholder="যেমন: অনুমোদিত ইসলামিক গবেষক / বিশেষ রিভিউয়ার"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="h-8 text-xs"
-              />
-            </div>
-          </div>
-        )}
-
-        <DialogFooter className="flex items-center justify-between sm:justify-between gap-2 pt-2 border-t border-border/60">
-          {hasCustomRecord ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={resetMutation.isPending}
-              onClick={() => resetMutation.mutate()}
-              className="text-destructive hover:bg-destructive/10 text-xs h-8 cursor-pointer"
-            >
-              <RotateCcw className="size-3 mr-1" /> গ্লোবাল ডিফল্টে রিসেট
-            </Button>
-          ) : (
-            <div />
-          )}
-
-          <div className="flex items-center gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={onClose} className="h-8 text-xs cursor-pointer">
-              বাতিল
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              disabled={saveMutation.isPending || loading}
-              onClick={() => saveMutation.mutate()}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 text-xs cursor-pointer"
-            >
-              {saveMutation.isPending ? <Loader2 className="size-3 animate-spin mr-1" /> : <Check className="size-3 mr-1" />}
-              পারমিশন সংরক্ষণ করুন
-            </Button>
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }
 
