@@ -25,13 +25,15 @@ async function main() {
 
   // 1. Generate Homepage OG Image (1200x630 HD) for https://blog.wooniche.com/
   try {
+    let heroImageBase64 = '';
+    const heroImgPath = path.resolve('public/hero-image.webp');
+    if (fs.existsSync(heroImgPath)) {
+      heroImageBase64 = fs.readFileSync(heroImgPath).toString('base64');
+    }
+
     const homeSvg = generateHomeOgSvg({
-      siteName: 'Alam M',
-      tagline: 'শব্দ আমার ক্যানভাস',
-      description: 'কবিতা, গল্প, সাহিত্য ও চিন্তাভাবনার গভীর আলোড়নকারী সাহিত্যিক কাজ',
-      subDescription: 'শব্দের একজন লেখক এবং জীবনের নীরব মুহূর্তের গল্পকথক',
-      categoryBadge: 'অফিশিয়াল ওয়েবসাইট',
-      authorName: 'আলম এম.',
+      heroImageBase64,
+      authorName: 'আলম',
       domain: 'blog.wooniche.com'
     });
 
