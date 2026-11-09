@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "a5ddcccb-52f9-414d-ad31-382fe6cf0310",
+      "slug": "gotokal",
+      "title_bn": "গতকাল",
+      "title_en": "Yesterday",
+      "excerpt_bn": "আয়নার সামনে দাঁড়ালাম। দেখতে তো মানুষের মতই লাগছে! বীজ রোপণ করা হয়ে গেছে ফসল কাটার পর গোলা গুলোর নামফলক এখন বৈশ্বিকভাবে... মানুষের গর্ভ গেলো কই? মানুষের গর্ভের বিলুপ্তি ঘটেছে এইতো গতকাল।",
+      "excerpt_en": "I stood before the mirror. Looks just like a human! Seeds have been sown, and after the harvest, the granaries bear global nameplates... But where did the womb of humanity go? The extinction of the human womb happened—just yesterday.",
+      "content_bn": "<p>আয়নার সামনে দাঁড়ালাম।<br>দেখতে তো মানুষের মতই লাগছে!<br>বীজ রোপণ করা হয়ে গেছে<br>ফসল কাটার পর গোলা গুলোর<br>নামফলক এখন বৈশ্বিকভাবে<br>মুসলমানের গর্ভ<br>হিন্দুর গর্ভ<br>ইহুদীর গর্ভ<br>খ্রিস্টানের গর্ভ...</p>\n<p>আরো কত কত যে গর্ভ<br>দেশীয় গর্ভ<br>আওয়ামী গর্ভ — লী লী আর লী<br>বিএনপি গর্ভ — দ দ আর দ<br>জামাত গর্ভ — শি শি আর শি<br>নামে বেনামে কত যে গর্ভ, কিন্তু<br>মানুষের গর্ভ গেলো কই?</p>\n<p>আয়নার সামনে দাড়াই আর বলি<br>দেখতে তো মানুষের মতই লাগছে<br>গর্ভের রঙ রূপ আলাদা আলাদা হয়ে গেলো<br>আমায় তুমি মারছো<br>আমি তোমায় মারছি<br>মারছি আর মরছি সবাই যেন এখন<br>কীটপতঙ্গ</p>\n<p>আয়নার সামনে দাঁড়ালে শুধু প্রতিবিম্ব দেখি<br>মানুষের গর্ভের বিলুপ্তি ঘটেছে<br>এইতো গতকাল</p>\n<p class=\"mt-8 font-semibold text-primary\">©আলম <span class=\"text-xs font-normal text-muted-foreground block mt-1\">১১ নভেম্বর ২০২৩ইং, বেলা ১১টা ৫৩মি.</span></p>",
+      "content_en": "<p>I stood before the mirror.<br>Looks just like a human!<br>The seeds have been sown,<br>And after harvesting the crop, the granaries<br>Now bear global nameplates—<br>Muslim womb<br>Hindu womb<br>Jewish womb<br>Christian womb...</p>\n<p>And so many more wombs,<br>National wombs—<br>Awami womb — League, League and League<br>BNP womb — Dal, Dal and Dal<br>Jamaat womb — Shibir, Shibir and Shibir<br>Named and nameless countless wombs, but<br>Where did the womb of humanity go?</p>\n<p>I stand before the mirror and say,<br>Looks just like a human!<br>Yet the color and shape of every womb turned distinct.<br>You are striking me,<br>I am striking you,<br>Killing and dying, everyone now seems<br>Mere insects.</p>\n<p>Standing before the mirror, I only see a reflection—<br>The extinction of the human womb came to pass<br>Just yesterday.</p>\n<p class=\"mt-8 font-semibold text-primary\">©Alam <span class=\"text-xs font-normal text-muted-foreground block mt-1\">11 November 2023, 11:53 AM</span></p>",
+      "cover_image_url": null,
+      "published": true,
+      "published_at": "2026-11-09T13:55:00.000Z",
+      "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2023-11-11T05:53:00.000Z",
+      "updated_at": "2026-11-09T13:55:00.000Z"
+    },
+    {
       "id": "c1e00831-a9c2-4d4a-a842-56b7b9723794",
       "slug": "menopause",
       "title_bn": "মেনোপোজ",
@@ -395,6 +412,10 @@ export const INITIAL_SEED_DATA = {
   ],
   "verse_translations": [],
   "article_categories": [
+    {
+      "article_id": "a5ddcccb-52f9-414d-ad31-382fe6cf0310",
+      "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
+    },
     {
       "article_id": "c1e00831-a9c2-4d4a-a842-56b7b9723794",
       "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"

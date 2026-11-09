@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "a5ddcccb-52f9-414d-ad31-382fe6cf0310",
+    "slug": "gotokal",
+    "title_bn": "গতকাল",
+    "title_en": "Yesterday",
+    "excerpt_bn": "আয়নার সামনে দাঁড়ালাম। দেখতে তো মানুষের মতই লাগছে! বীজ রোপণ করা হয়ে গেছে ফসল কাটার পর গোলা গুলোর নামফলক এখন বৈশ্বিকভাবে... মানুষের গর্ভ গেলো কই? মানুষের গর্ভের বিলুপ্তি ঘটেছে এইতো গতকাল।",
+    "excerpt_en": "I stood before the mirror. Looks just like a human! Seeds have been sown, and after the harvest, the granaries bear global nameplates... But where did the womb of humanity go? The extinction of the human womb happened—just yesterday.",
+    "cover_image_url": null,
+    "published_at": "2026-11-09T13:55:00.000Z"
+  },
+  {
     "id": "c1e00831-a9c2-4d4a-a842-56b7b9723794",
     "slug": "menopause",
     "title_bn": "মেনোপোজ",
