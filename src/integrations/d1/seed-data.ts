@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "1c4b9bdf-f784-472f-81c2-7fb3e6535d67",
+      "slug": "alada-akash",
+      "title_bn": "আলাদা আকাশ",
+      "title_en": "Different Sky",
+      "excerpt_bn": "তার শহরে বৃষ্টির সুবাস, আমার শহরে খরা, একই আকাশের নিচে থেকেও আকাশ কেন আমাদের আলাদা? বুঝে নেবো আমরা- ভালোবাসারও একটি ঋতু আছে, খরায় পোড়া কিংবা বৃষ্টিতে ভেজা।",
+      "excerpt_en": "In her city, the fragrance of rain; in mine, drought. Living under the same expanse, why are our skies so apart? We will understand then-love too has its own season, scorched in drought or drenched in rain.",
+      "content_bn": "<p>তার শহরে বৃষ্টির সুবাস,<br>আমার শহরে খরা<br>একই আকাশের নিচে থেকেও<br>আকাশ কেন আমাদের আলাদা?</p>\n<p>ওপারে জানালার কাচে<br>জলরঙের স্বপ্ন ঝরে,<br>এপারে ধুলো উড়ে<br>অপেক্ষার পুরোনো পাতার।</p>\n<p>তুমি হয়তো ভিজে সাজো<br>অভিমানের শেষ অক্ষর দিয়ে<br>আর আমি শুকিয়ে রাখি<br>অব্যক্ত শুকিয়ে যাওয়া নদীর কথা।</p>\n<p>তোমার পথে কদম ফোটে,<br>আমার পথে তপ্ত বালি<br>তবু কেন দুজনের আকাশেই<br>একটিই চাঁদ নীরবে জেগে থাকে?</p>\n<p>আমি প্রতিদিন মেঘ ডাকি,<br>মেঘ আর আসে না<br>সে হয়তো রোদ ডাকে,<br>রোদ সেখানে দাঁড়ায় না।</p>\n<p>তাই বুঝি প্রকৃতি আমাদের গল্প পড়ে<br>নিজের মতো করে উল্টায়<br>ঋতুর পাতা</p>\n<p>যেদিন আমার শহরে<br>প্রথম বৃষ্টির ফোঁটা পড়বে,<br>সেদিন হয়তো তোমার শহরেও<br>রোদ কড়া নাড়বে</p>\n<p>বুঝে নেবো আমরা-<br>ভালোবাসারও একটি ঋতু আছে<br>খরায় পোড়া কিংবা<br>বৃষ্টিতে ভেজা।</p>\n<p class=\"mt-8 font-semibold text-primary\">©আলম <span class=\"text-xs font-normal text-muted-foreground block mt-1\">২ আগস্ট ২০২৬ইং, বেলা ১টা ৫৭মি.</span></p>",
+      "content_en": "<p>In her city, the fragrance of rain,<br>In my city, drought.<br>Even under the very same sky,<br>Why are our skies so apart?</p>\n<p>Beyond the window pane on that other side,<br>Watercolor dreams trickle down;<br>On this side, dust swirls<br>From the withered pages of waiting.</p>\n<p>Perhaps you adorn yourself in the rain<br>With the final letters of quiet grief,<br>While I keep dry the unuttered tale<br>Of a parched, dried-up river.</p>\n<p>Along your path, kodom blossoms bloom,<br>Along mine, scorching sand.<br>Yet why does the very same solitary moon<br>Keep silent vigil across both our skies?</p>\n<p>Every single day I summon the rainclouds,<br>Yet the clouds never arrive.<br>Perhaps she calls out for sunlight,<br>Yet the sun refuses to stay.</p>\n<p>Perhaps that is why nature reads our tale,<br>Turning the pages of the seasons<br>In its own wandering way.</p>\n<p>The day the first raindrop<br>Falls upon my city,<br>Perhaps that very same day<br>The sun will knock firmly at your door.</p>\n<p>We will understand then-<br>Love too has its own season,<br>Either scorched in drought<br>Or drenched in rain.</p>\n<p class=\"mt-8 font-semibold text-primary\">©Alam <span class=\"text-xs font-normal text-muted-foreground block mt-1\">2 August 2026, 1:57 PM</span></p>",
+      "cover_image_url": null,
+      "published": true,
+      "published_at": "2026-11-09T15:40:00.000Z",
+      "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-08-02T07:57:00.000Z",
+      "updated_at": "2026-11-09T15:40:00.000Z"
+    },
+    {
       "id": "19f2e09a-32fb-4ced-b497-4bfea5f833ee",
       "slug": "alada-hote-parini",
       "title_bn": "আলাদা হতে পারিনি",
@@ -429,6 +446,10 @@ export const INITIAL_SEED_DATA = {
   ],
   "verse_translations": [],
   "article_categories": [
+    {
+      "article_id": "1c4b9bdf-f784-472f-81c2-7fb3e6535d67",
+      "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
+    },
     {
       "article_id": "19f2e09a-32fb-4ced-b497-4bfea5f833ee",
       "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"

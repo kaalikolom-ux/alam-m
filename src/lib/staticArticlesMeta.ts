@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "1c4b9bdf-f784-472f-81c2-7fb3e6535d67",
+    "slug": "alada-akash",
+    "title_bn": "আলাদা আকাশ",
+    "title_en": "Different Sky",
+    "excerpt_bn": "তার শহরে বৃষ্টির সুবাস, আমার শহরে খরা, একই আকাশের নিচে থেকেও আকাশ কেন আমাদের আলাদা? বুঝে নেবো আমরা- ভালোবাসারও একটি ঋতু আছে, খরায় পোড়া কিংবা বৃষ্টিতে ভেজা।",
+    "excerpt_en": "In her city, the fragrance of rain; in mine, drought. Living under the same expanse, why are our skies so apart? We will understand then-love too has its own season, scorched in drought or drenched in rain.",
+    "cover_image_url": null,
+    "published_at": "2026-11-09T15:40:00.000Z"
+  },
+  {
     "id": "19f2e09a-32fb-4ced-b497-4bfea5f833ee",
     "slug": "alada-hote-parini",
     "title_bn": "আলাদা হতে পারিনি",
