@@ -5,8 +5,8 @@ export const STATIC_ARTICLES_META = [
     "slug": "alada-hote-parini",
     "title_bn": "আলাদা হতে পারিনি",
     "title_en": "Could Not Separate",
-    "excerpt_bn": "মুছে দেয়া যায়, ভুলে গেছি— এ যেন খাঁটি মিথ্যে বলা হয়ে যায়। তবুও মুছে দিতে হয়, খাঁটি মিথ্যেটা বলতে হয়। সত্যিটা হলো— আমরা যে আলাদা হতেই পারিনি।",
-    "excerpt_en": "One can erase, say 'I\\'ve forgotten'—yet that feels like telling an absolute lie. Still, one has to erase, one has to utter that pure lie. The truth is—we were never able to truly part.",
+    "excerpt_bn": "মুছে দেয়া যায়, ভুলে গেছি- এ যেন খাঁটি মিথ্যে বলা হয়ে যায়। তবুও- মুছে দিতে হয়, খাঁটি মিথ্যেটা বলতে হয়। সত্যিটা হলো- আমরা যে আলাদা হতেই পারিনি।",
+    "excerpt_en": "One can erase, say 'I\\'ve forgotten'-yet that feels like telling an absolute lie. Still, one has to erase, one has to utter that pure lie. The truth is-we were never able to truly part.",
     "cover_image_url": null,
     "published_at": "2026-11-09T14:03:00.000Z"
   },
@@ -16,7 +16,7 @@ export const STATIC_ARTICLES_META = [
     "title_bn": "গতকাল",
     "title_en": "Yesterday",
     "excerpt_bn": "আয়নার সামনে দাঁড়ালাম। দেখতে তো মানুষের মতই লাগছে! বীজ রোপণ করা হয়ে গেছে ফসল কাটার পর গোলা গুলোর নামফলক এখন বৈশ্বিকভাবে... মানুষের গর্ভ গেলো কই? মানুষের গর্ভের বিলুপ্তি ঘটেছে এইতো গতকাল।",
-    "excerpt_en": "I stood before the mirror. Looks just like a human! Seeds have been sown, and after the harvest, the granaries bear global nameplates... But where did the womb of humanity go? The extinction of the human womb happened—just yesterday.",
+    "excerpt_en": "I stood before the mirror. Looks just like a human! Seeds have been sown, and after the harvest, the granaries bear global nameplates... But where did the womb of humanity go? The extinction of the human womb happened-just yesterday.",
     "cover_image_url": null,
     "published_at": "2026-11-09T13:55:00.000Z"
   },
@@ -26,7 +26,7 @@ export const STATIC_ARTICLES_META = [
     "title_bn": "মেনোপোজ",
     "title_en": "Menopause",
     "excerpt_bn": "চল্লিশ পেরিয়েই আমি বুঝলাম- বয়স শুধু ক্যালেন্ডারে বাড়ে না, মানুষের চোখেও বাড়ে। হঠাৎ করে আমার হাসিটা বেশি হয়ে যায়, চুপ করে থাকাটা অভিমান, একটু সাজলে অহংকার... মেনোপোজ তুমি নও।",
-    "excerpt_en": "Stepping past forty, I realized age doesn't just increase on calendars—it increases in the eyes of people. Suddenly my smile seems too loud, my silence is deemed resentment... You are not menopause.",
+    "excerpt_en": "Stepping past forty, I realized age doesn't just increase on calendars-it increases in the eyes of people. Suddenly my smile seems too loud, my silence is deemed resentment... You are not menopause.",
     "cover_image_url": null,
     "published_at": "2026-11-09T09:09:00.000Z"
   },
@@ -46,7 +46,7 @@ export const STATIC_ARTICLES_META = [
     "title_bn": "হারজিত",
     "title_en": "Win or Loss",
     "excerpt_bn": "তোর জন্যে মায়া হয়, যদি মায়া দিয়ে তোকে জিতিয়ে দিতে পারতাম! তাহলে হয়তো হেরে যাওয়ারও এতটা কষ্ট থাকত না। তোর চোখে যে অভিমান জমে থাকে, আমি হাত বাড়িয়ে ছুঁয়ে দিতাম...",
-    "excerpt_en": "My heart aches with affection for you—if only I could make you win with tender compassion! Then perhaps the pain of losing wouldn't hurt so deeply...",
+    "excerpt_en": "My heart aches with affection for you-if only I could make you win with tender compassion! Then perhaps the pain of losing wouldn't hurt so deeply...",
     "cover_image_url": null,
     "published_at": "2026-11-09T08:25:00.000Z"
   },
@@ -56,7 +56,7 @@ export const STATIC_ARTICLES_META = [
     "title_bn": "ভালোবাসার আগে নিজের কাছে সৎ হও",
     "title_en": "Be Honest With Yourself Before Loving",
     "excerpt_bn": "ভালোবাসার আগে একবার নিজের চোখের দিকে তাকাও, সেখানে কি সত্যিই কারও জন্য একটি দরজা খোলা আছে? নাকি শুধু নিঃসঙ্গতার ঘরে একটু আলো চাও তুমি? কাউকে কাছে ডেকে তার হৃদয়ে আশ্রয় নিয়ে আবার একদিন চলে যাবে? ভালোবাসা কোনো খেলা নয়...",
-    "excerpt_en": "Before you love, look into your own eyes once—is there truly an open door for someone? Or do you only seek a bit of light in your room of solitude? Love is not a game...",
+    "excerpt_en": "Before you love, look into your own eyes once-is there truly an open door for someone? Or do you only seek a bit of light in your room of solitude? Love is not a game...",
     "cover_image_url": null,
     "published_at": "2026-11-09T08:03:11.863Z"
   },
@@ -106,7 +106,7 @@ export const STATIC_ARTICLES_META = [
     "title_bn": "ডুব সাঁতার (be careful)",
     "title_en": "Be Careful",
     "excerpt_bn": "রাত তখন সাড়ে এগারোটা। ল্যাপটপ বন্ধ করে আরিয়ান ফোন হাতে নিয়ে ফেসবুকে ঢুকলো। ইনবক্সে নতুন নোটিফিকেশন। অচেনা নাম- নায়লা। প্রথম মেসেজটা পড়েই বুকটা ধড়াস করে উঠলো...",
-    "excerpt_en": "It was half past eleven at night. Ariyan closed his laptop. Picked up his phone. Opened Facebook. And there it was—a message from a name he'd never seen before...",
+    "excerpt_en": "It was half past eleven at night. Ariyan closed his laptop. Picked up his phone. Opened Facebook. And there it was-a message from a name he'd never seen before...",
     "cover_image_url": "https://a.wooniche.com/og/articles/be-careful.png",
     "published_at": "2026-11-07T16:30:00.000Z"
   },
@@ -175,8 +175,8 @@ export const STATIC_ARTICLES_META = [
     "slug": "ekta-shari",
     "title_bn": "একটা শাড়ী",
     "title_en": "একটা শাড়ী",
-    "excerpt_bn": "সখী, ভালো তো বাসি, সে কথা তো অসত্য নয়, তবে ভয় হয় — সেদিন যদি তোমায় শাড়িতে দেখে নতুন করে প্রেমে পড়ে যাই!",
-    "excerpt_en": "সখী, ভালো তো বাসি, সে কথা তো অসত্য নয়, তবে ভয় হয় — সেদিন যদি তোমায় শাড়িতে দেখে নতুন করে প্রেমে পড়ে যাই!",
+    "excerpt_bn": "সখী, ভালো তো বাসি, সে কথা তো অসত্য নয়, তবে ভয় হয় - সেদিন যদি তোমায় শাড়িতে দেখে নতুন করে প্রেমে পড়ে যাই!",
+    "excerpt_en": "সখী, ভালো তো বাসি, সে কথা তো অসত্য নয়, তবে ভয় হয় - সেদিন যদি তোমায় শাড়িতে দেখে নতুন করে প্রেমে পড়ে যাই!",
     "cover_image_url": "https://a.wooniche.com/og/articles/ekta-shari.png",
     "published_at": "2026-11-04T00:34:00.000Z"
   },
