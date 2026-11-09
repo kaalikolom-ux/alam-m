@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "3a4ceefb-c613-46e3-9f1e-3fd77affb25d",
+      "slug": "tomar-songe-jonmo-neowa-ami",
+      "title_bn": "তোমার সঙ্গে জন্ম নেওয়া আমি",
+      "title_en": "The Me Born With You",
+      "excerpt_bn": "তোমাকে ভুলে যাওয়া হয়তো একদিন সম্ভব হবে, ক্যালেন্ডারের পাতা বদলাবে, অভ্যাসের জায়গাগুলোও একসময় ফাঁকা হয়ে যাবে, তোমার নাম শুনে আর থমকে দাঁড়াব না হয়তো। কিন্তু যে মানুষটা তোমার সঙ্গে জন্ম নিয়েছিল, তার কী হবে?",
+      "excerpt_en": "Perhaps one day it will be possible to forget you, the pages of the calendar will turn, the spaces of old habits will eventually be emptied... But that person who was born alongside you, what will become of him?",
+      "content_bn": "<p>তোমাকে ভুলে যাওয়া হয়তো একদিন সম্ভব হবে,<br>ক্যালেন্ডারের পাতা বদলাবে,<br>অভ্যাসের জায়গাগুলোও একসময় ফাঁকা হয়ে যাবে,<br>তোমার নাম শুনে আর থমকে দাঁড়াব না হয়তো।<br>কিন্তু যে মানুষটা তোমার সঙ্গে জন্ম নিয়েছিল,<br>তার কী হবে?</p>\n<p>যে আমি তোমার অপেক্ষায় বিকেল চিনতাম,<br>সামান্য কথায় সারাদিন ভালো থাকতাম,<br>যে আমি নিজের অজান্তেই<br>অন্য একজনের সুখের মধ্যে নিজের ঠিকানা খুঁজেছিলাম।</p>\n<p>তাকে তো তুমি সঙ্গে করে নিয়ে যাওনি,<br>ফেলে গেছ আমারই ভেতরে,<br>এক অদ্ভুত অসমাপ্ত জীবনের মতো।</p>\n<p>এখন আয়নার সামনে দাঁড়ালে<br>একজন মানুষকে দেখতে পাই,<br>চেনা মুখ, পরিচিত চোখ,<br>শুধু কোথাও যেন আগের সেই আমি নেই।</p>\n<p>তোমাকে ছাড়া বাঁচতে শিখেছি,<br>কিন্তু তোমার সঙ্গে যে জীবনটা বাঁচতাম,<br>সেই জীবনের মানুষটাকে<br>কোনোভাবেই আর খুঁজে পাই না।</p>\n<p>মাঝে মাঝে ভাবি,<br>তুমি ফিরে এলে হয়তো তোমাকে চিনতে পারব,<br>কিন্তু তোমার সঙ্গে জন্ম নেওয়া আমিটাকে<br>আবার ফিরে পাব কি?<br>নাকি সে-ও আমার মতো<br>তোমার ফিরে আসার অপেক্ষা ছেড়ে দিয়েছে,<br>শুধু আমাকে না জানিয়েই?</p>\n<p class=\"mt-6 font-semibold text-primary\">©আলম</p>",
+      "content_en": "<p>Perhaps one day it will be possible to forget you,<br>The pages of the calendar will turn,<br>The spaces of old habits will eventually be emptied,<br>Perhaps my heart won't skip a beat upon hearing your name.<br>But that person who was born alongside you,<br>What will become of him?</p>\n<p>The me who knew afternoons by waiting for you,<br>Who remained happy the entire day over a few gentle words,<br>The me who, unknowingly,<br>Sought his own home in someone else's happiness.</p>\n<p>You didn't take him away with you,<br>You left him abandoned inside of me,<br>Like a strangely unfinished life.</p>\n<p>Now when I stand in front of the mirror,<br>I see a person,<br>A familiar face, familiar eyes,<br>Only that earlier 'me' seems nowhere to be found.</p>\n<p>I have learned to live without you,<br>Yet the life I used to live with you—<br>The person of that life,<br>I can no longer find in any way.</p>\n<p>Sometimes I wonder,<br>If you return, perhaps I will still recognize you,<br>But that 'me' who was born with you,<br>Will I ever get him back?<br>Or has he too, like me,<br>Given up waiting for your return,<br>Without ever telling me?</p>\n<p class=\"mt-6 font-semibold text-primary\">©Alam</p>",
+      "cover_image_url": null,
+      "published": true,
+      "published_at": "2026-11-09T05:41:02.635Z",
+      "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-11-09T05:41:02.635Z",
+      "updated_at": "2026-11-09T05:41:02.635Z"
+    },
+    {
       "id": "e2b34a19-7c8d-4f15-992a-3b567d10e8f2",
       "slug": "old-spice-man",
       "title_bn": "ওল্ড স্পাইস ম্যান",
@@ -310,6 +327,10 @@ export const INITIAL_SEED_DATA = {
   ],
   "verse_translations": [],
   "article_categories": [
+    {
+      "article_id": "3a4ceefb-c613-46e3-9f1e-3fd77affb25d",
+      "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
+    },
     {
       "article_id": "e2b34a19-7c8d-4f15-992a-3b567d10e8f2",
       "category_id": "0b772921-f656-483b-9f0d-664ebabede53",

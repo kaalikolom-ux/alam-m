@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "3a4ceefb-c613-46e3-9f1e-3fd77affb25d",
+    "slug": "tomar-songe-jonmo-neowa-ami",
+    "title_bn": "তোমার সঙ্গে জন্ম নেওয়া আমি",
+    "title_en": "The Me Born With You",
+    "excerpt_bn": "তোমাকে ভুলে যাওয়া হয়তো একদিন সম্ভব হবে, ক্যালেন্ডারের পাতা বদলাবে, অভ্যাসের জায়গাগুলোও একসময় ফাঁকা হয়ে যাবে, তোমার নাম শুনে আর থমকে দাঁড়াব না হয়তো। কিন্তু যে মানুষটা তোমার সঙ্গে জন্ম নিয়েছিল, তার কী হবে?",
+    "excerpt_en": "Perhaps one day it will be possible to forget you, the pages of the calendar will turn, the spaces of old habits will eventually be emptied... But that person who was born alongside you, what will become of him?",
+    "cover_image_url": null,
+    "published_at": "2026-11-09T05:41:02.635Z"
+  },
+  {
     "id": "e2b34a19-7c8d-4f15-992a-3b567d10e8f2",
     "slug": "old-spice-man",
     "title_bn": "ওল্ড স্পাইস ম্যান",
