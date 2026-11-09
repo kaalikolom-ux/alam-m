@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "3a39c6b7-dda6-4c07-9951-ad99b2d81706",
+    "slug": "hoyto-dutoi",
+    "title_bn": "হয়তো দুটোই",
+    "title_en": "Maybe Both",
+    "excerpt_bn": "সে জানে না কেন বারবার তোমার কাছেই ফিরতে ইচ্ছে করে। কখনো মনে হয়, এটা ভালোবাসা। আবার কখনো মনে হয়, শুধু অভ্যাস। হয়তো তোমাকে নয়, তোমার সঙ্গে কাটানো দিনগুলোকে সে খুঁজে বেড়ায়...",
+    "excerpt_en": "He doesn't know why he longs to return to you time and again. Sometimes it feels like love. Other times, merely habit. Perhaps it isn't you, but the days spent with you that he searches for...",
+    "cover_image_url": null,
+    "published_at": "2026-09-22T04:25:00.000Z"
+  },
+  {
     "id": "b5e03659-1939-4d9e-ae18-86db6cfb90aa",
     "slug": "bhalobashar-age-nijer-kache-sot-how",
     "title_bn": "ভালোবাসার আগে নিজের কাছে সৎ হও",
