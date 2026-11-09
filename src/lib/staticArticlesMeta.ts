@@ -7,7 +7,7 @@ export const STATIC_ARTICLES_META = [
     "title_en": "Old Spice Man",
     "excerpt_bn": "আমি পারভীন। সবাই পারু বলে ডাকে। আমাদের বাড়ি প্রত্যন্ত গ্রাম অঞ্চলে, একদম ইন্ডিয়ার বর্ডার সংলগ্ন। কাটা তারের বেড়া দেখা যায়। অল্প কিছুদিন ধরে ফেসবুক চালাই... ওল্ড স্পাইস ম্যানের সাথে পরিচয়...",
     "excerpt_en": "I am Parveen. Everyone calls me Paru. Our house is in a remote village, right along the Indian border. The barbed-wire fencing can be seen from here...",
-    "cover_image_url": "https://a.wooniche.com/og/articles/old-spice-man.png",
+    "cover_image_url": null,
     "published_at": "2026-11-09T04:14:00.000Z"
   },
   {

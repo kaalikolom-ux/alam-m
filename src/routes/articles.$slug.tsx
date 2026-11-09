@@ -872,6 +872,9 @@ function ArticlePage() {
           alt={title}
           className="mt-6 w-full rounded-xl object-cover shadow-sm"
           loading="lazy"
+          onError={(e) => {
+            (e.currentTarget as HTMLElement).style.display = "none";
+          }}
         />
       )}
 
