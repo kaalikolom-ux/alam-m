@@ -97,9 +97,9 @@ function CategoryPostsPage() {
               className="card-soft group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]"
             >
               <div className="aspect-[16/10] w-full shrink-0 overflow-hidden bg-accent/40 relative">
-                {a.cover_image_url || a.slug ? (
+                {a.cover_image_url ? (
                   <img
-                    src={a.cover_image_url || ("/og/articles/" + a.slug + ".png")}
+                    src={a.cover_image_url}
                     alt={title}
                     loading="lazy"
                     width={1600}
