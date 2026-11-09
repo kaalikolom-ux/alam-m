@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "e2b34a19-7c8d-4f15-992a-3b567d10e8f2",
+    "slug": "old-spice-man",
+    "title_bn": "ওল্ড স্পাইস ম্যান",
+    "title_en": "Old Spice Man",
+    "excerpt_bn": "আমি পারভীন। সবাই পারু বলে ডাকে। আমাদের বাড়ি প্রত্যন্ত গ্রাম অঞ্চলে, একদম ইন্ডিয়ার বর্ডার সংলগ্ন। কাটা তারের বেড়া দেখা যায়। অল্প কিছুদিন ধরে ফেসবুক চালাই... ওল্ড স্পাইস ম্যানের সাথে পরিচয়...",
+    "excerpt_en": "I am Parveen. Everyone calls me Paru. Our house is in a remote village, right along the Indian border. The barbed-wire fencing can be seen from here...",
+    "cover_image_url": "https://a.wooniche.com/og/articles/old-spice-man.png",
+    "published_at": "2026-11-09T04:14:00.000Z"
+  },
+  {
     "id": "5c18b7c9-4b2e-4b68-963a-2bc0a9b34a17",
     "slug": "apnar-basha-ki-thakurgaon",
     "title_bn": "আপনার বাসা কী ঠাকুরগাঁও?",
