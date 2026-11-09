@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "789c53e5-68b6-45f0-99d2-22e84a63b7dc",
+      "slug": "harjit",
+      "title_bn": "হারজিত",
+      "title_en": "Win or Loss",
+      "excerpt_bn": "তোর জন্যে মায়া হয়, যদি মায়া দিয়ে তোকে জিতিয়ে দিতে পারতাম! তাহলে হয়তো হেরে যাওয়ারও এতটা কষ্ট থাকত না। তোর চোখে যে অভিমান জমে থাকে, আমি হাত বাড়িয়ে ছুঁয়ে দিতাম...",
+      "excerpt_en": "My heart aches with affection for you—if only I could make you win with tender compassion! Then perhaps the pain of losing wouldn't hurt so deeply...",
+      "content_bn": "<p>তোর জন্যে মায়া হয়<br>যদি মায়া দিয়ে তোকে জিতিয়ে দিতে পারতাম!<br>তাহলে হয়তো হেরে যাওয়ারও<br>এতটা কষ্ট থাকত না।</p>\n<p>তোর চোখে যে অভিমান জমে থাকে,<br>আমি হাত বাড়িয়ে ছুঁয়ে দিতাম,<br>বলতাম— <em>সব দোষ আমার।</em></p>\n<p>তুই হয়তো বিশ্বাস করতিস না,<br>তবু একটু চুপ করে থাকতিস।</p>\n<p>সেই নীরবতাটুকুই আমার প্রাপ্তি হতো।</p>\n<p>জানিস, তোকে হারানোর ভয়<br>কখনো তোকে পাওয়ার ইচ্ছের চেয়ে কম ছিল না।<br>তাই কাছে এসেও দূরে থেকেছি,<br>যেন আমার ছায়াটুকুও তোকে ভারী না করে।<br>কত রাত তোর কথা ভেবে<br>জানালার পাশে বসে থেকেছি,<br>বাইরে বৃষ্টি নামলে মনে হয়েছে<br>তুই বুঝি ফিরে আসার পথ খুঁজছিস।</p>\n<p>তারপর ভোর হয়েছে,<br>বৃষ্টি থেমেছে,<br>আর আমি আবার একা হয়ে গেছি।</p>\n<blockquote><p>তুই জানিস না,<br>কিছু মানুষকে ভালোবাসতে নেই,<br>শুধু মায়া করে যেতে হয়।<br>কারণ ভালোবাসা দাবি করে,<br>মায়া কিছুই চায় না।</p></blockquote>\n<p>তোর সুখ যদি আমার না হয়,<br>তবু তুই সুখী হোস।<br>আমি তোকে জিতিয়ে দিতে চেয়েছিলাম,<br>নিজেকে হারিয়ে নয়,<br>তোকে হারানোর ভয়ে।</p>\n<blockquote><p>আজও তাই মনে হয়,<br>তোর জন্যে মায়া হয়—<br>যদি মায়া দিয়ে তোকে জিতিয়ে দিতে পারতাম!</p></blockquote>\n<p class=\"mt-8 font-semibold text-primary\">©আলম <span class=\"text-xs font-normal text-muted-foreground block mt-1\">২০ সেপ্টেম্বর ২০২৬ইং, সকাল ৭টা ৫৬মি.</span></p>",
+      "content_en": "<p>My heart aches with affection for you,<br>If only I could make you win with tender compassion!<br>Then perhaps the pain of losing<br>Wouldn't hurt so deeply.</p>\n<p>That quiet hurt lingering in your eyes,<br>I would reach out my hand and touch it,<br>Saying—<em>it is all my fault.</em></p>\n<p>Perhaps you wouldn't believe it,<br>Yet you would stay silent for a moment.</p>\n<p>That silence alone would have been my reward.</p>\n<p>You know, the fear of losing you<br>Was never less than the longing to have you.<br>So even coming close, I kept my distance,<br>Lest even my shadow should feel heavy upon you.<br>How many nights thinking of you<br>I have sat beside the open window,<br>When the rain poured outside, it felt as though<br>You were searching for the way back home.</p>\n<p>Then dawn broke,<br>The rain stopped,<br>And once again, I was left alone.</p>\n<blockquote><p>You do not know,<br>Some people are not meant to be loved,<br>One must only go on feeling tender compassion for them.<br>Because love demands,<br>While compassion asks for nothing in return.</p></blockquote>\n<p>Even if your happiness is not with me,<br>May you still be happy.<br>I wanted to let you win,<br>Not by losing myself,<br>But out of the fear of losing you.</p>\n<blockquote><p>Even today I feel so,<br>My heart aches with affection for you—<br>If only I could make you win with tender compassion!</p></blockquote>\n<p class=\"mt-8 font-semibold text-primary\">©Alam <span class=\"text-xs font-normal text-muted-foreground block mt-1\">20 September 2026, 7:56 AM</span></p>",
+      "cover_image_url": null,
+      "published": true,
+      "published_at": "2026-09-20T01:56:00.000Z",
+      "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-09-20T01:56:00.000Z",
+      "updated_at": "2026-11-09T08:21:11.935Z"
+    },
+    {
       "id": "3a39c6b7-dda6-4c07-9951-ad99b2d81706",
       "slug": "hoyto-dutoi",
       "title_bn": "হয়তো দুটোই",
@@ -361,6 +378,10 @@ export const INITIAL_SEED_DATA = {
   ],
   "verse_translations": [],
   "article_categories": [
+    {
+      "article_id": "789c53e5-68b6-45f0-99d2-22e84a63b7dc",
+      "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
+    },
     {
       "article_id": "3a39c6b7-dda6-4c07-9951-ad99b2d81706",
       "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"

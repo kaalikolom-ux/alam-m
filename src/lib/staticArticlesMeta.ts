@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "789c53e5-68b6-45f0-99d2-22e84a63b7dc",
+    "slug": "harjit",
+    "title_bn": "হারজিত",
+    "title_en": "Win or Loss",
+    "excerpt_bn": "তোর জন্যে মায়া হয়, যদি মায়া দিয়ে তোকে জিতিয়ে দিতে পারতাম! তাহলে হয়তো হেরে যাওয়ারও এতটা কষ্ট থাকত না। তোর চোখে যে অভিমান জমে থাকে, আমি হাত বাড়িয়ে ছুঁয়ে দিতাম...",
+    "excerpt_en": "My heart aches with affection for you—if only I could make you win with tender compassion! Then perhaps the pain of losing wouldn't hurt so deeply...",
+    "cover_image_url": null,
+    "published_at": "2026-09-20T01:56:00.000Z"
+  },
+  {
     "id": "3a39c6b7-dda6-4c07-9951-ad99b2d81706",
     "slug": "hoyto-dutoi",
     "title_bn": "হয়তো দুটোই",
