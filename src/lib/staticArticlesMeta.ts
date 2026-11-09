@@ -1,16 +1,6 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
-    "id": "789c53e5-68b6-45f0-99d2-22e84a63b7dc",
-    "slug": "harjit",
-    "title_bn": "হারজিত",
-    "title_en": "Win or Loss",
-    "excerpt_bn": "তোর জন্যে মায়া হয়, যদি মায়া দিয়ে তোকে জিতিয়ে দিতে পারতাম! তাহলে হয়তো হেরে যাওয়ারও এতটা কষ্ট থাকত না। তোর চোখে যে অভিমান জমে থাকে, আমি হাত বাড়িয়ে ছুঁয়ে দিতাম...",
-    "excerpt_en": "My heart aches with affection for you—if only I could make you win with tender compassion! Then perhaps the pain of losing wouldn't hurt so deeply...",
-    "cover_image_url": null,
-    "published_at": "2026-09-20T01:56:00.000Z"
-  },
-  {
     "id": "3a39c6b7-dda6-4c07-9951-ad99b2d81706",
     "slug": "hoyto-dutoi",
     "title_bn": "হয়তো দুটোই",
@@ -18,7 +8,17 @@ export const STATIC_ARTICLES_META = [
     "excerpt_bn": "সে জানে না কেন বারবার তোমার কাছেই ফিরতে ইচ্ছে করে। কখনো মনে হয়, এটা ভালোবাসা। আবার কখনো মনে হয়, শুধু অভ্যাস। হয়তো তোমাকে নয়, তোমার সঙ্গে কাটানো দিনগুলোকে সে খুঁজে বেড়ায়...",
     "excerpt_en": "He doesn't know why he longs to return to you time and again. Sometimes it feels like love. Other times, merely habit. Perhaps it isn't you, but the days spent with you that he searches for...",
     "cover_image_url": null,
-    "published_at": "2026-09-22T04:25:00.000Z"
+    "published_at": "2026-11-09T08:26:00.000Z"
+  },
+  {
+    "id": "789c53e5-68b6-45f0-99d2-22e84a63b7dc",
+    "slug": "harjit",
+    "title_bn": "হারজিত",
+    "title_en": "Win or Loss",
+    "excerpt_bn": "তোর জন্যে মায়া হয়, যদি মায়া দিয়ে তোকে জিতিয়ে দিতে পারতাম! তাহলে হয়তো হেরে যাওয়ারও এতটা কষ্ট থাকত না। তোর চোখে যে অভিমান জমে থাকে, আমি হাত বাড়িয়ে ছুঁয়ে দিতাম...",
+    "excerpt_en": "My heart aches with affection for you—if only I could make you win with tender compassion! Then perhaps the pain of losing wouldn't hurt so deeply...",
+    "cover_image_url": null,
+    "published_at": "2026-11-09T08:25:00.000Z"
   },
   {
     "id": "b5e03659-1939-4d9e-ae18-86db6cfb90aa",
@@ -181,26 +181,6 @@ export const STATIC_ARTICLES_META = [
     "published_at": "2026-11-01T17:00:00.000Z"
   },
   {
-    "id": "e494d481-876f-4e23-8ce7-608cc055857b",
-    "slug": "osomapto-kobitar-chorone",
-    "title_bn": "অসমাপ্ত কবিতার চরনে",
-    "title_en": "অসমাপ্ত কবিতার চরনে",
-    "excerpt_bn": "",
-    "excerpt_en": "",
-    "cover_image_url": "https://a.wooniche.com/og/articles/osomapto-kobitar-chorone.png",
-    "published_at": "2026-08-12T03:33:40.012+00:00"
-  },
-  {
-    "id": "cd4c4604-800b-4d6c-b153-7d1d6eb31186",
-    "slug": "kobita-jokhon-klanto-hoye-dekhe",
-    "title_bn": "কবিতা যখন ক্লান্ত হয়ে দেখে",
-    "title_en": "কবিতা যখন ক্লান্ত হয়ে দেখে",
-    "excerpt_bn": "",
-    "excerpt_en": "",
-    "cover_image_url": "https://a.wooniche.com/og/articles/kobita-jokhon-klanto-hoye-dekhe.png",
-    "published_at": "2026-08-19T17:27:48.087+00:00"
-  },
-  {
     "id": "442b340f-45e8-4cd6-81c3-69a838c28cc2",
     "slug": "odressho-tthikana",
     "title_bn": "অদৃশ্য ঠিকানা",
@@ -219,6 +199,26 @@ export const STATIC_ARTICLES_META = [
     "excerpt_en": "",
     "cover_image_url": "https://a.wooniche.com/og/articles/option-ami-noi.png",
     "published_at": "2026-08-19T22:15:49.528+00:00"
+  },
+  {
+    "id": "cd4c4604-800b-4d6c-b153-7d1d6eb31186",
+    "slug": "kobita-jokhon-klanto-hoye-dekhe",
+    "title_bn": "কবিতা যখন ক্লান্ত হয়ে দেখে",
+    "title_en": "কবিতা যখন ক্লান্ত হয়ে দেখে",
+    "excerpt_bn": "",
+    "excerpt_en": "",
+    "cover_image_url": "https://a.wooniche.com/og/articles/kobita-jokhon-klanto-hoye-dekhe.png",
+    "published_at": "2026-08-19T17:27:48.087+00:00"
+  },
+  {
+    "id": "e494d481-876f-4e23-8ce7-608cc055857b",
+    "slug": "osomapto-kobitar-chorone",
+    "title_bn": "অসমাপ্ত কবিতার চরনে",
+    "title_en": "অসমাপ্ত কবিতার চরনে",
+    "excerpt_bn": "",
+    "excerpt_en": "",
+    "cover_image_url": "https://a.wooniche.com/og/articles/osomapto-kobitar-chorone.png",
+    "published_at": "2026-08-12T03:33:40.012+00:00"
   }
 ] as const;
 
