@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "b5e03659-1939-4d9e-ae18-86db6cfb90aa",
+    "slug": "bhalobashar-age-nijer-kache-sot-how",
+    "title_bn": "ভালোবাসার আগে নিজের কাছে সৎ হও",
+    "title_en": "Be Honest With Yourself Before Loving",
+    "excerpt_bn": "ভালোবাসার আগে একবার নিজের চোখের দিকে তাকাও, সেখানে কি সত্যিই কারও জন্য একটি দরজা খোলা আছে? নাকি শুধু নিঃসঙ্গতার ঘরে একটু আলো চাও তুমি? কাউকে কাছে ডেকে তার হৃদয়ে আশ্রয় নিয়ে আবার একদিন চলে যাবে? ভালোবাসা কোনো খেলা নয়...",
+    "excerpt_en": "Before you love, look into your own eyes once—is there truly an open door for someone? Or do you only seek a bit of light in your room of solitude? Love is not a game...",
+    "cover_image_url": null,
+    "published_at": "2026-11-09T08:03:11.863Z"
+  },
+  {
     "id": "3a4ceefb-c613-46e3-9f1e-3fd77affb25d",
     "slug": "tomar-songe-jonmo-neowa-ami",
     "title_bn": "তোমার সঙ্গে জন্ম নেওয়া আমি",

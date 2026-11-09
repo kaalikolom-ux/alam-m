@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "b5e03659-1939-4d9e-ae18-86db6cfb90aa",
+      "slug": "bhalobashar-age-nijer-kache-sot-how",
+      "title_bn": "ভালোবাসার আগে নিজের কাছে সৎ হও",
+      "title_en": "Be Honest With Yourself Before Loving",
+      "excerpt_bn": "ভালোবাসার আগে একবার নিজের চোখের দিকে তাকাও, সেখানে কি সত্যিই কারও জন্য একটি দরজা খোলা আছে? নাকি শুধু নিঃসঙ্গতার ঘরে একটু আলো চাও তুমি? কাউকে কাছে ডেকে তার হৃদয়ে আশ্রয় নিয়ে আবার একদিন চলে যাবে? ভালোবাসা কোনো খেলা নয়...",
+      "excerpt_en": "Before you love, look into your own eyes once—is there truly an open door for someone? Or do you only seek a bit of light in your room of solitude? Love is not a game...",
+      "content_bn": "<p>ভালোবাসার আগে<br>একবার নিজের চোখের দিকে তাকাও,<br>সেখানে কি সত্যিই কারও জন্য<br>একটি দরজা খোলা আছে?</p>\n<p>নাকি শুধু নিঃসঙ্গতার ঘরে<br>একটু আলো চাও তুমি?<br>কাউকে কাছে ডেকে<br>তার হৃদয়ে আশ্রয় নিয়ে<br>আবার একদিন চলে যাবে?</p>\n<p>ভালোবাসা কোনো খেলা নয়,<br>কাউকে অভ্যাসে পরিণত করে<br>হঠাৎ অচেনা হয়ে যাওয়ার নামও নয়।<br>কারও হৃদয়কে<br>নিজের একাকিত্বের ওষুধ কোরো না।</p>\n<blockquote><p>যদি থেকে যাওয়ার ইচ্ছে না থাকে,<br>তবে থাকার প্রতিশ্রুতি দিও না।<br>যদি ভালোবাসতে না পারো,<br>তবে ভালোবাসার অভিনয় কোরো না।</p></blockquote>\n<p>কারণ মানুষ ভাঙে<br>বিদায়ের শব্দে নয়,<br>ভাঙে সেই বিশ্বাসে<br>যেটাকে একদিন সত্যি ভেবেছিল।</p>\n<p>তাই ভালোবাসার আগে<br>নিজের কাছে সৎ হও।<br>জেনে নাও, তুমি কি সত্যিই কাউকে চাও,<br>নাকি শুধু কাউকে হারাতে চাও না।</p>\n<p>কারও হৃদয়ে প্রবেশের আগে<br>নিজের দরজাটা খুলে দেখো।<br>সেখানে যদি এখনও<br>অতীতের কারও ছায়া থাকে,<br>তবে নতুন কাউকে<br>আলো বলে ডেকো না।</p>\n<blockquote><p>ভালোবাসা মানে শুধু কাছে আসা নয়,<br>কখনও কখনও<br>সৎভাবে দূরে থাকাও ভালোবাসা।</p></blockquote>\n<p>কারও হৃদয় নিয়ে খেলো না,<br>কারণ ভাঙা হৃদয়ের শব্দ<br>বাইরে শোনা যায় না,<br>শুধু একজন মানুষ<br>আরও একটু নীরব হয়ে যায়।</p>\n<p class=\"mt-8 font-semibold text-primary\">©আলম</p>",
+      "content_en": "<p>Before you love,<br>Look into your own eyes once,<br>Is there truly a door open<br>For someone there?</p>\n<p>Or do you only seek<br>A bit of light in your room of solitude?<br>Calling someone close,<br>Taking shelter in their heart,<br>Only to walk away again one day?</p>\n<p>Love is not a game,<br>Nor is it about making someone a habit<br>And suddenly turning into a stranger.<br>Do not make someone's heart<br>The medicine for your loneliness.</p>\n<blockquote><p>If you have no intention to stay,<br>Do not promise your presence.<br>If you cannot love,<br>Do not pretend to love.</p></blockquote>\n<p>Because people do not break<br>From the sound of farewells,<br>They break from that trust<br>Which they once believed to be true.</p>\n<p>So before you love,<br>Be honest with yourself.<br>Know whether you truly want someone,<br>Or simply do not want to lose anyone.</p>\n<p>Before stepping into someone's heart,<br>Open your own door and see.<br>If there is still<br>The shadow of someone from the past,<br>Do not call someone new<br>Your light.</p>\n<blockquote><p>Love is not merely drawing near,<br>Sometimes,<br>Staying honorably away is love too.</p></blockquote>\n<p>Do not play with someone's heart,<br>For the sound of a broken heart<br>Cannot be heard from outside;<br>Only a human being<br>Becomes just a little more silent.</p>\n<p class=\"mt-8 font-semibold text-primary\">©Alam</p>",
+      "cover_image_url": null,
+      "published": true,
+      "published_at": "2026-11-09T08:03:11.863Z",
+      "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-11-09T08:03:11.863Z",
+      "updated_at": "2026-11-09T08:03:11.863Z"
+    },
+    {
       "id": "3a4ceefb-c613-46e3-9f1e-3fd77affb25d",
       "slug": "tomar-songe-jonmo-neowa-ami",
       "title_bn": "তোমার সঙ্গে জন্ম নেওয়া আমি",
@@ -327,6 +344,10 @@ export const INITIAL_SEED_DATA = {
   ],
   "verse_translations": [],
   "article_categories": [
+    {
+      "article_id": "b5e03659-1939-4d9e-ae18-86db6cfb90aa",
+      "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
+    },
     {
       "article_id": "3a4ceefb-c613-46e3-9f1e-3fd77affb25d",
       "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
