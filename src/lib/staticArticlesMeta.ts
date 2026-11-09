@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "c1e00831-a9c2-4d4a-a842-56b7b9723794",
+    "slug": "menopause",
+    "title_bn": "মেনোপোজ",
+    "title_en": "Menopause",
+    "excerpt_bn": "চল্লিশ পেরিয়েই আমি বুঝলাম- বয়স শুধু ক্যালেন্ডারে বাড়ে না, মানুষের চোখেও বাড়ে। হঠাৎ করে আমার হাসিটা বেশি হয়ে যায়, চুপ করে থাকাটা অভিমান, একটু সাজলে অহংকার... মেনোপোজ তুমি নও।",
+    "excerpt_en": "Stepping past forty, I realized age doesn't just increase on calendars—it increases in the eyes of people. Suddenly my smile seems too loud, my silence is deemed resentment... You are not menopause.",
+    "cover_image_url": null,
+    "published_at": "2026-11-09T09:09:00.000Z"
+  },
+  {
     "id": "3a39c6b7-dda6-4c07-9951-ad99b2d81706",
     "slug": "hoyto-dutoi",
     "title_bn": "হয়তো দুটোই",

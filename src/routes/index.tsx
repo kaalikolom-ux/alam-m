@@ -271,9 +271,9 @@ function HomePage() {
                   >
                     {/* ফটোকার্ড হেডার / ইমেজ কনটেইনার */}
                     <div className="aspect-[16/10] w-full shrink-0 overflow-hidden bg-muted relative">
-                      {a.cover_image_url ? (
+                      {a.cover_image_url || a.slug ? (
                         <img
-                          src={a.cover_image_url}
+                          src={a.cover_image_url || ("/og/articles/" + a.slug + ".png")}
                           alt={title}
                           loading="lazy"
                           decoding="async"

@@ -142,6 +142,33 @@ import {
 } from "@/components/ArticleDisclaimerBox";
 
 
+function AdminRouteErrorComponent({ error, reset }: { error: any; reset: () => void }) {
+  return (
+    <div className="flex min-h-[70vh] items-center justify-center bg-background px-4">
+      <div className="max-w-md w-full rounded-2xl border border-border bg-card p-6 text-center shadow-lg space-y-4">
+        <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+          <AlertTriangle className="size-6" />
+        </div>
+        <h2 className="text-base font-bold text-foreground">অ্যাডমিন প্যানেলে সাময়িক সমস্যা হয়েছে</h2>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          {error?.message || "পোস্ট এডিটর বা প্যানেলটি লোড করতে সমস্যা হয়েছে। দয়া করে ক্যাশ ক্লিয়ার করে পুনরায় চেষ্টা করুন।"}
+        </p>
+        <div className="flex flex-wrap justify-center gap-2 pt-2">
+          <Button size="sm" onClick={() => reset()} className="text-xs">
+            পুনরায় চেষ্টা করুন
+          </Button>
+          <Button size="sm" variant="outline" asChild className="text-xs">
+            <a href="/admin">ড্যাশবোর্ডে ফিরুন</a>
+          </Button>
+          <Button size="sm" variant="ghost" asChild className="text-xs">
+            <a href="/">ওয়েবসাইটে যান</a>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/admin")({
   validateSearch: (search: Record<string, unknown>) => {
     return {
@@ -155,6 +182,7 @@ export const Route = createFileRoute("/admin")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  errorComponent: AdminRouteErrorComponent,
   component: AdminPage,
 });
 
@@ -1772,7 +1800,7 @@ function ArticlesAdmin({
         .from("tags")
         .select("id, name_bn, name_en, slug")
         .order("name_bn");
-      const dbTags = data || [];
+      const dbTags = (data || []).filter((t: any) => t && typeof t.name_bn === "string" && t.name_bn.trim().length > 0);
       const dbNames = new Set(dbTags.map((t: any) => (t.name_bn || "").toLowerCase().trim()));
 
       const extraTags: { id: string; name_bn: string; slug: string }[] = [];
@@ -3077,14 +3105,16 @@ function ArticlesAdmin({
                 <span className="text-[11px] text-muted-foreground">কোনো ট্যাগ নেই। উপরে নতুন ট্যাগ লিখুন।</span>
               ) : (
                 filteredAvailableTags.map((tagObj: any) => {
+                  const tagBn = String(tagObj?.name_bn || "").trim();
+                  if (!tagBn) return null;
                   const isSelected = selectedTags.some(
-                    (t) => t.toLowerCase() === tagObj.name_bn.toLowerCase()
+                    (t) => String(t || "").toLowerCase() === tagBn.toLowerCase()
                   );
                   return (
                     <button
-                      key={tagObj.id}
+                      key={tagObj.id || tagBn}
                       type="button"
-                      onClick={() => toggleTagSelection(tagObj.name_bn)}
+                      onClick={() => toggleTagSelection(tagBn)}
                       className={`text-xs px-2.5 py-1 rounded-md border transition-all cursor-pointer inline-flex items-center gap-1 ${
                         isSelected
                           ? "bg-primary text-primary-foreground border-primary font-medium shadow-2xs"
