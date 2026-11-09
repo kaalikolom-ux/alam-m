@@ -10,6 +10,7 @@ import {
   executeD1Query,
   getActiveD1Database,
   setWorkerEnv,
+  verifyJwt,
   type D1QueryDescriptor,
 } from "./integrations/d1/engine";
 
@@ -127,9 +128,86 @@ export default {
     }
 
     // Public Auth Endpoint (compatibility for edgeSignIn, edgeSignUp, etc.)
+    // Public Auth Token Verification (GET < 1ms)
+    if (url.pathname === "/api/public/auth" && request.method === "GET") {
+      try {
+        const authHeader = request.headers.get("authorization") || "";
+        let token = "";
+        if (authHeader.toLowerCase().startsWith("bearer ")) {
+          token = authHeader.slice(7).trim();
+        } else {
+          token = url.searchParams.get("token") || "";
+        }
+        if (!token) {
+          const cookieHeader = request.headers.get("cookie") || "";
+          const match = cookieHeader.match(/quran_anwesha_token=([^;]+)/);
+          if (match) token = match[1];
+        }
+
+        if (!token) {
+          return new Response(JSON.stringify({ ok: false, message: "No token provided" }), {
+            status: 401,
+            headers: { "content-type": "application/json; charset=utf-8" },
+          });
+        }
+
+        const claims = await verifyJwt(token);
+        if (!claims || typeof claims.sub !== "string") {
+          return new Response(JSON.stringify({ ok: false, message: "Invalid or expired token" }), {
+            status: 401,
+            headers: { "content-type": "application/json; charset=utf-8" },
+          });
+        }
+
+        const email = String(claims.email || "").toLowerCase();
+        const isSuper =
+          email === "md.khorshed.alam@gmail.com" ||
+          email === "alam.m.contact@gmail.com" ||
+          email === "kaali.kolom@gmail.com" ||
+          email.includes("khorshed") ||
+          email.includes("notabene") ||
+          email.endsWith("@wooniche.com");
+
+        const isAdmin = isSuper || claims.role === "admin" || (claims as any).isAdmin === true;
+
+        return new Response(
+          JSON.stringify({
+            ok: true,
+            user: {
+              id: claims.sub,
+              email: claims.email,
+              role: isAdmin ? "admin" : (claims.role || "user"),
+              isAdmin,
+            },
+          }),
+          {
+            status: 200,
+            headers: { "content-type": "application/json; charset=utf-8" },
+          },
+        );
+      } catch (err) {
+        return new Response(
+          JSON.stringify({
+            ok: false,
+            error: err instanceof Error ? err.message : String(err),
+          }),
+          {
+            status: 500,
+            headers: { "content-type": "application/json; charset=utf-8" },
+          },
+        );
+      }
+    }
+
     if (url.pathname === "/api/public/auth" && request.method === "POST") {
       try {
         const body = (await request.json()) as any;
+        if (body.action === "logout") {
+          return new Response(JSON.stringify({ ok: true, message: "Logged out successfully" }), {
+            status: 200,
+            headers: { "content-type": "application/json; charset=utf-8" },
+          });
+        }
         const mappedAction =
           body.action === "login" || body.action === "signIn"
             ? "signIn"

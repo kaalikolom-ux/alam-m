@@ -358,6 +358,19 @@ const DDL_STATEMENTS = [
 async function ensureD1Initialized(db: D1Database): Promise<void> {
   if (initializedDbs.has(db)) return;
   try {
+    // Ultra-fast check: if tables already exist, skip DDL batch completely (<1ms)
+    try {
+      const check = await db
+        .prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='users' LIMIT 1")
+        .first();
+      if (check) {
+        initializedDbs.add(db);
+        return;
+      }
+    } catch {
+      // Table check failed, proceed with full schema creation
+    }
+
     const ddlBatch = DDL_STATEMENTS.map((sql) => db.prepare(sql));
     await db.batch(ddlBatch);
 

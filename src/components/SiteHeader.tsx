@@ -15,7 +15,9 @@ import {
 
 import { usePrefs } from "@/lib/prefs";
 import { useMenu } from "@/lib/menu";
-import { useSession, useIsAdmin } from "@/lib/auth";
+import { useSession, useIsAdmin, signOutFast } from "@/lib/auth";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { GlobalSearchDialog } from "@/components/GlobalSearchDialog";
@@ -27,8 +29,10 @@ export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
+  const queryClient = useQueryClient();
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await signOutFast(queryClient);
+    toast.success("লগআউট সফল হয়েছে");
   };
 
   const menu = useMenu("header");

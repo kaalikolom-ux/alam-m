@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 // src/lib/auth.ts
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -254,6 +255,8 @@ export function setCachedSession(session: any) {
       } else {
         try { localStorage.removeItem(STORAGE_KEY); } catch {}
         try { localStorage.removeItem(TOKEN_KEY); } catch {}
+        try { localStorage.removeItem("alam_m_d1_auth_session"); } catch {}
+        try { localStorage.removeItem("alam_m_auth_session"); } catch {}
         document.cookie = "quran_anwesha_token=; path=/; max-age=0; SameSite=Lax; Secure";
         try {
           document.cookie = "quran_anwesha_token=; path=/; domain=.quraan.bd; max-age=0; SameSite=Lax; Secure";
@@ -306,7 +309,7 @@ export function useIsAdmin() {
     initialData: () => {
       if (!user) return false;
       if (isSuperAdminEmail(user.email)) return true;
-      if ((user as any).isAdmin === true) return true;
+      if ((user as any).isAdmin === true || (user as any).role === "admin") return true;
       if (typeof window !== "undefined") {
         const cached = localStorage.getItem(`is_admin_${user.id}`);
         if (cached === "true") return true;
@@ -321,7 +324,7 @@ export function useIsAdmin() {
         }
         return true;
       }
-      if ((user as any).isAdmin === true) return true;
+      if ((user as any).isAdmin === true || (user as any).role === "admin") return true;
 
       // Verify via Edge Auth API
       const token = getStoredAuthToken();
@@ -345,9 +348,15 @@ export function useIsAdmin() {
     },
   });
 
+  const definitelyAdmin =
+    isSuperAdminEmail(user?.email) ||
+    (user as any)?.isAdmin === true ||
+    (user as any)?.role === "admin" ||
+    query.data === true;
+
   return {
-    isAdmin: query.data === true,
-    loading: query.isLoading && query.data === undefined,
+    isAdmin: definitelyAdmin,
+    loading: definitelyAdmin ? false : (query.isLoading && query.data === undefined),
   };
 }
 
@@ -608,6 +617,10 @@ export async function signOutFast(queryClient?: any) {
   }
 
   setCachedSession(null);
+
+  try {
+    await supabase.auth.signOut();
+  } catch {}
 
   if (typeof window !== "undefined") {
     try {
