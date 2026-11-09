@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "19f2e09a-32fb-4ced-b497-4bfea5f833ee",
+    "slug": "alada-hote-parini",
+    "title_bn": "আলাদা হতে পারিনি",
+    "title_en": "Could Not Separate",
+    "excerpt_bn": "মুছে দেয়া যায়, ভুলে গেছি— এ যেন খাঁটি মিথ্যে বলা হয়ে যায়। তবুও মুছে দিতে হয়, খাঁটি মিথ্যেটা বলতে হয়। সত্যিটা হলো— আমরা যে আলাদা হতেই পারিনি।",
+    "excerpt_en": "One can erase, say 'I\\'ve forgotten'—yet that feels like telling an absolute lie. Still, one has to erase, one has to utter that pure lie. The truth is—we were never able to truly part.",
+    "cover_image_url": null,
+    "published_at": "2026-11-09T14:03:00.000Z"
+  },
+  {
     "id": "a5ddcccb-52f9-414d-ad31-382fe6cf0310",
     "slug": "gotokal",
     "title_bn": "গতকাল",

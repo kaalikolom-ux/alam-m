@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "19f2e09a-32fb-4ced-b497-4bfea5f833ee",
+      "slug": "alada-hote-parini",
+      "title_bn": "আলাদা হতে পারিনি",
+      "title_en": "Could Not Separate",
+      "excerpt_bn": "মুছে দেয়া যায়, ভুলে গেছি— এ যেন খাঁটি মিথ্যে বলা হয়ে যায়। তবুও মুছে দিতে হয়, খাঁটি মিথ্যেটা বলতে হয়। সত্যিটা হলো— আমরা যে আলাদা হতেই পারিনি।",
+      "excerpt_en": "One can erase, say 'I\\'ve forgotten'—yet that feels like telling an absolute lie. Still, one has to erase, one has to utter that pure lie. The truth is—we were never able to truly part.",
+      "content_bn": "<p>মুছে দেয়া যায়,<br>ভুলে গেছি—<br>এ যেন খাঁটি মিথ্যে বলা হয়ে যায়।<br>তবুও—<br>মুছে দিতে হয়,<br>খাঁটি মিথ্যেটা বলতে হয়।</p>\n<p>সত্যিটা হলো—<br>আমরা যে আলাদা হতেই পারিনি।</p>\n<p>শুধু দূরে সরে গেছি,<br>কথাগুলো থামিয়ে দিয়েছি,<br>চোখের দিকে তাকানো এড়িয়েছি,<br>নিজেদের বোঝাতে চেয়েছি—<br>সব শেষ।</p>\n<p>কিন্তু শেষ কি কখনো হয়<br>যেখানে স্মৃতিরা বেঁচে থাকে?<br>রাত গভীর হলে<br>নিঃশব্দ ঘরের ভেতর<br>তোমার নামহীন উপস্থিতি<br>আজও আমাকে ডাকে।</p>\n<p>আমি ভুলে যাওয়ার অভিনয় করি,<br>তুমিও হয়তো একই অভিনয়ে ব্যস্ত—<br>অথচ দুজনের নীরবতাই বলে,<br>আমরা কেউ কাউকে ছাড়িইনি।</p>\n<p>কিছু সম্পর্ক দূরত্বে যায়,<br>মুছে যায় না।<br>কিছু মানুষ হারিয়ে যায়,<br>হারায় না।<br>আর কিছু ভালোবাসা—<br>আলাদা হয়ে থেকেও<br>দুজনকে একই গল্পের<br>দুটি অসমাপ্ত বাক্য করে রাখে।</p>\n<p>সত্যিটা তাই আজও একই—<br>আমরা যে আলাদা হতেই পারিনি।</p>\n<p class=\"mt-8 font-semibold text-primary\">©আলম</p>",
+      "content_en": "<p>One can erase,<br>Say 'I've forgotten'—<br>Yet that feels like telling an absolute lie.<br>And yet—<br>One must erase,<br>One must speak that pure lie.</p>\n<p>The truth is—<br>We were never truly able to part.</p>\n<p>We merely drifted away,<br>Stifled our spoken words,<br>Avoided looking into each other's eyes,<br>Trying to convince ourselves—<br>Everything is over.</p>\n<p>But does anything ever truly end<br>Where memories still breathe?<br>When the night deepens<br>Inside the silent room,<br>Your nameless presence<br>Calls to me even today.</p>\n<p>I act as if I have forgotten,<br>And perhaps you too are busy in that very same charade—<br>Yet the silence of us both confesses,<br>Neither of us ever let the other go.</p>\n<p>Some bonds stretch into distance,<br>Yet never fade away.<br>Some souls drift out of sight,<br>Yet are never lost.<br>And some love—<br>Even while apart,<br>Keeps both souls bound<br>As two unfinished sentences<br>Within the very same tale.</p>\n<p>And so the truth remains unchanged today—<br>We were never truly able to part.</p>\n<p class=\"mt-8 font-semibold text-primary\">©Alam</p>",
+      "cover_image_url": null,
+      "published": true,
+      "published_at": "2026-11-09T14:03:00.000Z",
+      "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-11-09T14:03:00.000Z",
+      "updated_at": "2026-11-09T14:03:00.000Z"
+    },
+    {
       "id": "a5ddcccb-52f9-414d-ad31-382fe6cf0310",
       "slug": "gotokal",
       "title_bn": "গতকাল",
@@ -412,6 +429,10 @@ export const INITIAL_SEED_DATA = {
   ],
   "verse_translations": [],
   "article_categories": [
+    {
+      "article_id": "19f2e09a-32fb-4ced-b497-4bfea5f833ee",
+      "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
+    },
     {
       "article_id": "a5ddcccb-52f9-414d-ad31-382fe6cf0310",
       "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
