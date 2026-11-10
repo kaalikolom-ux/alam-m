@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "d64421e5-1026-49cf-b768-5d51a04f1dc7",
+    "slug": "meghla-akash",
+    "title_bn": "মেঘলা আকাশ",
+    "title_en": "Cloudy Sky",
+    "excerpt_bn": "টুক করে একটা নোটিফিকেশনের ঘন্টি বাজলো। ওপেন করতেই দেখি মেঘলা আকাশ আমার সাথে বন্ধুত্ব করতে চায়। বাহ, কি কাব্যিক নাম। ভাবার জন্যে সময় নিলাম না। এক্সেপ্ট করলাম...",
+    "excerpt_en": "A notification chimed softly. Opening it, I saw Meghla Akash sending me a friend request. What a poetic name. Without a second thought, I accepted...",
+    "cover_image_url": null,
+    "published_at": "2026-11-10T13:35:00.000Z"
+  },
+  {
     "id": "1c4b9bdf-f784-472f-81c2-7fb3e6535d67",
     "slug": "alada-akash",
     "title_bn": "আলাদা আকাশ",
