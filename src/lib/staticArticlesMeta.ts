@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "ef09721e-a02f-48e9-b3f1-f94518b2deb2",
+    "slug": "opekkhay",
+    "title_bn": "অপেক্ষায়...",
+    "title_en": "Waiting...",
+    "excerpt_bn": "বিকেল গড়িয়ে সন্ধ্যা নামার সময়টায় নদীর পারের চেনা পথ ধরে ধীর পায়ে হেঁটে আসে বীণা। চারপাশের বাতাসে মেঘের ঘ্রাণ, দূরে শান্ত জলের বুকে ম্রিয়মাণ আলো। এই পুরোনো কদম গাছটার তলাটাই যেন বীণার সারা দিনের ক্লান্তির একমাত্র ঠিকানা...",
+    "excerpt_en": "As afternoon gently yields to dusk, Beena walks with slow, deliberate steps along the familiar riverside path. The scent of rain-laden clouds drifts in the air, while faint light flickers across the serene waters...",
+    "cover_image_url": null,
+    "published_at": "2026-11-12T08:05:00.000Z"
+  },
+  {
     "id": "d06e652a-60cb-47ec-a6bf-84f8d5d404cd",
     "slug": "amar-pothchola",
     "title_bn": "আমার পথচলা",
