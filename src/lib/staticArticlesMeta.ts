@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "d06e652a-60cb-47ec-a6bf-84f8d5d404cd",
+    "slug": "amar-pothchola",
+    "title_bn": "আমার পথচলা",
+    "title_en": "My Journey",
+    "excerpt_bn": "কতোদিন বউ বলে ডাকা হয় না, বলিনা- \"কেমন আছো বউ?\" ব্যস্ততার চোরাবালিতে দিন চলে যায়, আবেগের খেয়া আর পায় না তো তরী-কূলের ঢেউ। দিনশেষে এই একবুক চেনা নির্ভরতার নীড়ে, আমার যত ক্লান্তি, যত শান্তি- সব তোমাতে রয়...",
+    "excerpt_en": "How long has it been since I called you 'my wife', since I asked- \"How are you, wife?\" In the quicksand of bustling routines, days slip away... At day's end, within this familiar nest of comforting refuge, all my exhaustion, all my peace- reside solely in you...",
+    "cover_image_url": null,
+    "published_at": "2026-11-12T00:41:00.000Z"
+  },
+  {
     "id": "d64421e5-1026-49cf-b768-5d51a04f1dc7",
     "slug": "meghla-akash",
     "title_bn": "মেঘলা আকাশ",

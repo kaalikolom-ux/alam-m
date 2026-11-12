@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "d06e652a-60cb-47ec-a6bf-84f8d5d404cd",
+      "slug": "amar-pothchola",
+      "title_bn": "আমার পথচলা",
+      "title_en": "My Journey",
+      "excerpt_bn": "কতোদিন বউ বলে ডাকা হয় না, বলিনা- \"কেমন আছো বউ?\" ব্যস্ততার চোরাবালিতে দিন চলে যায়, আবেগের খেয়া আর পায় না তো তরী-কূলের ঢেউ। দিনশেষে এই একবুক চেনা নির্ভরতার নীড়ে, আমার যত ক্লান্তি, যত শান্তি- সব তোমাতে রয়...",
+      "excerpt_en": "How long has it been since I called you 'my wife', since I asked- \"How are you, wife?\" In the quicksand of bustling routines, days slip away... At day's end, within this familiar nest of comforting refuge, all my exhaustion, all my peace- reside solely in you...",
+      "content_bn": "<p>কতোদিন বউ বলে ডাকা হয় না,<br>বলিনা- \"কেমন আছো বউ?\"<br>ব্যস্ততার চোরাবালিতে দিন চলে যায়,<br>আবেগের খেয়া আর পায় না তো তরী-কূলের ঢেউ।</p>\n<p>অভিমান করেছো?<br>জানি, নীরবেই জমেছে মেঘ,<br>একলা ঘরের কোণে তোমার ফেলে আসা দীর্ঘশ্বাস।<br>অভিযোগগুলো আজ চোখের পাতায় আঁকা,<br>বুঝে নিতে পারিনি মনখারাপের এই অবশ বাতাস।</p>\n<p>করো, করো অভিমান-<br>যত খুশি সাজাও অনুযোগ,<br>অধিকারের দাবিতে থাকুক তীব্র সেই নীরবতা।<br>তবু কখনো পথ ভুলে কোথাও হারিয়ে যেও না,<br>মুছে ফেলো না এই বুকের গহিনে তোমার ব্যাকুলতা।<br>দিনশেষে এই একবুক চেনা নির্ভরতার নীড়ে,<br>আমার যত ক্লান্তি, যত শান্তি- সব তোমাতে রয়।<br>তোমারই আঁচল ঘিরে বাঁধি আমার পথচলা,<br>এই অস্ফুট ভালোবাসায় যেন কোনো বিচ্ছেদ না হয়।</p>\n<p class=\"mt-8 font-semibold text-primary\">©আলম</p>",
+      "content_en": "<p>How long has it been since I called you 'my wife',<br>Since I asked- \"How are you, wife?\"<br>In the quicksand of bustling routines, days slip away,<br>The boat of emotions no longer catches the waves of the landing shore.</p>\n<p>Are you hurt?<br>I know, silent clouds have gathered within,<br>In the lonely corner of the room lies your lingering sigh.<br>Unspoken grievances are sketched upon your eyelids today,<br>I failed to comprehend this numb breeze of sorrow.</p>\n<p>Go ahead, be hurt-<br>Weave as many complaints as you wish,<br>Let that fierce silence remain in asserting your rightful bond.<br>Yet never lose your way or wander into the distant unknown,<br>Do not erase your tender longing from the depths of this heart.<br>At day's end, within this familiar nest of comforting refuge,<br>All my exhaustion, all my peace- reside solely in you.<br>Entwined within your comforting warmth, I anchor my journey,<br>May no parting ever shadow this unspoken love.</p>\n<p class=\"mt-8 font-semibold text-primary\">©Alam</p>",
+      "cover_image_url": null,
+      "published": true,
+      "published_at": "2026-11-12T00:41:00.000Z",
+      "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-11-12T00:41:00.000Z",
+      "updated_at": "2026-11-12T00:41:00.000Z"
+    },
+    {
       "id": "d64421e5-1026-49cf-b768-5d51a04f1dc7",
       "slug": "meghla-akash",
       "title_bn": "মেঘলা আকাশ",
@@ -463,6 +480,10 @@ export const INITIAL_SEED_DATA = {
   ],
   "verse_translations": [],
   "article_categories": [
+    {
+      "article_id": "d06e652a-60cb-47ec-a6bf-84f8d5d404cd",
+      "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
+    },
     {
       "article_id": "d64421e5-1026-49cf-b768-5d51a04f1dc7",
       "category_id": "0b772921-f656-483b-9f0d-664ebabede53"
