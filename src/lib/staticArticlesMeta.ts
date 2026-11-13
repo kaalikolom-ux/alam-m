@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "b039b367-a3cf-4fad-9bb8-1a1c84ca9321",
+    "slug": "bor-bodhu-tui-tui-tumi-tumi",
+    "title_bn": "বর-বধুঃ তুই-তুই তুমি-তুমি",
+    "title_en": "Groom and Bride: Be Friends Forever",
+    "excerpt_bn": "তুমি কারও বর হইয়ো না, বন্ধু হইয়ো। তুমি কারও বধূ হইয়ো না, বন্ধু হইয়ো। বর-বধূ, বধূ-বর, সে তো কেবল সামাজিক এক ঘর... সারাটা জীবন যেন কেবল তুই-তুই তুমি-তুমি বন্ধু হয়ে রয়।",
+    "excerpt_en": "Do not become merely someone's groom, be a friend instead. Do not become merely someone's bride, be a friend instead. Beyond titles and obligations, may all of life remain simply as cherished, intimate friends...",
+    "cover_image_url": null,
+    "published_at": "2026-11-13T04:17:00.000Z"
+  },
+  {
     "id": "ef09721e-a02f-48e9-b3f1-f94518b2deb2",
     "slug": "opekkhay",
     "title_bn": "অপেক্ষায়...",

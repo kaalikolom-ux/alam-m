@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "b039b367-a3cf-4fad-9bb8-1a1c84ca9321",
+      "slug": "bor-bodhu-tui-tui-tumi-tumi",
+      "title_bn": "বর-বধুঃ তুই-তুই তুমি-তুমি",
+      "title_en": "Groom and Bride: Be Friends Forever",
+      "excerpt_bn": "তুমি কারও বর হইয়ো না, বন্ধু হইয়ো। তুমি কারও বধূ হইয়ো না, বন্ধু হইয়ো। বর-বধূ, বধূ-বর, সে তো কেবল সামাজিক এক ঘর... সারাটা জীবন যেন কেবল তুই-তুই তুমি-তুমি বন্ধু হয়ে রয়।",
+      "excerpt_en": "Do not become merely someone's groom, be a friend instead. Do not become merely someone's bride, be a friend instead. Beyond titles and obligations, may all of life remain simply as cherished, intimate friends...",
+      "content_bn": "<p>তুমি কারও বর হইয়ো না,<br>বন্ধু হইয়ো।<br>তুমি কারও বধূ হইয়ো না,<br>বন্ধু হইয়ো।</p>\n<p>বর-বধূ, বধূ-বর<br>সে তো কেবল সামাজিক এক ঘর,<br>দায়িত্বের বেড়াজালে বাঁধা পরিচয়।<br>বন্ধু হলে মিলেমিশে<br>একাকার হয় মন,<br>থাকবে না কোনো আড়াল কিংবা সংশয়।</p>\n<p>দিনশেষে যখন ক্লান্ত হবে প্রাণ,<br>অধিকার নয়, যেন পাশে থাকে<br>শুধুই সম্মান।</p>\n<p>বর কিংবা বধূর চেয়েও বড় যে ভাবনায়<br>সারাটা জীবন যেন কেবল<br>তুই-তুই তুমি-তুমি বন্ধু হয়ে রয়।</p>\n<p class=\"mt-8 font-semibold text-primary\">©আলম <span class=\"text-xs font-normal text-muted-foreground block mt-1\">১৩ নভেম্বর ২০২৬ইং, সকাল ১০টা ১৭মি.</span></p>",
+      "content_en": "<p>Do not become merely someone's groom,<br>Be a friend instead.<br>Do not become merely someone's bride,<br>Be a friend instead.</p>\n<p>Groom and bride, bride and groom-<br>That is merely a societal domestic bound,<br>An identity tethered by cages of obligations.<br>When you become friends, mingling as one,<br>Hearts unite seamlessly,<br>Leaving neither veil nor lingering doubt.</p>\n<p>At day's end when the soul grows weary,<br>Not sense of entitlement, but let there be<br>Only enduring respect.</p>\n<p>In a thought far greater than being groom or bride,<br>May all of life remain simply as<br>Cherished, intimate friends side by side.</p>\n<p class=\"mt-8 font-semibold text-primary\">©Alam <span class=\"text-xs font-normal text-muted-foreground block mt-1\">13 November 2026, 10:17 AM</span></p>",
+      "cover_image_url": null,
+      "published": true,
+      "published_at": "2026-11-13T04:17:00.000Z",
+      "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-11-13T04:17:00.000Z",
+      "updated_at": "2026-11-13T04:17:00.000Z"
+    },
+    {
       "id": "ef09721e-a02f-48e9-b3f1-f94518b2deb2",
       "slug": "opekkhay",
       "title_bn": "অপেক্ষায়...",
@@ -497,6 +514,10 @@ export const INITIAL_SEED_DATA = {
   ],
   "verse_translations": [],
   "article_categories": [
+    {
+      "article_id": "b039b367-a3cf-4fad-9bb8-1a1c84ca9321",
+      "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
+    },
     {
       "article_id": "ef09721e-a02f-48e9-b3f1-f94518b2deb2",
       "category_id": "0b772921-f656-483b-9f0d-664ebabede53"
