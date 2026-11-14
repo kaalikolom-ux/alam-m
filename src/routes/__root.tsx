@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { PrefsProvider } from "../lib/prefs";
+import { initWebMcp } from "../lib/webmcp";
 import { SiteHeader } from "../components/SiteHeader";
 import { SiteFooter } from "../components/SiteFooter";
 import { Toaster } from "../components/ui/sonner";
@@ -122,6 +123,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png?v=3" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png?v=3" },
       { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "ard", href: "/.well-known/ard.json" },
     ],
   }),
   shellComponent: RootShell,
@@ -192,6 +194,7 @@ function OfflineBoot() {
   useQueryPersistence();
   useEffect(() => {
     void registerOfflineWorker();
+    initWebMcp();
   }, []);
   return null;
 }

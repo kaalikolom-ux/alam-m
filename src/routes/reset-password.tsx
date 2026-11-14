@@ -78,7 +78,12 @@ function ResetPasswordPage() {
         {!ready ? (
           <p className="mt-4 text-sm text-muted-foreground">{t("loading")}</p>
         ) : (
-          <form className="mt-6 space-y-4" onSubmit={submit}>
+          <form
+            toolname="request_password_reset"
+            tooldescription="Request a password reset email."
+            className="mt-6 space-y-4"
+            onSubmit={submit}
+          >
             <div className="space-y-2">
               <Label htmlFor="password">{t("newPassword")}</Label>
               <Input

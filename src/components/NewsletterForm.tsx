@@ -39,9 +39,16 @@ export function NewsletterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="relative flex w-full items-center">
+    <form
+      toolname="newsletter_subscribe"
+      tooldescription="Subscribe to author Alam M's literary newsletter to receive updates on new articles, stories, and poetry."
+      onSubmit={handleSubmit}
+      className="relative flex w-full items-center"
+    >
       <Input
+        name="email"
         type="email"
+        toolparamdescription="Subscriber email address"
         placeholder={lang === "bn" ? "আপনার ইমেইল অ্যাড্রেস..." : "Your email address..."}
         value={email}
         onChange={(e) => setEmail(e.target.value)}

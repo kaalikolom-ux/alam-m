@@ -95,6 +95,8 @@ function ContactPage() {
     <div className="pb-16">
       <PageBody slug="contact" fallbackTitle={t("contact")} />
       <form
+        toolname="send_contact_message"
+        tooldescription="Send a direct message or literary feedback to author Alam M."
         className="card-soft mx-auto w-full max-w-3xl space-y-4 p-6"
         onSubmit={(e) => {
           e.preventDefault();
@@ -104,12 +106,14 @@ function ContactPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="c-name">{t("yourName")}</Label>
-            <Input id="c-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            <Input id="c-name" name="name" toolparamdescription="Name of the sender" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="c-email">{t("email")}</Label>
             <Input
               id="c-email"
+              name="email"
+              toolparamdescription="Email address of the sender"
               type="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -120,6 +124,8 @@ function ContactPage() {
           <Label htmlFor="c-subject">{t("subject")}</Label>
           <Input
             id="c-subject"
+            name="subject"
+            toolparamdescription="Subject or topic of the message"
             value={form.subject}
             onChange={(e) => setForm({ ...form, subject: e.target.value })}
           />
@@ -128,6 +134,8 @@ function ContactPage() {
           <Label htmlFor="c-message">{t("message")}</Label>
           <Textarea
             id="c-message"
+            name="message"
+            toolparamdescription="Full message content"
             rows={6}
             value={form.message}
             onChange={(e) => setForm({ ...form, message: e.target.value })}

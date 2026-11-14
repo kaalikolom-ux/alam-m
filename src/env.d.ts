@@ -9,3 +9,16 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+declare namespace React {
+  interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
+    toolname?: string;
+    tooldescription?: string;
+  }
+  interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
+    toolparamdescription?: string;
+  }
+  interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
+    toolparamdescription?: string;
+  }
+}

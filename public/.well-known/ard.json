@@ -1,0 +1,28 @@
+{
+  "$schema": "https://agenticresourcediscovery.org/schemas/v0.91/ard.schema.json",
+  "entries": [
+    {
+      "identifier": "urn:air:blog.wooniche.com:tool:article-search",
+      "displayName": "Alam M Article & Literature Search",
+      "type": "application/json",
+      "url": "https://blog.wooniche.com/articles",
+      "description": "Search and discover Bengali short stories, poems, memoirs, and essays written by author Alam M.",
+      "representativeQueries": [
+        "Read poems by Alam M",
+        "Search Bengali short stories about life and nostalgia",
+        "Browse essays and memoirs by Alam M"
+      ]
+    },
+    {
+      "identifier": "urn:air:blog.wooniche.com:tool:newsletter-subscribe",
+      "displayName": "Alam M Literary Newsletter Subscription",
+      "type": "application/json",
+      "url": "https://blog.wooniche.com/",
+      "description": "Subscribe to literary updates, new poetry releases, and personal essays from author Alam M.",
+      "representativeQueries": [
+        "Subscribe to Alam M stories",
+        "Get literary updates from Alam M"
+      ]
+    }
+  ]
+}

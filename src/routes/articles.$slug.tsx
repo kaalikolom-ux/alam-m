@@ -977,9 +977,16 @@ function ArticlePage() {
           </h2>
         </div>
 
-        <form onSubmit={handleCommentSubmit} className="mt-5 space-y-3.5">
+        <form
+          toolname="submit_article_comment"
+          tooldescription="Submit a reader comment on this literary article or poem."
+          onSubmit={handleCommentSubmit}
+          className="mt-5 space-y-3.5"
+        >
           <div>
             <Input
+              name="author_name"
+              toolparamdescription="Name of the commenter"
               type="text"
               placeholder={lang === "bn" ? "আপনার নাম লিখুন *" : "Your Name *"}
               value={commentName}
@@ -989,6 +996,8 @@ function ArticlePage() {
           </div>
           <div>
             <Textarea
+              name="comment_text"
+              toolparamdescription="Content of the comment"
               rows={3}
               placeholder={lang === "bn" ? "আপনার মন্তব্য লিখুন... *" : "Write your comment here... *"}
               value={commentText}

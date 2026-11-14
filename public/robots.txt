@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://a.wooniche.com/sitemap.xml
-
+Sitemap: https://blog.wooniche.com/sitemap.xml
+Agentmap: https://blog.wooniche.com/.well-known/ard.json

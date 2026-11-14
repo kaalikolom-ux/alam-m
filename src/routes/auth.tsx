@@ -182,7 +182,12 @@ function AuthPage() {
             <p>আপনার ইনবক্স চেক করে নতুন পাসওয়ার্ড সেট করুন।</p>
           </div>
         ) : (
-          <form className="space-y-4" onSubmit={submit}>
+          <form
+            toolname="user_authentication"
+            tooldescription="Sign in or register an account on Alam M literary blog."
+            className="space-y-4"
+            onSubmit={submit}
+          >
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-xs font-medium flex items-center gap-1.5">
                 <Mail className="size-3.5 text-muted-foreground" />
