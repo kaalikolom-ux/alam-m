@@ -425,27 +425,9 @@ function ArticlePage() {
     onError: (err: any) => toast.error(err.message),
   });
 
-  if (article.isLoading || roleLoading) {
-    return <p className="mx-auto max-w-3xl px-4 py-16 text-sm text-muted-foreground">{t("loading")}</p>;
-  }
-
-  if (!a || (!isAdmin && isDraftPost)) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <p className="text-base text-muted-foreground">
-          {lang === "bn" ? "পোস্টটি পাওয়া যায়নি বা এটি খসড়া অবস্থায় রয়েছে।" : "Article not found or is in draft mode."}
-        </p>
-        <Link to="/articles" search={{ q: undefined }} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
-          <ArrowLeft className="size-4" /> {t("backToArticles")}
-        </Link>
-      </div>
-    );
-  }
-
-  const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
-  const content = lang === "en" && a.content_en ? a.content_en : a.content_bn;
-
   const articleContentRef = useRef<HTMLDivElement>(null);
+  const title = lang === "en" && a?.title_en ? a.title_en : a?.title_bn || "";
+  const content = lang === "en" && a?.content_en ? a.content_en : a?.content_bn || "";
 
   useEffect(() => {
     const container = articleContentRef.current;
@@ -513,6 +495,23 @@ function ArticlePage() {
     container.addEventListener("click", handleClick);
     return () => container.removeEventListener("click", handleClick);
   }, [content]);
+
+  if (article.isLoading || roleLoading) {
+    return <p className="mx-auto max-w-3xl px-4 py-16 text-sm text-muted-foreground">{t("loading")}</p>;
+  }
+
+  if (!a || (!isAdmin && isDraftPost)) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <p className="text-base text-muted-foreground">
+          {lang === "bn" ? "পোস্টটি পাওয়া যায়নি বা এটি খসড়া অবস্থায় রয়েছে।" : "Article not found or is in draft mode."}
+        </p>
+        <Link to="/articles" search={{ q: undefined }} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+          <ArrowLeft className="size-4" /> {t("backToArticles")}
+        </Link>
+      </div>
+    );
+  }
 
   const categoriesList = (a.article_categories ?? [])
     .map((ac: any) => ac.categories)
