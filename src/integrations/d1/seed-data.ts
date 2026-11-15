@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "f6a7b8c9-d0e1-4234-b567-8901abcdef23",
+      "slug": "antigravity-github-cloudflare-d1-workers-guide",
+      "title_bn": "Antigravity, GitHub, Cloudflare D1 ও Workers দিয়ে আধুনিক ফুল-স্ট্যাক ওয়েবসাইট তৈরির পূর্ণাঙ্গ নির্দেশিকা",
+      "title_en": "Complete Guide to Building Modern Full-Stack Websites with Antigravity, GitHub, Cloudflare D1 & Workers",
+      "excerpt_bn": "বর্তমান সময়ে ওয়েবসাইট তৈরি এবং তা গ্লোবাল লেভেলে ডেপ্লয় করার প্রক্রিয়া আগের চেয়ে অনেক বেশি সহজ ও স্মার্ট হয়ে গেছে। Antigravity, GitHub, Cloudflare D1 ও Workers দিয়ে সার্ভারলেস ওয়েবসাইট তৈরির পূর্ণাঙ্গ হ্যান্ডস-অন নির্দেশিকা।",
+      "excerpt_en": "Building and deploying modern websites globally has become faster, smarter, and simpler than ever. A complete hands-on guide to serverless web development with Antigravity, GitHub, Cloudflare D1, and Workers.",
+      "content_bn": null,
+      "content_en": null,
+      "cover_image_url": "https://blog.wooniche.com/og/articles/antigravity-github-cloudflare-d1-workers-guide.png",
+      "published": true,
+      "published_at": "2026-11-15T11:45:00.000Z",
+      "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-11-15T11:45:00.000Z",
+      "updated_at": "2026-11-15T11:45:00.000Z"
+    },
+    {
       "id": "b039b367-a3cf-4fad-9bb8-1a1c84ca9321",
       "slug": "bor-bodhu-tui-tui-tumi-tumi",
       "title_bn": "বর-বধুঃ তুই-তুই তুমি-তুমি",
@@ -515,6 +532,10 @@ export const INITIAL_SEED_DATA = {
   "verse_translations": [],
   "article_categories": [
     {
+      "article_id": "f6a7b8c9-d0e1-4234-b567-8901abcdef23",
+      "category_id": "d5e6f7a8-b9c0-4123-a456-7890abcdef12"
+    },
+    {
       "article_id": "b039b367-a3cf-4fad-9bb8-1a1c84ca9321",
       "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
     },
@@ -678,6 +699,15 @@ export const INITIAL_SEED_DATA = {
   ],
   "categories": [
     {
+      "id": "d5e6f7a8-b9c0-4123-a456-7890abcdef12",
+      "slug": "tech-tips",
+      "name_bn": "টেক টিপস",
+      "name_en": "Tech Tips",
+      "description_bn": "আধুনিক প্রযুক্তি, এআই টুলস ও ফুল-স্ট্যাক এজ ওয়েব ডেভেলপমেন্ট নির্দেশিকা।",
+      "created_at": "2026-11-15T11:45:00.000Z",
+      "updated_at": "2026-11-15T11:45:00.000Z"
+    },
+    {
       "id": "0b772921-f656-483b-9f0d-664ebabede53",
       "slug": "golpo",
       "name_bn": "গল্প",
@@ -724,6 +754,17 @@ export const INITIAL_SEED_DATA = {
     }
   ],
   "menu_items": [
+    {
+      "id": "b4c5d6e7-f8a9-4012-b345-6789abcdef01",
+      "label_bn": "টেক টিপস",
+      "label_en": "Tech Tips",
+      "url": "/tech-tips",
+      "location": "header",
+      "sort_order": 3,
+      "visible": true,
+      "created_at": "2026-11-15T11:45:00.000Z",
+      "updated_at": "2026-11-15T11:45:00.000Z"
+    },
     {
       "id": "4e4971e7-9903-490a-a70c-2ead4e38052f",
       "label_bn": "হোম",

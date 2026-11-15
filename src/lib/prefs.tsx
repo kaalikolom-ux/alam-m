@@ -16,6 +16,7 @@ interface PrefsContextType {
 const translations: Record<string, Record<Lang, string>> = {
   home: { bn: "হোম", en: "Home" },
   articles: { bn: "লেখালেখি", en: "Articles" },
+  techTips: { bn: "টেক টিপস", en: "Tech Tips" },
   contact: { bn: "যোগাযোগ", en: "Contact" },
   dashboard: { bn: "ড্যাশবোর্ড", en: "Dashboard" },
   categoriesTab: { bn: "ক্যাটাগরি", en: "Categories" },

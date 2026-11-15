@@ -17,6 +17,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as TechTipsRouteImport } from './routes/tech-tips'
 import { Route as ArticlesIndexRouteImport } from './routes/articles.index'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
 import { Route as CSlugRouteImport } from './routes/c.$slug'
@@ -63,6 +64,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TechTipsRoute = TechTipsRouteImport.update({
+  id: '/tech-tips',
+  path: '/tech-tips',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArticlesIndexRoute = ArticlesIndexRouteImport.update({
   id: '/articles/',
   path: '/articles/',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/bookmarks': typeof BookmarksRoute
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/tech-tips': typeof TechTipsRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/c/$slug': typeof CSlugRoute
   '/p/$slug': typeof PSlugRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/bookmarks': typeof BookmarksRoute
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/tech-tips': typeof TechTipsRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/c/$slug': typeof CSlugRoute
   '/p/$slug': typeof PSlugRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/bookmarks': typeof BookmarksRoute
   '/contact': typeof ContactRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/tech-tips': typeof TechTipsRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/c/$slug': typeof CSlugRoute
   '/p/$slug': typeof PSlugRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/bookmarks'
     | '/contact'
     | '/reset-password'
+    | '/tech-tips'
     | '/articles/$slug'
     | '/c/$slug'
     | '/p/$slug'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/bookmarks'
     | '/contact'
     | '/reset-password'
+    | '/tech-tips'
     | '/articles/$slug'
     | '/c/$slug'
     | '/p/$slug'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/bookmarks'
     | '/contact'
     | '/reset-password'
+    | '/tech-tips'
     | '/articles/$slug'
     | '/c/$slug'
     | '/p/$slug'
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   BookmarksRoute: typeof BookmarksRoute
   ContactRoute: typeof ContactRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TechTipsRoute: typeof TechTipsRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
   CSlugRoute: typeof CSlugRoute
   PSlugRoute: typeof PSlugRoute
@@ -257,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tech-tips': {
+      id: '/tech-tips'
+      path: '/tech-tips'
+      fullPath: '/tech-tips'
+      preLoaderRoute: typeof TechTipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/articles/': {
       id: '/articles/'
       path: '/articles'
@@ -304,6 +324,7 @@ const rootRouteChildren: RootRouteChildren = {
   BookmarksRoute: BookmarksRoute,
   ContactRoute: ContactRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TechTipsRoute: TechTipsRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
   CSlugRoute: CSlugRoute,
   PSlugRoute: PSlugRoute,
