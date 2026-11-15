@@ -445,6 +445,75 @@ function ArticlePage() {
   const title = lang === "en" && a.title_en ? a.title_en : a.title_bn;
   const content = lang === "en" && a.content_en ? a.content_en : a.content_bn;
 
+  const articleContentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = articleContentRef.current;
+    if (!container) return;
+
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const downloadBtn = target.closest(".code-download-btn") as HTMLElement | null;
+      const copyBtn = target.closest(".code-copy-btn") as HTMLElement | null;
+      const codeBlock = target.closest(".clickable-code-block") as HTMLElement | null;
+      const pre = target.closest("pre") as HTMLElement | null;
+
+      if (downloadBtn) {
+        e.stopPropagation();
+        let codeText = downloadBtn.getAttribute("data-code") || "";
+        try {
+          if (codeText.includes("%")) {
+            codeText = decodeURIComponent(codeText);
+          }
+        } catch (_) {}
+        const fileName = downloadBtn.getAttribute("data-filename") || "command.sh";
+        if (codeText) {
+          const blob = new Blob([codeText + "\n"], { type: "text/x-sh;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          toast.success(`${fileName} ডাউনলোড হয়েছে`);
+        }
+        return;
+      }
+
+      if (copyBtn || codeBlock || pre) {
+        let textToCopy =
+          copyBtn?.getAttribute("data-code") ||
+          codeBlock?.getAttribute("data-code") ||
+          (pre ? (pre.querySelector("code") || pre).textContent : "") ||
+          "";
+
+        try {
+          if (textToCopy.includes("%")) {
+            textToCopy = decodeURIComponent(textToCopy);
+          }
+        } catch (_) {}
+
+        if (textToCopy && textToCopy.trim()) {
+          navigator.clipboard.writeText(textToCopy.trim()).then(() => {
+            toast.success("কমান্ড কপি করা হয়েছে!");
+            if (copyBtn) {
+              const oldText = copyBtn.innerHTML;
+              copyBtn.innerHTML = "<span class='text-emerald-400'>✓ কপি হয়েছে</span>";
+              setTimeout(() => {
+                copyBtn.innerHTML = oldText;
+              }, 2000);
+            }
+          });
+        }
+      }
+    };
+
+    container.addEventListener("click", handleClick);
+    return () => container.removeEventListener("click", handleClick);
+  }, [content]);
+
   const categoriesList = (a.article_categories ?? [])
     .map((ac: any) => ac.categories)
     .filter((cat: any) => cat && (isAdmin || (cat.slug !== "draft" && cat.name_bn !== "খসড়া")));
@@ -878,7 +947,10 @@ function ArticlePage() {
         />
       )}
 
-      <div className="prose-reader mt-8 text-base leading-relaxed text-foreground font-serif">
+      <div
+        ref={articleContentRef}
+        className="prose-reader mt-8 text-base leading-relaxed text-foreground font-serif"
+      >
         <div
           dangerouslySetInnerHTML={{ __html: formatArticleContent(content || "") }}
           className="[&_p]:mb-4 [&_p:empty]:h-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6"

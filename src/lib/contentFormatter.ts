@@ -14,6 +14,37 @@ function formatInlineText(str: string): string {
     .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary underline">$1</a>');
 }
 
+function wrapCodeBlocks(html: string): string {
+  // If already wrapped in clickable-code-block, skip
+  return html.replace(/(?<!<div class="clickable-code-block[^>]*>[\s\S]*?)<pre><code(?:\s+class="([^"]*)")?>([\s\S]*?)<\/code><\/pre>/gi, (match, cls, innerCode) => {
+    const rawText = innerCode
+      .replace(/<[^>]+>/g, "")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"')
+      .trim();
+
+    const lang = (cls || "").includes("bash") ? "Bash" : (cls || "").includes("sql") ? "SQL" : "Bash";
+
+    return `<div class="clickable-code-block group relative my-4 overflow-hidden rounded-2xl border border-zinc-800 bg-[#141417] text-zinc-100 shadow-md cursor-pointer" data-code="${encodeURIComponent(rawText)}" title="ক্লিক করে কমান্ড কপি করুন">
+  <div class="flex items-center justify-between border-b border-zinc-800/80 bg-[#1c1c22] px-4 py-2 text-xs">
+    <span class="font-semibold text-zinc-300 font-sans">${lang}</span>
+    <div class="flex items-center gap-1.5">
+      <button type="button" class="code-download-btn flex size-7 items-center justify-center rounded text-zinc-400 hover:bg-zinc-800 hover:text-white" data-code="${encodeURIComponent(rawText)}" data-filename="command.sh" title="ডাউনলোড করুন">
+        <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+      </button>
+      <button type="button" class="code-copy-btn flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white" data-code="${encodeURIComponent(rawText)}" title="কপি করুন">
+        <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        <span>কপি</span>
+      </button>
+    </div>
+  </div>
+  <pre class="p-4 text-xs sm:text-sm font-mono overflow-x-auto text-zinc-100 selection:bg-primary/30"><code class="${cls || ""}">${innerCode}</code></pre>
+</div>`;
+  });
+}
+
 export function formatArticleContent(rawHtml: string): string {
   if (!rawHtml || typeof rawHtml !== "string") return "";
 
@@ -64,7 +95,7 @@ export function formatArticleContent(rawHtml: string): string {
       htmlBlocks.push(`<p>${lines}</p>`);
     }
 
-    return htmlBlocks.join("");
+    return wrapCodeBlocks(htmlBlocks.join(""));
   }
 
   // ৩. যদি টেক্সটের ভেতরে HTML থাকে কিন্তু আন-পার্সড ** বা > থেকে যায়
@@ -77,5 +108,5 @@ export function formatArticleContent(rawHtml: string): string {
     // প্যারাগ্রাফের ভেতরে থাকা > বা &gt; কে blockquote এ রূপান্তর
     .replace(/<p>\s*(?:&gt;|>)\s*([\s\S]*?)<\/p>/gi, "<blockquote><p>$1</p></blockquote>");
 
-  return html;
+  return wrapCodeBlocks(html);
 }
