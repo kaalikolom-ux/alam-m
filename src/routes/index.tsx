@@ -64,7 +64,7 @@ const HeroImageBackground = memo(function HeroImageBackground() {
         className="absolute inset-0 size-full object-cover object-[70%_25%] sm:object-[75%_30%] md:object-[center_35%] brightness-[0.70] contrast-[1.05]"
       />
 
-      {/* প্লেইন ও নরমাল সুষম ওভারলে — সম্পূর্ণ হিরো সেকশনে সমান কভারেজ ও স্পষ্ট টেক্সট */}
+      {/* প্লেইন ও নরমাল সুষম ওভারলে - সম্পূর্ণ হিরো সেকশনে সমান কভারেজ ও স্পষ্ট টেক্সট */}
       <div className="absolute inset-0 bg-slate-950/75 dark:bg-slate-950/80 transition-colors duration-300" />
 
       {/* নিচের সেকশনের সাথে মসৃণ ফেড ট্রানজিশন */}
@@ -185,7 +185,7 @@ function HomePage() {
           </p>
 
           <h1 className="mt-6 text-3xl font-bold leading-tight sm:text-5xl md:text-6xl text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)]">
-            {heroPrefix} <span className="gold-text">{heroName} —</span>
+            {heroPrefix} <span className="gold-text">{heroName} -</span>
           </h1>
 
           <div className="mt-4 flex justify-center">
@@ -318,11 +318,7 @@ function HomePage() {
                         )}
                       </div>
 
-                      <h3 className="line-clamp-2 text-lg font-bold tracking-tight text-foreground transition-colors duration-200 group-hover:text-primary">
-                        {title}
-                      </h3>
-
-                      <p className="mt-2.5 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                      <p className="line-clamp-4 text-sm leading-relaxed text-muted-foreground">
                         {excerpt}
                       </p>
 
