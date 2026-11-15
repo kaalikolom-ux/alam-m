@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "a1b2c3d4-e5f6-4789-abcd-ef0123456789",
+    "slug": "humanize-ai-content-writing-tips",
+    "title_bn": "কৃত্রিম বুদ্ধিমত্তার লেখায় মানুষের ছোঁয়া: এআই আর্টিকেল হিউম্যানাইজ করার সহজ উপায়",
+    "title_en": "The Human Touch in AI Writing: Easy Ways to Humanize AI Articles",
+    "excerpt_bn": "ডিজিটাল দুনিয়ায় এআই-এর রোবোটিক লেখাকে কীভাবে একদম নিখুঁত, ন্যাচারাল ও প্রাণবন্ত মানুষের ভাষায় রূপান্তর করবেন? এআই আর্টিকেল হিউম্যানাইজ করার জাদুকরী কৌশল ও পূর্ণাঙ্গ গাইডলাইন।",
+    "excerpt_en": "How to transform robotic AI-generated text into natural, engaging, human-like writing? Essential techniques, master prompts, and hands-on tips for humanizing AI articles.",
+    "cover_image_url": null,
+    "published_at": "2026-11-15T18:00:00.000Z"
+  },
+  {
     "id": "f6a7b8c9-d0e1-4234-b567-8901abcdef23",
     "slug": "antigravity-github-cloudflare-d1-workers-guide",
     "title_bn": "Antigravity, GitHub, Cloudflare D1 ও Workers দিয়ে আধুনিক ফুল-স্ট্যাক ওয়েবসাইট তৈরির পূর্ণাঙ্গ নির্দেশিকা",
