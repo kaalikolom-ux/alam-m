@@ -10,7 +10,7 @@ export const INITIAL_SEED_DATA = {
       "excerpt_en": "Building and deploying modern websites globally has become faster, smarter, and simpler than ever. A complete hands-on guide to serverless web development with Antigravity, GitHub, Cloudflare D1, and Workers.",
       "content_bn": null,
       "content_en": null,
-      "cover_image_url": "https://blog.wooniche.com/og/articles/antigravity-github-cloudflare-d1-workers-guide.png",
+      "cover_image_url": null,
       "published": true,
       "published_at": "2026-11-15T11:45:00.000Z",
       "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",

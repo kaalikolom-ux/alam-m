@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, FileText, Sparkles, Image as ImageIcon } from "lucide-react";
+import { ArrowRight, FileText, Sparkles } from "lucide-react";
 import { useEffect, useState, memo } from "react";
 
 import { usePrefs } from "@/lib/prefs";
@@ -280,9 +280,8 @@ function HomePage() {
                           className="size-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
                         />
                       ) : (
-                        <div className="flex size-full flex-col items-center justify-center bg-gradient-to-br from-primary/10 via-accent/30 to-background p-6 text-center transition-colors group-hover:from-primary/20 group-hover:to-accent/40">
-                          <ImageIcon className="size-8 text-muted-foreground/40 mb-2" />
-                          <h3 className="line-clamp-2 text-base font-semibold text-foreground/80 group-hover:text-primary transition-colors">
+                        <div className="flex size-full items-center justify-center p-6 text-center bg-gradient-to-br from-primary/5 via-accent/20 to-primary/10 transition-colors group-hover:from-primary/10 group-hover:to-primary/20">
+                          <h3 className="line-clamp-3 text-lg font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">
                             {title}
                           </h3>
                         </div>

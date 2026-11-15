@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "f6a7b8c9-d0e1-4234-b567-8901abcdef23",
+    "slug": "antigravity-github-cloudflare-d1-workers-guide",
+    "title_bn": "Antigravity, GitHub, Cloudflare D1 ও Workers দিয়ে আধুনিক ফুল-স্ট্যাক ওয়েবসাইট তৈরির পূর্ণাঙ্গ নির্দেশিকা",
+    "title_en": "Complete Guide to Building Modern Full-Stack Websites with Antigravity, GitHub, Cloudflare D1 & Workers",
+    "excerpt_bn": "বর্তমান সময়ে ওয়েবসাইট তৈরি এবং তা গ্লোবাল লেভেলে ডেপ্লয় করার প্রক্রিয়া আগের চেয়ে অনেক বেশি সহজ ও স্মার্ট হয়ে গেছে। Antigravity, GitHub, Cloudflare D1 ও Workers দিয়ে সার্ভারলেস ওয়েবসাইট তৈরির পূর্ণাঙ্গ হ্যান্ডস-অন নির্দেশিকা।",
+    "excerpt_en": "Building and deploying modern websites globally has become faster, smarter, and simpler than ever. A complete hands-on guide to serverless web development with Antigravity, GitHub, Cloudflare D1, and Workers.",
+    "cover_image_url": null,
+    "published_at": "2026-11-15T11:45:00.000Z"
+  },
+  {
     "id": "b039b367-a3cf-4fad-9bb8-1a1c84ca9321",
     "slug": "bor-bodhu-tui-tui-tumi-tumi",
     "title_bn": "বর-বধুঃ তুই-তুই তুমি-তুমি",
