@@ -6,6 +6,7 @@ import {
   Check,
   ChevronRight,
   BookOpen,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -60,11 +61,18 @@ export const Route = createFileRoute("/tech-tips")({
   component: TechTipsPage,
 });
 
-function SourcePill({ label }: { label: string }) {
+function SourcePill({ label, href }: { label: string; href: string }) {
   return (
-    <span className="inline-flex items-center rounded-md border border-zinc-700/60 bg-zinc-800/80 px-2 py-0.5 text-[11px] font-sans font-medium text-zinc-400 ml-2 align-middle select-none shadow-2xs">
-      {label}
-    </span>
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 rounded-md border border-zinc-700/70 bg-zinc-800/80 px-2 py-0.5 text-[11px] font-sans font-medium text-zinc-300 hover:text-white hover:bg-zinc-700 hover:border-zinc-500 transition-all ml-2 align-middle shadow-2xs group/pill cursor-pointer"
+      title={`${label} রেফারেন্স লিঙ্ক খুলুন`}
+    >
+      <span>{label}</span>
+      <ExternalLink className="size-2.5 opacity-60 group-hover/pill:opacity-100 transition-opacity" />
+    </a>
   );
 }
 
@@ -210,7 +218,7 @@ function TechTipsPage() {
                 {isBn
                   ? "এটি একটি শক্তিশালী এআই কোডিং টুল যা আপনার কোড লিখে দেওয়া, লজিক সাজানো এবং ক্লাউড কনফিগারেশন তৈরিতে জাদুকরি ভূমিকা পালন করে।"
                   : "An advanced AI coding companion that writes code, shapes application logic, and scaffolds cloud infrastructure."}
-                <SourcePill label="GitHub" />
+                <SourcePill label="GitHub" href="https://github.com/topics/antigravity" />
               </div>
             </li>
             <li className="flex items-start">
@@ -220,7 +228,7 @@ function TechTipsPage() {
                 {isBn
                   ? "আপনার প্রোজেক্টের কোড সুরক্ষিত রাখতে এবং ক্লাউডের সাথে অটো-ডেপ্লয়মেন্ট পাইপলাইন তৈরি করতে ভার্সন কন্ট্রোল।"
                   : "Reliable version control that keeps your code safe and automates cloud deployment triggers."}
-                <SourcePill label="Composio" />
+                <SourcePill label="Composio" href="https://composio.dev/" />
               </div>
             </li>
             <li className="flex items-start">
@@ -230,7 +238,7 @@ function TechTipsPage() {
                 {isBn
                   ? "ফ্রন্টএন্ড এবং সার্ভারলেস ব্যাকএন্ড একসাথে রান করার জন্য বিশ্বমানের একটি এজ প্ল্যাটফর্ম, যা সম্পূর্ণ ফ্রি টিয়ারে দুর্দান্ত গতি দেয়।"
                   : "A global edge platform executing frontend and serverless backend code with blazing speed on a generous free tier."}
-                <SourcePill label="GitHub" />
+                <SourcePill label="GitHub" href="https://github.com/cloudflare/workers-sdk" />
               </div>
             </li>
             <li className="flex items-start">
@@ -240,7 +248,7 @@ function TechTipsPage() {
                 {isBn
                   ? "একদম লাইটওয়েট, সার্ভারলেস এসকিউএল ডাটাবেস, যা ক্লাউডের এজেই অত্যন্ত দ্রুত ডাটা রিড ও রাইট করতে পারে।"
                   : "A lightweight, serverless relational SQLite database that queries at the edge with ultra-low latency."}
-                <SourcePill label="GitHub" />
+                <SourcePill label="GitHub" href="https://github.com/cloudflare/workers-sdk/tree/main/packages/d1" />
               </div>
             </li>
           </ul>
@@ -260,7 +268,7 @@ function TechTipsPage() {
               {isBn
                 ? "ধাপ ১: Antigravity-এর সাহায্যে প্রোজেক্ট স্ক্যাফোল্ডিং ও কোড তৈরি"
                 : "Step 1: Project Scaffolding & Code Generation with Antigravity"}
-              <SourcePill label="GitHub" />
+              <SourcePill label="GitHub" href="https://github.com/topics/antigravity" />
             </h3>
             <p className="text-sm sm:text-base text-zinc-300 leading-relaxed">
               {isBn
@@ -290,19 +298,19 @@ function TechTipsPage() {
               {isBn
                 ? "ধাপ ২: Cloudflare D1 ডাটাবেস কনফিগারেশন"
                 : "Step 2: Cloudflare D1 Database Configuration"}
-              <SourcePill label="Cloudflare" />
+              <SourcePill label="Cloudflare" href="https://developers.cloudflare.com/d1/" />
             </h3>
             <p className="text-sm sm:text-base text-zinc-300 leading-relaxed">
               {isBn
                 ? "ওয়েবসাইটে যদি ইউজার কমেন্ট, আর্টিকেলের ডেটা বা কোনো ফর্ম সাবমিশনের ব্যবস্থা থাকে, তবে ডাটাবেস দরকার। Cloudflare D1 হলো এজ-ভিত্তিক SQLite ডাটাবেস।"
                 : "If your website accepts comments, articles, or form data, a database is required. Cloudflare D1 provides edge-based SQLite persistence."}
-              <SourcePill label="GitHub + 1" />
+              <SourcePill label="GitHub + 1" href="https://developers.cloudflare.com/d1/get-started/" />
             </p>
             <p className="text-sm sm:text-base text-zinc-300 leading-relaxed pt-1">
               {isBn
                 ? "1. Wrangler CLI ব্যবহার করে লোকালি D1 ডাটাবেস তৈরি করুন:"
                 : "1. Create the D1 database locally using Wrangler CLI:"}
-              <SourcePill label="GitHub" />
+              <SourcePill label="GitHub" href="https://developers.cloudflare.com/workers/wrangler/commands/#d1-create" />
             </p>
             <ClickableCodeBlock
               code="npx wrangler d1 create my-website-db"
@@ -315,17 +323,29 @@ function TechTipsPage() {
               {isBn ? (
                 <>
                   2. প্রাপ্ত ডাটাবেস আইডি আপনার প্রোজেক্টের{" "}
-                  <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs font-mono text-zinc-200">
+                  <a
+                    href="https://developers.cloudflare.com/workers/wrangler/configuration/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs font-mono text-zinc-200 hover:bg-zinc-700 underline decoration-zinc-500"
+                    title="wrangler.toml ডকুমেন্টেশন"
+                  >
                     wrangler.toml
-                  </code>{" "}
+                  </a>{" "}
                   ফাইলে যুক্ত করুন। Antigravity-কে বললেই সে আপনার কনফিগারেশন ফাইলটি স্বয়ংক্রিয়ভাবে সাজিয়ে দেবে।
                 </>
               ) : (
                 <>
                   2. Add the generated database ID to your{" "}
-                  <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs font-mono text-zinc-200">
+                  <a
+                    href="https://developers.cloudflare.com/workers/wrangler/configuration/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs font-mono text-zinc-200 hover:bg-zinc-700 underline decoration-zinc-500"
+                    title="wrangler.toml documentation"
+                  >
                     wrangler.toml
-                  </code>{" "}
+                  </a>{" "}
                   file. Antigravity can configure this automatically.
                 </>
               )}
@@ -373,12 +393,21 @@ function TechTipsPage() {
               {isBn
                 ? "প্রোজেক্টের কোড লোকালি পুরোপুরি তৈরি হয়ে গেলে সেটিকে GitHub-এ আপলোড করতে হবে যাতে ক্লাউডফেয়ার সেখান থেকে অটো-ডেপ্লয় করতে পারে।"
                 : "Once the code is ready locally, publish it to GitHub so Cloudflare can trigger automatic deployments."}
-              <SourcePill label="Composio" />
+              <SourcePill label="Composio" href="https://composio.dev/" />
             </p>
             <p className="text-sm sm:text-base text-zinc-300 leading-relaxed pt-1">
               {isBn ? (
                 <>
-                  1. GitHub-এ একটি নতুন রিপোজিটরি তৈরি করুন (যেমন:{" "}
+                  1.{" "}
+                  <a
+                    href="https://github.com/new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-zinc-200 underline decoration-zinc-500 hover:text-white"
+                  >
+                    GitHub
+                  </a>
+                  -এ একটি নতুন রিপোজিটরি তৈরি করুন (যেমন:{" "}
                   <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs font-mono text-zinc-200">
                     my-edge-website
                   </code>
@@ -386,7 +415,16 @@ function TechTipsPage() {
                 </>
               ) : (
                 <>
-                  1. Create a new repository on GitHub (e.g.{" "}
+                  1. Create a new repository on{" "}
+                  <a
+                    href="https://github.com/new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-zinc-200 underline decoration-zinc-500 hover:text-white"
+                  >
+                    GitHub
+                  </a>{" "}
+                  (e.g.{" "}
                   <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-xs font-mono text-zinc-200">
                     my-edge-website
                   </code>
@@ -442,12 +480,40 @@ git push -u origin main`}
                 : "With your code on GitHub, it's time to bring your application live:"}
             </p>
             <ol className="space-y-2 text-sm sm:text-base text-zinc-300 leading-relaxed">
-              <li>{isBn ? "1. আপনার Cloudflare Dashboard-এ লগইন করুন।" : "1. Log into your Cloudflare Dashboard."}</li>
+              <li>
+                {isBn ? (
+                  <>
+                    1. আপনার{" "}
+                    <a
+                      href="https://dash.cloudflare.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-zinc-200 underline decoration-zinc-500 hover:text-white font-medium"
+                    >
+                      Cloudflare Dashboard
+                    </a>
+                    -এ লগইন করুন।
+                  </>
+                ) : (
+                  <>
+                    1. Log into your{" "}
+                    <a
+                      href="https://dash.cloudflare.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-zinc-200 underline decoration-zinc-500 hover:text-white font-medium"
+                    >
+                      Cloudflare Dashboard
+                    </a>
+                    .
+                  </>
+                )}
+              </li>
               <li>
                 {isBn
                   ? "2. বাম দিক থেকে Workers & Pages অপশনে গিয়ে Create application বাটনে ক্লিক করুন এবং Pages ট্যাবে গিয়ে Connect to Git সিলেক্ট করুন।"
                   : "2. On the left menu, go to Workers & Pages > Create application > Pages > Connect to Git."}
-                <SourcePill label="GitHub" />
+                <SourcePill label="GitHub" href="https://developers.cloudflare.com/pages/get-started/git-integration/" />
               </li>
               <li>
                 {isBn ? (
@@ -502,7 +568,7 @@ git push -u origin main`}
                 {isBn
                   ? "5. Save and Deploy বাটনে ক্লিক করুন। ব্যস! কয়েক সেকেন্ডের মধ্যে Cloudflare আপনার সাইটটিকে বিশ্বব্যাপী তাদের শত শত এজ সার্ভারে ছড়িয়ে দেবে।"
                   : "5. Click Save and Deploy. Within seconds, Cloudflare distributes your website across hundreds of global edge data centers."}
-                <SourcePill label="Composio" />
+                <SourcePill label="Composio" href="https://composio.dev/" />
               </li>
             </ol>
           </div>
@@ -513,7 +579,7 @@ git push -u origin main`}
               {isBn
                 ? "ধাপ ৫: D1 ডাটাবেস প্রোডাকশনে মাইগ্রেট করা"
                 : "Step 5: Migrating D1 Database to Production"}
-              <SourcePill label="GitHub" />
+              <SourcePill label="GitHub" href="https://developers.cloudflare.com/d1/configuration/data-location-and-migrations/" />
             </h3>
             <p className="text-sm sm:text-base text-zinc-300 leading-relaxed">
               {isBn
@@ -553,7 +619,7 @@ git push -u origin main`}
                 {isBn
                   ? "Cloudflare-এর ফ্রি টিয়ারে হিউজ রিকোয়েস্ট এবং ডাটাবেস অপারেশন সম্পূর্ণ বিনামূল্যে পাওয়া যায়।"
                   : "Cloudflare's generous free tier provides high request volumes and database operations completely free of charge."}
-                <SourcePill label="GitHub" />
+                <SourcePill label="GitHub" href="https://developers.cloudflare.com/plans/free/" />
               </div>
             </li>
             <li className="flex items-start">
@@ -565,7 +631,7 @@ git push -u origin main`}
                 {isBn
                   ? "যেহেতু ডাটাবেস এবং কোড দুটিই ইউজারের সবচেয়ে কাছের এজ লোকেশনে রান করে, তাই সাইট লোড হয় চোখের পলকে।"
                   : "Because both code and data run at the edge closest to your visitors, pages load in the blink of an eye."}
-                <SourcePill label="GitHub" />
+                <SourcePill label="GitHub" href="https://www.cloudflare.com/network/" />
               </div>
             </li>
             <li className="flex items-start">
