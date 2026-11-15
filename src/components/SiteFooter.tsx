@@ -2,31 +2,16 @@ import { Link } from "@tanstack/react-router";
 import { Facebook, Mail } from "lucide-react";
 import { usePrefs } from "@/lib/prefs";
 import { useMenu } from "@/lib/menu";
+import { getMenuIcon, ORDERED_MENU_ITEMS, sortMenuItems } from "@/lib/menuIcons";
 import { NewsletterForm } from "@/components/NewsletterForm";
-
-const FALLBACK_FOOTER = [
-  { id: "home", label_bn: "হোম", label_en: "Home", url: "/" },
-  { id: "story", label_bn: "গল্প", label_en: "Stories", url: "/articles?q=গল্প" },
-  { id: "poem", label_bn: "কবিতা", label_en: "Poems", url: "/articles?q=কবিতা" },
-  { id: "memory", label_bn: "স্মৃতিকথা", label_en: "Memories", url: "/articles?q=স্মৃতিকথা" },
-  { id: "about", label_bn: "আমার পাতা", label_en: "About Me", url: "/about" },
-  { id: "contact", label_bn: "যোগাযোগ", label_en: "Contact", url: "/contact" },
-];
 
 export function SiteFooter() {
   const { lang } = usePrefs();
   const menu = useMenu("footer");
-  const rawItems = menu.data && menu.data.length > 0 ? menu.data : FALLBACK_FOOTER;
 
-  // "আর্টিকেল" ফিল্টার করে বাদ দেওয়া এবং হোম প্রথমে রাখা
-  const filteredItems = rawItems.filter(
-    (item) => item.label_bn !== "আর্টিকেল" && item.label_en?.toLowerCase() !== "articles"
-  );
-  const homeItem = filteredItems.find(
-    (item) => item.url === "/" || item.label_bn === "হোম" || item.label_en?.toLowerCase() === "home"
-  );
-  const otherItems = filteredItems.filter((item) => item !== homeItem);
-  const items = homeItem ? [homeItem, ...otherItems] : otherItems;
+  // Ordered menu items matching header order
+  const rawItems = menu.data && menu.data.length > 0 ? menu.data : ORDERED_MENU_ITEMS;
+  const items = sortMenuItems(rawItems);
 
   const currentYear = new Date().getFullYear();
 
@@ -72,16 +57,32 @@ export function SiteFooter() {
             <h3 className="text-sm font-semibold text-foreground">
               {lang === "bn" ? "মেনু লিংক" : "Menu Links"}
             </h3>
-            <nav className="grid grid-cols-2 gap-x-2 gap-y-1">
-              {items.map((item) => (
-                <a
-                  key={item.id}
-                  href={item.url}
-                  className="relative inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium text-foreground/80 border border-transparent transition-all duration-200 hover:bg-primary/10 hover:border-primary/20 hover:text-primary hover:translate-x-0.5 active:scale-95"
-                >
-                  {lang === "en" && item.label_en ? item.label_en : item.label_bn}
-                </a>
-              ))}
+            <nav className="grid grid-cols-2 gap-x-2 gap-y-1.5">
+              {items.map((item) => {
+                const Icon = getMenuIcon(item.url, item.label_bn);
+                const isInternal = item.url.startsWith("/");
+                const label = lang === "en" && item.label_en ? item.label_en : item.label_bn;
+
+                return isInternal ? (
+                  <Link
+                    key={item.id}
+                    to={item.url}
+                    className="relative inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-foreground/80 border border-transparent transition-all duration-200 hover:bg-primary/10 hover:border-primary/20 hover:text-primary hover:translate-x-0.5 active:scale-95"
+                  >
+                    <Icon className="size-3.5 shrink-0 text-primary/70 transition-colors" />
+                    <span>{label}</span>
+                  </Link>
+                ) : (
+                  <a
+                    key={item.id}
+                    href={item.url}
+                    className="relative inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-foreground/80 border border-transparent transition-all duration-200 hover:bg-primary/10 hover:border-primary/20 hover:text-primary hover:translate-x-0.5 active:scale-95"
+                  >
+                    <Icon className="size-3.5 shrink-0 text-primary/70 transition-colors" />
+                    <span>{label}</span>
+                  </a>
+                );
+              })}
             </nav>
           </div>
 
@@ -109,11 +110,11 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-logo text-sm text-primary transition-opacity hover:opacity-80 inline-block mx-0.5"
-                  title="Alam M — Upwork Profile"
+                  title="Alam M - Upwork Profile"
                 >
                   Alam M
                 </a>{" "}
-                — {lang === "bn" ? "সর্বস্বত্ব সংরক্ষিত।" : "All rights reserved."}
+                - {lang === "bn" ? "সর্বস্বত্ব সংরক্ষিত।" : "All rights reserved."}
               </p>
             </div>
           </div>

@@ -15,6 +15,7 @@ import {
 
 import { usePrefs } from "@/lib/prefs";
 import { useMenu } from "@/lib/menu";
+import { getMenuIcon, ORDERED_MENU_ITEMS, sortMenuItems } from "@/lib/menuIcons";
 import { useSession, useIsAdmin, signOutFast } from "@/lib/auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -37,40 +38,10 @@ export function SiteHeader() {
 
   const menu = useMenu("header");
 
-  const fallbackLinks = [
-    { id: "home", url: "/", label_bn: "হোম", label_en: "Home" },
-    { id: "articles", url: "/articles", label_bn: "লেখালেখি", label_en: "Articles" },
-    { id: "tech-tips", url: "/c/tech-tips", label_bn: "টেক টিপস", label_en: "Tech Tips" },
-    { id: "about", url: "/about", label_bn: "আমার পাতা", label_en: "About Me" },
-    { id: "contact", url: "/contact", label_bn: "যোগাযোগ", label_en: "Contact" },
-  ];
+  const dbLinks = menu.data && menu.data.length > 0 ? menu.data : ORDERED_MENU_ITEMS;
+  const sortedItems = sortMenuItems(dbLinks);
 
-  const dbLinks = menu.data || [];
-  let baseItems = dbLinks.length > 0 ? [...dbLinks] : fallbackLinks;
-
-  // Make sure '/tech-tips' is always in the header menu
-  if (dbLinks.length > 0 && !baseItems.some((item) => item.url === "/c/tech-tips" || item.url?.includes("tech-tips"))) {
-    const contactIdx = baseItems.findIndex((item) => item.url === "/contact" || item.url?.includes("contact"));
-    const techItem = { id: "tech-tips", url: "/c/tech-tips", label_bn: "টেক টিপস", label_en: "Tech Tips" };
-    if (contactIdx !== -1) {
-      baseItems.splice(contactIdx, 0, techItem);
-    } else {
-      baseItems.push(techItem);
-    }
-  }
-
-  // Make sure '/about' is always in the header menu
-  if (dbLinks.length > 0 && !baseItems.some((item) => item.url === "/about" || item.url?.includes("about"))) {
-    const contactIdx = baseItems.findIndex((item) => item.url === "/contact" || item.url?.includes("contact"));
-    const aboutItem = { id: "about", url: "/about", label_bn: "আমার পাতা", label_en: "About Me" };
-    if (contactIdx !== -1) {
-      baseItems.splice(contactIdx, 0, aboutItem);
-    } else {
-      baseItems.push(aboutItem);
-    }
-  }
-
-  const navLinks = baseItems.map((item) => ({
+  const navLinks = sortedItems.map((item) => ({
     id: item.id,
     url: item.url,
     label: lang === "en" && item.label_en ? item.label_en : item.label_bn,
@@ -92,25 +63,28 @@ export function SiteHeader() {
             </Link>
 
             {/* ডেস্কটপ নেভিগেশন লিংক */}
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+            <nav className="hidden md:flex items-center gap-5 text-sm font-medium">
               {navLinks.map((link) => {
+                const Icon = getMenuIcon(link.url, link.label);
                 const isInternal = link.url.startsWith("/");
                 return isInternal ? (
                   <Link
                     key={link.id}
                     to={link.url}
-                    className="text-muted-foreground transition-colors hover:text-primary"
+                    className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
                     activeProps={{ className: "text-primary font-semibold" }}
                   >
-                    {link.label}
+                    <Icon className="size-3.5 shrink-0 opacity-80" />
+                    <span>{link.label}</span>
                   </Link>
                 ) : (
                   <a
                     key={link.id}
                     href={link.url}
-                    className="text-muted-foreground transition-colors hover:text-primary"
+                    className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
                   >
-                    {link.label}
+                    <Icon className="size-3.5 shrink-0 opacity-80" />
+                    <span>{link.label}</span>
                   </a>
                 );
               })}
@@ -243,25 +217,28 @@ export function SiteHeader() {
         {mobileMenuOpen && (
           <div className="md:hidden border-b border-border bg-background/95 backdrop-blur-md px-4 py-4 space-y-2 animate-in slide-in-from-top-2 duration-200">
             {navLinks.map((link) => {
+              const Icon = getMenuIcon(link.url, link.label);
               const isInternal = link.url.startsWith("/");
               return isInternal ? (
                 <Link
                   key={link.id}
                   to={link.url}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block py-2 px-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted"
+                  className="flex items-center gap-2.5 py-2 px-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted"
                   activeProps={{ className: "bg-muted text-primary font-semibold" }}
                 >
-                  {link.label}
+                  <Icon className="size-4 text-primary shrink-0" />
+                  <span>{link.label}</span>
                 </Link>
               ) : (
                 <a
                   key={link.id}
                   href={link.url}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block py-2 px-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted"
+                  className="flex items-center gap-2.5 py-2 px-3 rounded-lg text-sm font-medium text-foreground hover:bg-muted"
                 >
-                  {link.label}
+                  <Icon className="size-4 text-primary shrink-0" />
+                  <span>{link.label}</span>
                 </a>
               );
             })}

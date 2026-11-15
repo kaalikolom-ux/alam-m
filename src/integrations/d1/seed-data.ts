@@ -755,17 +755,6 @@ export const INITIAL_SEED_DATA = {
   ],
   "menu_items": [
     {
-      "id": "b4c5d6e7-f8a9-4012-b345-6789abcdef01",
-      "label_bn": "টেক টিপস",
-      "label_en": "Tech Tips",
-      "url": "/c/tech-tips",
-      "location": "header",
-      "sort_order": 3,
-      "visible": true,
-      "created_at": "2026-11-15T11:45:00.000Z",
-      "updated_at": "2026-11-15T11:45:00.000Z"
-    },
-    {
       "id": "4e4971e7-9903-490a-a70c-2ead4e38052f",
       "label_bn": "হোম",
       "label_en": "Home",
@@ -777,12 +766,56 @@ export const INITIAL_SEED_DATA = {
       "updated_at": "2026-08-11T20:13:52.373907+00:00"
     },
     {
-      "id": "138f620d-a3b4-425c-a734-4a3a23ab2fd2",
-      "label_bn": "আমার পাতা",
-      "label_en": "About Me",
-      "url": "/about",
+      "id": "7b524046-2c6e-4a81-95b8-8e6d224d1874",
+      "label_bn": "গল্প",
+      "label_en": "Story",
+      "url": "/c/golpo",
+      "location": "header",
+      "sort_order": 2,
+      "visible": true,
+      "created_at": "2026-08-19T14:59:51.012583+00:00",
+      "updated_at": "2026-08-29T02:31:34.792419+00:00"
+    },
+    {
+      "id": "38e876b7-eb5b-46ca-b7fc-7efbb1c22b4a",
+      "label_bn": "কবিতা",
+      "label_en": "Poem",
+      "url": "/c/kobita",
       "location": "header",
       "sort_order": 3,
+      "visible": true,
+      "created_at": "2026-08-12T03:43:01.67708+00:00",
+      "updated_at": "2026-08-29T02:31:34.792419+00:00"
+    },
+    {
+      "id": "de29ad91-9b96-44bb-a965-ef6b9c759fc5",
+      "label_bn": "স্মৃতিকথা",
+      "label_en": "Memoirs",
+      "url": "/c/smritikotha",
+      "location": "header",
+      "sort_order": 4,
+      "visible": true,
+      "created_at": "2026-08-12T03:42:32.609058+00:00",
+      "updated_at": "2026-08-29T02:31:34.792419+00:00"
+    },
+    {
+      "id": "b4c5d6e7-f8a9-4012-b345-6789abcdef01",
+      "label_bn": "টেক টিপস",
+      "label_en": "Tech Tips",
+      "url": "/c/tech-tips",
+      "location": "header",
+      "sort_order": 5,
+      "visible": true,
+      "created_at": "2026-11-15T11:45:00.000Z",
+      "updated_at": "2026-11-15T11:45:00.000Z"
+    },
+    {
+      "id": "138f620d-a3b4-425c-a734-4a3a23ab2fd2",
+      "label_bn": "আমার পাতা",
+      "label_en": "About",
+      "url": "/about",
+      "location": "header",
+      "sort_order": 6,
       "visible": true,
       "created_at": "2026-08-11T20:13:52.373907+00:00",
       "updated_at": "2026-08-11T20:13:52.373907+00:00"
@@ -793,43 +826,10 @@ export const INITIAL_SEED_DATA = {
       "label_en": "Contact",
       "url": "/contact",
       "location": "header",
-      "sort_order": 4,
+      "sort_order": 7,
       "visible": true,
       "created_at": "2026-08-11T20:13:52.373907+00:00",
       "updated_at": "2026-08-11T20:13:52.373907+00:00"
-    },
-    {
-      "id": "38e876b7-eb5b-46ca-b7fc-7efbb1c22b4a",
-      "label_bn": "কবিতা",
-      "label_en": null,
-      "url": "/c/kobita",
-      "location": "header",
-      "sort_order": 2,
-      "visible": true,
-      "created_at": "2026-08-12T03:43:01.67708+00:00",
-      "updated_at": "2026-08-29T02:31:34.792419+00:00"
-    },
-    {
-      "id": "de29ad91-9b96-44bb-a965-ef6b9c759fc5",
-      "label_bn": "স্মৃতিকথা",
-      "label_en": null,
-      "url": "/c/smritikotha",
-      "location": "header",
-      "sort_order": 2,
-      "visible": true,
-      "created_at": "2026-08-12T03:42:32.609058+00:00",
-      "updated_at": "2026-08-29T02:31:34.792419+00:00"
-    },
-    {
-      "id": "7b524046-2c6e-4a81-95b8-8e6d224d1874",
-      "label_bn": "গল্প",
-      "label_en": "Story",
-      "url": "/c/golpo",
-      "location": "header",
-      "sort_order": 0,
-      "visible": true,
-      "created_at": "2026-08-19T14:59:51.012583+00:00",
-      "updated_at": "2026-08-29T02:31:34.792419+00:00"
     }
   ],
   "pages": [
