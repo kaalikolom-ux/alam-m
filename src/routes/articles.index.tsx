@@ -47,6 +47,11 @@ function getAutoExcerpt(content?: string | null, maxLength = 180) {
 }
 
 const CATEGORY_MAP: Record<string, { bn: string; en: string }> = {
+  "tech-tips": { bn: "টেক টিপস", en: "Tech Tips" },
+  "tech_tips": { bn: "টেক টিপস", en: "Tech Tips" },
+  "tech": { bn: "টেক টিপস", en: "Tech Tips" },
+  "টেক টিপস": { bn: "টেক টিপস", en: "Tech Tips" },
+  "টেক-টিপস": { bn: "টেক টিপস", en: "Tech Tips" },
   golpo: { bn: "গল্প", en: "Stories" },
   story: { bn: "গল্প", en: "Stories" },
   stories: { bn: "গল্প", en: "Stories" },

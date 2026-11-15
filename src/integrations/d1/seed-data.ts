@@ -758,7 +758,7 @@ export const INITIAL_SEED_DATA = {
       "id": "b4c5d6e7-f8a9-4012-b345-6789abcdef01",
       "label_bn": "টেক টিপস",
       "label_en": "Tech Tips",
-      "url": "/tech-tips",
+      "url": "/c/tech-tips",
       "location": "header",
       "sort_order": 3,
       "visible": true,

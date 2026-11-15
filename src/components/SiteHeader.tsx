@@ -40,7 +40,7 @@ export function SiteHeader() {
   const fallbackLinks = [
     { id: "home", url: "/", label_bn: "হোম", label_en: "Home" },
     { id: "articles", url: "/articles", label_bn: "লেখালেখি", label_en: "Articles" },
-    { id: "tech-tips", url: "/tech-tips", label_bn: "টেক টিপস", label_en: "Tech Tips" },
+    { id: "tech-tips", url: "/c/tech-tips", label_bn: "টেক টিপস", label_en: "Tech Tips" },
     { id: "about", url: "/about", label_bn: "আমার পাতা", label_en: "About Me" },
     { id: "contact", url: "/contact", label_bn: "যোগাযোগ", label_en: "Contact" },
   ];
@@ -49,9 +49,9 @@ export function SiteHeader() {
   let baseItems = dbLinks.length > 0 ? [...dbLinks] : fallbackLinks;
 
   // Make sure '/tech-tips' is always in the header menu
-  if (dbLinks.length > 0 && !baseItems.some((item) => item.url === "/tech-tips" || item.url?.includes("tech-tips"))) {
+  if (dbLinks.length > 0 && !baseItems.some((item) => item.url === "/c/tech-tips" || item.url?.includes("tech-tips"))) {
     const contactIdx = baseItems.findIndex((item) => item.url === "/contact" || item.url?.includes("contact"));
-    const techItem = { id: "tech-tips", url: "/tech-tips", label_bn: "টেক টিপস", label_en: "Tech Tips" };
+    const techItem = { id: "tech-tips", url: "/c/tech-tips", label_bn: "টেক টিপস", label_en: "Tech Tips" };
     if (contactIdx !== -1) {
       baseItems.splice(contactIdx, 0, techItem);
     } else {

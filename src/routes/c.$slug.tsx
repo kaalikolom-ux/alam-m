@@ -45,7 +45,10 @@ function CategoryPostsPage() {
         .select("articles(*, article_categories(categories(id, name_bn, name_en)))")
         .eq("category_id", categoryQuery.data!.id);
       if (error) throw error;
-      return (data || []).map((item) => item.articles).filter((a): a is any => !!a && a.published);
+      return (data || [])
+        .map((item) => item.articles)
+        .filter((a): a is any => !!a && a.published)
+        .sort((x: any, y: any) => new Date(y.published_at || y.created_at).getTime() - new Date(x.published_at || x.created_at).getTime());
     },
   });
 
