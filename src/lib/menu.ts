@@ -14,16 +14,28 @@ export function useCategories() {
   });
 }
 
-export function useMenuItems() {
+export function useMenuItems(location?: string) {
   return useQuery({
-    queryKey: ["menu_items"],
+    queryKey: ["menu_items", location],
     staleTime: 60 * 1000,
     queryFn: async () => {
       const { data } = await supabase
         .from("menu_items")
         .select("*")
         .order("sort_order", { ascending: true });
-      return (data || []) as any[];
+
+      const rawList = (data || []) as any[];
+      // Deduplicate by clean URL to prevent any duplicate menu items
+      const seen = new Set<string>();
+      const uniqueList: any[] = [];
+      for (const item of rawList) {
+        const cleanUrl = (item.url || "").trim();
+        if (cleanUrl && !seen.has(cleanUrl)) {
+          seen.add(cleanUrl);
+          uniqueList.push(item);
+        }
+      }
+      return uniqueList;
     },
   });
 }
