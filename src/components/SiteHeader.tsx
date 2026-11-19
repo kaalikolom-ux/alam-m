@@ -52,7 +52,7 @@ export function SiteHeader() {
       <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/85 backdrop-blur-md transition-colors">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
           {/* লোগো ও ট্যাগলাইন */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 lg:gap-6">
             <Link to="/" className="flex flex-col">
               <span className="font-['Kaushan_Script'] text-2xl font-bold tracking-tight text-primary">
                 Alam M
@@ -63,7 +63,7 @@ export function SiteHeader() {
             </Link>
 
             {/* ডেস্কটপ নেভিগেশন লিংক */}
-            <nav className="hidden md:flex items-center gap-5 text-sm font-medium">
+            <nav className="hidden md:flex items-center gap-3 lg:gap-4.5 text-xs lg:text-sm font-medium">
               {navLinks.map((link) => {
                 const Icon = getMenuIcon(link.url, link.label);
                 const isInternal = link.url.startsWith("/");

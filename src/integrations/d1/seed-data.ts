@@ -777,6 +777,17 @@ export const INITIAL_SEED_DATA = {
   ],
   "menu_items": [
     {
+      "id": "7d8e9f0a-1b2c-4d3e-8f9a-0b1c2d3e4f5a",
+      "label_bn": "প্রাইভেসি পলিসি",
+      "label_en": "Privacy Policy",
+      "url": "/privacy-policy",
+      "location": "header",
+      "sort_order": 8,
+      "visible": true,
+      "created_at": "2026-11-19T15:00:00.000Z",
+      "updated_at": "2026-11-19T15:00:00.000Z"
+    },
+    {
       "id": "4e4971e7-9903-490a-a70c-2ead4e38052f",
       "label_bn": "হোম",
       "label_en": "Home",
@@ -855,6 +866,19 @@ export const INITIAL_SEED_DATA = {
     }
   ],
   "pages": [
+    {
+      "id": "f1e2d3c4-b5a6-4789-9012-3456789abcde",
+      "slug": "privacy-policy",
+      "title_bn": "প্রাইভেসি পলিসি",
+      "title_en": "Privacy Policy",
+      "content_bn": "<p class=\"text-sm text-muted-foreground mb-4\"><strong>সর্বশেষ আপডেট:</strong> ১৯ নভেম্বর, ২০২৬</p>\n\n<p class=\"mb-4\"><strong>Alam M</strong>-এ আপনাকে স্বাগতম। আমরা আপনার গোপনীয়তাকে সর্বোচ্চ সম্মান জানাই এবং আমাদের ওয়েবসাইট <a href=\"https://blog.wooniche.com/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-primary underline\">https://blog.wooniche.com/</a> ও আমাদের অফিসিয়াল সোশ্যাল মিডিয়া পেজসমূহের মাধ্যমে আপনার শেয়ার করা যেকোনো ব্যক্তিগত তথ্যের সুরক্ষা নিশ্চিত করতে প্রতিশ্রুতিবদ্ধ।</p>\n\n<h3 class=\"text-lg font-bold text-foreground mt-6 mb-2\">১. যেসব তথ্য আমরা সংগ্রহ করি</h3>\n<p class=\"mb-4\">আপনি যখন আমাদের ওয়েবসাইট ভিজিট করেন, নিউজলেটারে সাবস্ক্রাইব করেন, কোনো মন্তব্য প্রকাশ করেন কিংবা সরাসরি আমাদের সাথে যোগাযোগ করেন, তখন আমরা আপনার নাম, ইমেইল ঠিকানা এবং বার্তার মতো কিছু মৌলিক তথ্য সংগ্রহ করতে পারি। এছাড়াও আপনার পড়ার অভিজ্ঞতা উন্নত করতে আমরা সাধারণ কুকিজের (Cookies) মাধ্যমে ব্রাউজারের ধরণ ও ডিভাইসের তথ্যের মতো অ-ব্যক্তিগত তথ্য সংগ্রহ করতে পারি।</p>\n\n<h3 class=\"text-lg font-bold text-foreground mt-6 mb-2\">২. তথ্যের ব্যবহার</h3>\n<p class=\"mb-2\">সংগৃহীত তথ্য আমরা শুধুমাত্র নিম্নলিখিত উদ্দেশ্যে ব্যবহার করি:</p>\n<ul class=\"list-disc pl-6 space-y-1 mb-4\">\n  <li>আপনার মন্তব্য, প্রশ্ন এবং অনুসন্ধানের উত্তর দেওয়া।</li>\n  <li>আপনি যদি সাবস্ক্রাইব করে থাকেন তবে নতুন আপডেট, আর্টিকেল, গল্প ও কুরআনিক গবেষণামূলক কনটেন্ট শেয়ার করা।</li>\n  <li>আমাদের ওয়েবসাইটের মান ও পাঠকদের ব্যবহারের অভিজ্ঞতা উন্নত করা।</li>\n</ul>\n\n<h3 class=\"text-lg font-bold text-foreground mt-6 mb-2\">৩. তথ্য শেয়ারিং ও নিরাপত্তা</h3>\n<p class=\"mb-4\">আমরা কোনো অবস্থাতেই আপনার ব্যক্তিগত তথ্য কোনো তৃতীয় পক্ষের কাছে বিক্রি, বিনিময় বা ভাড়া দিই না। ইন্টারনেটে ডেটা আদান-প্রদান শতভাগ ঝুঁকিমুক্ত না হলেও, আপনার তথ্যের সর্বোচ্চ নিরাপত্তা বজায় রাখতে আমরা প্রয়োজনীয় সকল কার্যকর ব্যবস্থা গ্রহণ করি।</p>\n\n<h3 class=\"text-lg font-bold text-foreground mt-6 mb-2\">৪. থার্ড-পার্টি বা বাহ্যিক লিংক</h3>\n<p class=\"mb-4\">আমাদের ওয়েবসাইট এবং সোশ্যাল মিডিয়া পোস্টগুলোতে বিভিন্ন বাহ্যিক সাইটের (যেমন: ইউটিউব, ফেসবুক বা রেফারেন্স উপকরণ) লিংক থাকতে পারে। সেইসব বহিরাগত ওয়েবসাইটের গোপনীয়তা নীতি কিংবা কনটেন্টের দায়ভার আমাদের নয়।</p>\n\n<h3 class=\"text-lg font-bold text-foreground mt-6 mb-2\">৫. আপনার সম্মতি ও অধিকার</h3>\n<p class=\"mb-4\">আমাদের ওয়েবসাইট ব্যবহারের মাধ্যমে আপনি এই প্রাইভেসি পলিসির সাথে সম্মতি প্রকাশ করছেন। যেকোনো সময় আমাদের সাথে যোগাযোগ করে আপনার ব্যক্তিগত তথ্য প্রদর্শন, সংশোধন বা মুছে ফেলার অনুরোধ জানানোর পূর্ণ অধিকার আপনার রয়েছে।</p>\n\n<h3 class=\"text-lg font-bold text-foreground mt-6 mb-2\">৬. যোগাযোগ</h3>\n<p class=\"mb-2\">এই প্রাইভেসি পলিসি সম্পর্কে আপনার কোনো প্রশ্ন বা মতামত থাকলে নির্দ্বিধায় আমাদের সাথে যোগাযোগ করুন:</p>\n<ul class=\"list-disc pl-6 space-y-1 mb-4\">\n  <li><strong>ইমেইল:</strong> <a href=\"mailto:me@wooniche.com\" class=\"text-primary underline\">me@wooniche.com</a></li>\n  <li><strong>ওয়েবসাইট:</strong> <a href=\"https://blog.wooniche.com/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-primary underline\">https://blog.wooniche.com/</a></li>\n</ul>",
+      "content_en": "<p class=\"text-sm text-muted-foreground mb-4\"><strong>Last Updated:</strong> November 19, 2026</p>\n\n<p class=\"mb-4\">Welcome to <strong>Alam M</strong>. We respect your privacy and are committed to protecting any personal information you share with us through our website <a href=\"https://blog.wooniche.com/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-primary underline\">https://blog.wooniche.com/</a> and our official social media pages.</p>\n\n<h3 class=\"text-lg font-bold text-foreground mt-6 mb-2\">1. Information We Collect</h3>\n<p class=\"mb-4\">When you visit our website, subscribe to our newsletter, leave a comment, or contact us directly, we may collect basic information such as your name, email address, and any message you send us. We may also collect non-personal data like browser type and device information through standard cookies to improve your reading experience.</p>\n\n<h3 class=\"text-lg font-bold text-foreground mt-6 mb-2\">2. How We Use Your Information</h3>\n<p class=\"mb-2\">We use the collected information solely to:</p>\n<ul class=\"list-disc pl-6 space-y-1 mb-4\">\n  <li>Respond to your comments, questions, and inquiries.</li>\n  <li>Share updates, articles, stories, and Quranic research content if you choose to subscribe.</li>\n  <li>Improve the quality and user experience of our website and content.</li>\n</ul>\n\n<h3 class=\"text-lg font-bold text-foreground mt-6 mb-2\">3. Data Sharing and Security</h3>\n<p class=\"mb-4\">We do not sell, trade, or rent your personal information to third parties. We take reasonable measures to keep your information secure, though no method of transmission over the internet is 100% secure.</p>\n\n<h3 class=\"text-lg font-bold text-foreground mt-6 mb-2\">4. Third-Party Links</h3>\n<p class=\"mb-4\">Our website and social media posts may contain links to external sites (such as YouTube, Facebook, or reference materials). We are not responsible for the privacy practices or content of those external websites.</p>\n\n<h3 class=\"text-lg font-bold text-foreground mt-6 mb-2\">5. Your Consent and Rights</h3>\n<p class=\"mb-4\">By using our website, you consent to this Privacy Policy. You have the right to request access to, correction of, or deletion of your personal information at any time by contacting us.</p>\n\n<h3 class=\"text-lg font-bold text-foreground mt-6 mb-2\">6. Contact Us</h3>\n<p class=\"mb-2\">If you have any questions about this Privacy Policy, please contact us at:</p>\n<ul class=\"list-disc pl-6 space-y-1 mb-4\">\n  <li><strong>Email:</strong> <a href=\"mailto:me@wooniche.com\" class=\"text-primary underline\">me@wooniche.com</a></li>\n  <li><strong>Website:</strong> <a href=\"https://blog.wooniche.com/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-primary underline\">https://blog.wooniche.com/</a></li>\n</ul>",
+      "cover_image_url": null,
+      "published": true,
+      "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-11-19T15:00:00.000Z",
+      "updated_at": "2026-11-19T15:00:00.000Z"
+    },
     {
       "id": "7027ae50-b93b-49b8-ba5d-4f4863858747",
       "slug": "story",

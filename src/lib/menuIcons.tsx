@@ -6,6 +6,7 @@ import {
   Cpu,
   User,
   Mail,
+  ShieldCheck,
   type LucideIcon,
 } from "lucide-react";
 
@@ -55,6 +56,13 @@ export function getMenuIcon(url: string, label?: string): LucideIcon {
   if (cleanUrl.includes("contact") || cleanLabel === "যোগাযোগ" || cleanLabel === "contact") {
     return Mail;
   }
+  if (
+    cleanUrl.includes("privacy") ||
+    cleanLabel.includes("privacy") ||
+    cleanLabel.includes("প্রাইভেসি")
+  ) {
+    return ShieldCheck;
+  }
   return BookOpen;
 }
 
@@ -66,6 +74,7 @@ export const ORDERED_MENU_ITEMS = [
   { id: "tech-tips", url: "/c/tech-tips", label_bn: "টেক টিপস", label_en: "Tech Tips", sort_order: 5 },
   { id: "about", url: "/about", label_bn: "আমার পাতা", label_en: "About", sort_order: 6 },
   { id: "contact", url: "/contact", label_bn: "যোগাযোগ", label_en: "Contact", sort_order: 7 },
+  { id: "privacy-policy", url: "/privacy-policy", label_bn: "প্রাইভেসি পলিসি", label_en: "Privacy Policy", sort_order: 8 },
 ];
 
 export const MENU_ORDER_MAP: Record<string, number> = {
@@ -76,6 +85,7 @@ export const MENU_ORDER_MAP: Record<string, number> = {
   "/c/tech-tips": 5,
   "/about": 6,
   "/contact": 7,
+  "/privacy-policy": 8,
 };
 
 export function sortMenuItems<T extends { url: string; sort_order?: number }>(items: T[]): T[] {

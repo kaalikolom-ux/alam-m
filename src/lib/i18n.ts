@@ -23,6 +23,7 @@ export const dict: Dict = {
   backToArticles: { bn: "সব আর্টিকেল", en: "All articles" },
   aboutMe: { bn: "আমার পরিচিতি", en: "About Me" },
   contact: { bn: "যোগাযোগ", en: "Contact" },
+  privacyPolicy: { bn: "প্রাইভেসি পলিসি", en: "Privacy Policy" },
   loading: { bn: "লোড হচ্ছে...", en: "Loading..." },
   error: { bn: "কিছু একটা ভুল হয়েছে", en: "Something went wrong" },
   pageNotFound: { bn: "পৃষ্ঠাটি পাওয়া যায়নি।", en: "Page not found." },

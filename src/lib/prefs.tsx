@@ -18,6 +18,7 @@ const translations: Record<string, Record<Lang, string>> = {
   articles: { bn: "লেখালেখি", en: "Articles" },
   techTips: { bn: "টেক টিপস", en: "Tech Tips" },
   contact: { bn: "যোগাযোগ", en: "Contact" },
+  privacyPolicy: { bn: "প্রাইভেসি পলিসি", en: "Privacy Policy" },
   dashboard: { bn: "ড্যাশবোর্ড", en: "Dashboard" },
   categoriesTab: { bn: "ক্যাটাগরি", en: "Categories" },
   pagesTab: { bn: "পাতা", en: "Pages" },
