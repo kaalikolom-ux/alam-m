@@ -50,10 +50,10 @@ export function SiteHeader() {
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/85 backdrop-blur-md transition-colors">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
           {/* লোগো ও ট্যাগলাইন */}
-          <div className="flex items-center gap-4 lg:gap-6">
-            <Link to="/" className="flex flex-col">
+          <div className="flex items-center gap-3 lg:gap-5 xl:gap-6">
+            <Link to="/" className="flex flex-col shrink-0">
               <span className="font-['Kaushan_Script'] text-2xl font-bold tracking-tight text-primary">
                 Alam M
               </span>
@@ -63,7 +63,7 @@ export function SiteHeader() {
             </Link>
 
             {/* ডেস্কটপ নেভিগেশন লিংক */}
-            <nav className="hidden md:flex items-center gap-3 lg:gap-4.5 text-xs lg:text-sm font-medium">
+            <nav className="hidden md:flex items-center gap-2 lg:gap-3 xl:gap-4.5 text-xs lg:text-[13px] xl:text-sm font-medium">
               {navLinks.map((link) => {
                 const Icon = getMenuIcon(link.url, link.label);
                 const isInternal = link.url.startsWith("/");
@@ -71,7 +71,7 @@ export function SiteHeader() {
                   <Link
                     key={link.id}
                     to={link.url}
-                    className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
+                    className="inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 text-muted-foreground transition-colors hover:text-primary"
                     activeProps={{ className: "text-primary font-semibold" }}
                   >
                     <Icon className="size-3.5 shrink-0 opacity-80" />
@@ -81,7 +81,7 @@ export function SiteHeader() {
                   <a
                     key={link.id}
                     href={link.url}
-                    className="inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
+                    className="inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 text-muted-foreground transition-colors hover:text-primary"
                   >
                     <Icon className="size-3.5 shrink-0 opacity-80" />
                     <span>{link.label}</span>
@@ -92,31 +92,17 @@ export function SiteHeader() {
           </div>
 
           {/* কন্ট্রোল বার: সার্চ, থিম, ভাষা, অ্যাডমিন ও মোবাইল টগল */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* ডেস্কটপ সার্চ বাটন (ইনপুট স্টাইল) */}
-            <button
-              onClick={() => setSearchOpen(true)}
-              aria-label={lang === "bn" ? "খুঁজুন (Ctrl+K)" : "Search (Ctrl+K)"}
-              className="hidden md:inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground hover:border-primary/40 hover:text-foreground transition-all shadow-sm"
-              title="খুঁজুন (Ctrl+K)"
-            >
-              <Search className="size-3.5 text-primary" />
-              <span>{lang === "bn" ? "অনুসন্ধান..." : "Search..."}</span>
-              <kbd className="rounded border border-border bg-background px-1.5 py-0.2 text-[10px] font-mono text-muted-foreground">
-                ⌘K
-              </kbd>
-            </button>
-
-            {/* মোবাইল সার্চ আইকন বাটন */}
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            {/* সার্চ বাটন (কমপ্যাক্ট আইকন ঘর) */}
             <Button
               variant="ghost"
               size="icon"
-              aria-label={lang === "bn" ? "অনুসন্ধান করুন" : "Search"}
-              className="md:hidden size-9 rounded-full text-foreground/80 hover:text-primary"
+              aria-label={lang === "bn" ? "অনুসন্ধান (Ctrl+K)" : "Search (Ctrl+K)"}
               onClick={() => setSearchOpen(true)}
-              title="খুঁজুন"
+              className="size-9 rounded-full border border-border/60 bg-muted/40 text-foreground/80 hover:border-primary/40 hover:text-primary hover:bg-muted/70 transition-all shadow-sm"
+              title={lang === "bn" ? "অনুসন্ধান (Ctrl+K)" : "Search (Ctrl+K)"}
             >
-              <Search className="size-4" />
+              <Search className="size-4 text-primary" />
             </Button>
 
             {/* ভাষা পরিবর্তন বাটন */}
