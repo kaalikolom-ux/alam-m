@@ -92,17 +92,31 @@ export function SiteHeader() {
           </div>
 
           {/* কন্ট্রোল বার: সার্চ, থিম, ভাষা, অ্যাডমিন ও মোবাইল টগল */}
-          <div className="flex items-center gap-1 sm:gap-1.5">
-            {/* সার্চ বাটন (কমপ্যাক্ট আইকন ঘর) */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* ডেস্কটপ সার্চ বাটন (ইনপুট স্টাইল) */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              aria-label={lang === "bn" ? "খুঁজুন (Ctrl+K)" : "Search (Ctrl+K)"}
+              className="hidden md:inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground hover:border-primary/40 hover:text-foreground transition-all shadow-sm"
+              title={lang === "bn" ? "অনুসন্ধান (Ctrl+K)" : "Search (Ctrl+K)"}
+            >
+              <Search className="size-3.5 text-primary" />
+              <span>{lang === "bn" ? "অনুসন্ধান..." : "Search..."}</span>
+              <kbd className="rounded border border-border bg-background px-1.5 py-0.2 text-[10px] font-mono text-muted-foreground shadow-xs">
+                ⌘K
+              </kbd>
+            </button>
+
+            {/* মোবাইল সার্চ আইকন বাটন */}
             <Button
               variant="ghost"
               size="icon"
-              aria-label={lang === "bn" ? "অনুসন্ধান (Ctrl+K)" : "Search (Ctrl+K)"}
+              aria-label={lang === "bn" ? "অনুসন্ধান করুন" : "Search"}
+              className="md:hidden size-9 rounded-full text-foreground/80 hover:text-primary"
               onClick={() => setSearchOpen(true)}
-              className="size-9 rounded-full border border-border/60 bg-muted/40 text-foreground/80 hover:border-primary/40 hover:text-primary hover:bg-muted/70 transition-all shadow-sm"
-              title={lang === "bn" ? "অনুসন্ধান (Ctrl+K)" : "Search (Ctrl+K)"}
+              title={lang === "bn" ? "অনুসন্ধান" : "Search"}
             >
-              <Search className="size-4 text-primary" />
+              <Search className="size-4" />
             </Button>
 
             {/* ভাষা পরিবর্তন বাটন */}
