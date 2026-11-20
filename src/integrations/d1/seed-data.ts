@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "c7e2b109-8d4e-4f76-bc3a-592f8931ae6b",
+      "slug": "rupantor",
+      "title_bn": "রূপান্তর",
+      "title_en": "Transformation",
+      "excerpt_bn": "ভুলে যেতে বলবো না, ভুলে যাওয়াটাই স্বাভাবিক। স্বাভাবিকতায় রূপান্তর ঘটাতে বলবো কেন? ব্যবধান তো মাত্র অল্প ক'দিনের, ভুলে যেতে বাধ্য একসময়...",
+      "excerpt_en": "I will not ask you to forget; forgetting is only natural. Why urge a transformation against what is natural? After all, it is just a matter of a few days, destined to be forgotten eventually...",
+      "content_bn": "<p>ভুলে যেতে বলবো না<br>ভুলে যাওয়াটাই স্বাভাবিক।<br>স্বাভাবিকতায় রূপান্তর ঘটাতে বলবো কেন?<br>ব্যবধান তো মাত্র অল্প ক'দিনের,<br>ভুলে যেতে বাধ্য একসময়।<br>নামটাও স্মরণ করতে মস্তিষ্কের ডাটাবেজের কাছে<br>ফিরতে হতে পারে।</p>\n<p>ডাটাবেজ পুরোনো হলে স্মরণেই ঘুরপাক চলবে,<br>নামটা শুধু ঠোঁটে আর আসবে না।<br>কিছু নাম এভাবেই হারিয়ে যায়, অথচ<br>হারিয়ে যাওয়ার খবরটা মস্তিষ্ক কাউকে জানায় না।</p>\n<p>একসময় পরিচিত কণ্ঠস্বরও<br>অচেনা কোনো শব্দের মতো মনে হবে।<br>কথার ভেতর যে অভ্যাস ছিল,<br>তা বদলে যাবে অন্য কোনো অভ্যাসে।<br>যে অপেক্ষা একদিন সময়কে দীর্ঘ করেছিল,<br>তার আর কোনো নির্দিষ্ট পদচিহ্ন থাকবে না।</p>\n<p>হয়তো কোনো পুরোনো প্রসঙ্গে<br>হঠাৎ মনে পড়ে যাবে কিছু একটা,<br>কিন্তু মনে পড়ার কারণটা মনে থাকবে না।<br>মানুষ এভাবেই স্মৃতি থেকে সরে যায়,<br>কেউ কাউকে মুছে ফেলে না,<br>শুধু মনে রাখার প্রয়োজন ফুরিয়ে যায়।</p>\n<p>তবু ভুলে যাওয়াকে অপরাধ বলি কী করে?<br>সময় তো কাউকে ধরে রাখার প্রতিশ্রুতি দেয়নি।</p>\n<p class=\"mt-8 font-semibold text-primary\">©আলম <span class=\"text-xs font-normal text-muted-foreground block mt-1\">২০ নভেম্বর ২০২৬ইং, দুপুর ১২টা ২১মি.</span></p>",
+      "content_en": "<p>I will not ask you to forget;<br>Forgetting is only natural.<br>Why should I ask for a transformation in what is natural?<br>After all, it is just a matter of a few days,<br>Destined to be forgotten eventually.<br>Even to recall the name, one might have to turn<br>To the database of the mind.</p>\n<p>When the database ages, thoughts will only circle in memory,<br>The name simply won't reach the lips.<br>Some names are lost like this, yet<br>The mind never notifies anyone of their loss.</p>\n<p>In time, even a once familiar voice<br>Will sound like a strange, unfamiliar word.<br>The habits woven into conversations<br>Will transform into different habits.<br>The waiting that once made time stretch endlessly<br>Will leave behind no distinct footprints.</p>\n<p>Perhaps in some old, forgotten context<br>Something will suddenly come to mind,<br>Yet the reason for remembering won't be recalled.<br>People slip away from memory just like this;<br>No one ever erases anyone,<br>It is just that the need to remember quietly fades away.</p>\n<p>Yet how could I call forgetting a crime?<br>Time, after all, never promised to hold onto anyone.</p>\n<p class=\"mt-8 font-semibold text-primary\">©Alam <span class=\"text-xs font-normal text-muted-foreground block mt-1\">20 November 2026, 12:21 PM</span></p>",
+      "cover_image_url": null,
+      "published": true,
+      "published_at": "2026-11-20T06:21:00.000Z",
+      "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-11-20T06:21:00.000Z",
+      "updated_at": "2026-11-20T06:21:00.000Z"
+    },
+    {
       "id": "a1b2c3d4-e5f6-4789-abcd-ef0123456789",
       "slug": "humanize-ai-content-writing-tips",
       "title_bn": "কৃত্রিম বুদ্ধিমত্তার লেখায় মানুষের ছোঁয়া: এআই আর্টিকেল হিউম্যানাইজ করার সহজ উপায়",
@@ -548,6 +565,10 @@ export const INITIAL_SEED_DATA = {
   ],
   "verse_translations": [],
   "article_categories": [
+    {
+      "article_id": "c7e2b109-8d4e-4f76-bc3a-592f8931ae6b",
+      "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
+    },
     {
       "id": "e9f8a7b6-c5d4-4321-9876-543210fedcba",
       "article_id": "a1b2c3d4-e5f6-4789-abcd-ef0123456789",

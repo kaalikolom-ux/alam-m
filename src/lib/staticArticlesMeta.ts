@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "c7e2b109-8d4e-4f76-bc3a-592f8931ae6b",
+    "slug": "rupantor",
+    "title_bn": "রূপান্তর",
+    "title_en": "Transformation",
+    "excerpt_bn": "ভুলে যেতে বলবো না, ভুলে যাওয়াটাই স্বাভাবিক। স্বাভাবিকতায় রূপান্তর ঘটাতে বলবো কেন? ব্যবধান তো মাত্র অল্প ক'দিনের, ভুলে যেতে বাধ্য একসময়...",
+    "excerpt_en": "I will not ask you to forget; forgetting is only natural. Why urge a transformation against what is natural? After all, it is just a matter of a few days, destined to be forgotten eventually...",
+    "cover_image_url": null,
+    "published_at": "2026-11-20T06:21:00.000Z"
+  },
+  {
     "id": "a1b2c3d4-e5f6-4789-abcd-ef0123456789",
     "slug": "humanize-ai-content-writing-tips",
     "title_bn": "কৃত্রিম বুদ্ধিমত্তার লেখায় মানুষের ছোঁয়া: এআই আর্টিকেল হিউম্যানাইজ করার সহজ উপায়",
@@ -321,5 +331,3 @@ export const STATIC_ARTICLES_META = [
     "published_at": "2026-08-12T03:33:40.012+00:00"
   }
 ] as const;
-
-export type StaticArticleMeta = (typeof STATIC_ARTICLES_META)[number];

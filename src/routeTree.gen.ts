@@ -16,6 +16,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BookmarksRouteImport } from './routes/bookmarks'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TechTipsRouteImport } from './routes/tech-tips'
 import { Route as ArticlesIndexRouteImport } from './routes/articles.index'
@@ -57,6 +58,11 @@ const BookmarksRoute = BookmarksRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/bookmarks': typeof BookmarksRoute
   '/contact': typeof ContactRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/tech-tips': typeof TechTipsRoute
   '/articles/$slug': typeof ArticlesSlugRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/bookmarks': typeof BookmarksRoute
   '/contact': typeof ContactRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/tech-tips': typeof TechTipsRoute
   '/articles/$slug': typeof ArticlesSlugRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/bookmarks': typeof BookmarksRoute
   '/contact': typeof ContactRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/tech-tips': typeof TechTipsRoute
   '/articles/$slug': typeof ArticlesSlugRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bookmarks'
     | '/contact'
+    | '/privacy-policy'
     | '/reset-password'
     | '/tech-tips'
     | '/articles/$slug'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bookmarks'
     | '/contact'
+    | '/privacy-policy'
     | '/reset-password'
     | '/tech-tips'
     | '/articles/$slug'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bookmarks'
     | '/contact'
+    | '/privacy-policy'
     | '/reset-password'
     | '/tech-tips'
     | '/articles/$slug'
@@ -203,6 +215,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BookmarksRoute: typeof BookmarksRoute
   ContactRoute: typeof ContactRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TechTipsRoute: typeof TechTipsRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
@@ -261,6 +274,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -323,6 +343,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BookmarksRoute: BookmarksRoute,
   ContactRoute: ContactRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TechTipsRoute: TechTipsRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
