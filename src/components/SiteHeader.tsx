@@ -63,7 +63,7 @@ export function SiteHeader() {
             </Link>
 
             {/* ডেস্কটপ নেভিগেশন লিংক */}
-            <nav className="hidden md:flex items-center gap-2 lg:gap-3 xl:gap-4.5 text-xs lg:text-[13px] xl:text-sm font-medium">
+            <nav className="hidden md:flex items-center gap-1.5 lg:gap-2.5 xl:gap-4 text-xs lg:text-[13px] xl:text-sm font-medium">
               {navLinks.map((link) => {
                 const Icon = getMenuIcon(link.url, link.label);
                 const isInternal = link.url.startsWith("/");
@@ -97,11 +97,11 @@ export function SiteHeader() {
             <button
               onClick={() => setSearchOpen(true)}
               aria-label={lang === "bn" ? "খুঁজুন (Ctrl+K)" : "Search (Ctrl+K)"}
-              className="hidden md:inline-flex items-center gap-2 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground hover:border-primary/40 hover:text-foreground transition-all shadow-sm"
+              className="hidden md:inline-flex items-center gap-1.5 lg:gap-2 rounded-full border border-border/60 bg-muted/40 px-2.5 lg:px-3 py-1.5 text-xs text-muted-foreground hover:border-primary/40 hover:text-foreground transition-all shadow-sm"
               title={lang === "bn" ? "অনুসন্ধান (Ctrl+K)" : "Search (Ctrl+K)"}
             >
               <Search className="size-3.5 text-primary" />
-              <span>{lang === "bn" ? "অনুসন্ধান..." : "Search..."}</span>
+              <span className="hidden xl:inline">{lang === "bn" ? "অনুসন্ধান..." : "Search..."}</span>
               <kbd className="rounded border border-border bg-background px-1.5 py-0.2 text-[10px] font-mono text-muted-foreground shadow-xs">
                 ⌘K
               </kbd>
