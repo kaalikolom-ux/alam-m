@@ -269,25 +269,15 @@ function HomePage() {
                     params={{ slug: a.slug }}
                     className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-card transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/60 hover:shadow-xl dark:hover:shadow-primary/5"
                   >
-                    {/* ফটোকার্ড হেডার / ইমেজ কনটেইনার */}
+                    {/* ফটোকার্ড হেডার / শিরোনাম কার্ড */}
                     <div className="aspect-[16/10] w-full shrink-0 overflow-hidden bg-muted relative">
-                      {a.cover_image_url ? (
-                        <img
-                          src={a.cover_image_url}
-                          alt={title}
-                          loading="lazy"
-                          decoding="async"
-                          className="size-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="flex size-full items-center justify-center p-6 text-center bg-gradient-to-br from-primary/5 via-accent/20 to-primary/10 transition-colors group-hover:from-primary/10 group-hover:to-primary/20">
-                          <h3 className="line-clamp-3 text-lg font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">
-                            {title}
-                          </h3>
-                        </div>
-                      )}
+                      <div className="flex size-full items-center justify-center p-6 text-center bg-gradient-to-br from-primary/5 via-accent/20 to-primary/10 transition-colors group-hover:from-primary/10 group-hover:to-primary/20">
+                        <h3 className="line-clamp-3 text-lg font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">
+                          {title}
+                        </h3>
+                      </div>
 
-                      {/* ইমেজ ওভারলে শ্যাডো */}
+                      {/* ওভারলে শ্যাডো */}
                       <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     </div>
 

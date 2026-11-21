@@ -284,23 +284,12 @@ function ArticlesPage() {
               className="card-soft group flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 p-0 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-lift)]"
             >
               <div className="aspect-[16/10] w-full shrink-0 overflow-hidden bg-accent/40 relative">
-                {a.cover_image_url ? (
-                  <img
-                    src={a.cover_image_url}
-                    alt={title}
-                    loading="lazy"
-                    width={1600}
-                    height={1000}
-                    className="block size-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                  />
-                ) : (
                   <div className="flex size-full items-center justify-center p-6 text-center bg-gradient-to-br from-primary/5 via-accent/20 to-primary/10 transition-colors group-hover:from-primary/10 group-hover:to-primary/20">
                     <h3 className="line-clamp-3 text-lg font-semibold tracking-tight text-foreground/90 transition-colors group-hover:text-primary">
                       {title}
                     </h3>
                   </div>
-                )}
-              </div>
+                </div>
 
               <div className="flex min-w-0 flex-1 flex-col p-5">
                 <div className="mb-2.5 flex flex-wrap items-center gap-2">
