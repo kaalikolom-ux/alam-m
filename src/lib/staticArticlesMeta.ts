@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "f7e8d9c0-b1a2-4354-9586-123456789abc",
+    "slug": "antigravity-cloudflare-dynamic-website-master-guide",
+    "title_bn": "কোডিং ছাড়াই Google Antigravity, GitHub ও Cloudflare দিয়ে পূর্ণাঙ্গ ডায়নামিক ওয়েবসাইট (ব্লগ, ই-কমার্স ও পেমেন্ট গেটওয়েসহ) তৈরির মাস্টার গাইড",
+    "title_en": "Master Guide: Building Full-Stack Dynamic Websites with Google Antigravity, GitHub & Cloudflare (No Coding Required)",
+    "excerpt_bn": "Google Antigravity, GitHub, Cloudflare D1 (SQLite) এবং Cloudflare Workers & Pages ব্যবহার করে কোনো কোডিং বা সার্ভার অভিজ্ঞতা ছাড়াই সম্পূর্ণ ফ্রিতে একটি পূর্ণাঙ্গ ডায়নামিক ওয়েবসাইট (ব্লগ, ই-কমার্স ও পেমেন্ট গেটওয়েসহ) তৈরির ধাপে ধাপে পূর্ণাঙ্গ গাইড।",
+    "excerpt_en": "A comprehensive master guide to building and deploying complete dynamic websites with blog, e-commerce, and Bangladeshi payment gateways using Google Antigravity, GitHub, and Cloudflare without writing code.",
+    "cover_image_url": "https://res.cloudinary.com/coindyna/image/upload/v1795264582/FreeWebsite.webp",
+    "published_at": "2026-11-21T12:41:00.000Z"
+  },
+  {
     "id": "c7e2b109-8d4e-4f76-bc3a-592f8931ae6b",
     "slug": "rupantor",
     "title_bn": "রূপান্তর",

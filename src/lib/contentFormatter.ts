@@ -33,12 +33,17 @@ function wrapCodeBlocks(html: string): string {
                  clsLower.includes("toml") ? "TOML" :
                  clsLower.includes("html") ? "HTML" :
                  clsLower.includes("javascript") || clsLower.includes("js") ? "JavaScript" :
-                 "Bash";
+                 clsLower.includes("markdown") || clsLower.includes("md") ? "Markdown" :
+                 clsLower.includes("prompt") ? "AI Prompt" :
+                 clsLower.includes("git") ? "Git" :
+                 "Code";
 
     const defaultFilename = clsLower.includes("sql") ? "schema.sql" :
                             clsLower.includes("toml") ? "wrangler.toml" :
                             clsLower.includes("html") ? "index.html" :
                             clsLower.includes("javascript") || clsLower.includes("js") ? "messages.js" :
+                            clsLower.includes("markdown") || clsLower.includes("md") ? ".antigravityrules" :
+                            clsLower.includes("prompt") ? "prompt.txt" :
                             "command.sh";
 
     return `<div class="clickable-code-block group relative my-4 overflow-hidden rounded-2xl border border-zinc-800 bg-[#141417] text-zinc-100 shadow-md" data-code="${encodeURIComponent(rawText)}">
