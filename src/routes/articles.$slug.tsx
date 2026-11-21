@@ -450,7 +450,7 @@ function ArticlePage() {
         } catch (_) {}
         const fileName = downloadBtn.getAttribute("data-filename") || "command.sh";
         if (codeText) {
-          const blob = new Blob([codeText + "\n"], { type: "text/x-sh;charset=utf-8" });
+          const blob = new Blob([codeText + "\n"], { type: "text/plain;charset=utf-8" });
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
@@ -464,13 +464,16 @@ function ArticlePage() {
         return;
       }
 
-      if (copyBtn || codeBlock || pre) {
-        let textToCopy =
-          copyBtn?.getAttribute("data-code") ||
-          codeBlock?.getAttribute("data-code") ||
-          (pre ? (pre.querySelector("code") || pre).textContent : "") ||
-          "";
+      // ব্যবহারকারী মাউস কার্সার দিয়ে নির্দিষ্ট টেক্সট সিলেক্ট করলে পুরো কোড কপি করা প্রতিরোধ করা
+      const selection = window.getSelection();
+      if (selection && selection.toString().trim().length > 0 && !copyBtn) {
+        return;
+      }
 
+      // কপি বাটনে ক্লিক করলে সম্পূর্ণ কোড কপি করা
+      if (copyBtn) {
+        e.stopPropagation();
+        let textToCopy = copyBtn.getAttribute("data-code") || "";
         try {
           if (textToCopy.includes("%")) {
             textToCopy = decodeURIComponent(textToCopy);
@@ -480,13 +483,11 @@ function ArticlePage() {
         if (textToCopy && textToCopy.trim()) {
           navigator.clipboard.writeText(textToCopy.trim()).then(() => {
             toast.success("কমান্ড কপি করা হয়েছে!");
-            if (copyBtn) {
-              const oldText = copyBtn.innerHTML;
-              copyBtn.innerHTML = "<span class='text-emerald-400'>✓ কপি হয়েছে</span>";
-              setTimeout(() => {
-                copyBtn.innerHTML = oldText;
-              }, 2000);
-            }
+            const oldText = copyBtn.innerHTML;
+            copyBtn.innerHTML = "<span class='text-emerald-400 font-medium'>✓ কপি হয়েছে</span>";
+            setTimeout(() => {
+              copyBtn.innerHTML = oldText;
+            }, 2000);
           });
         }
       }

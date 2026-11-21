@@ -10,8 +10,10 @@ function formatInlineText(str: string): string {
     .replace(/__(.*?)__/g, "<strong>$1</strong>")
     // *italic* বা _italic_ -> <em>
     .replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, "<em>$1</em>")
+    // `code` -> <code ...>
+    .replace(/`([^`]+)`/g, '<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-primary font-semibold select-text cursor-text">$1</code>')
     // [text](url) -> <a>
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary underline">$1</a>');
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-primary underline font-medium hover:text-primary/80">$1</a>');
 }
 
 function wrapCodeBlocks(html: string): string {
@@ -25,22 +27,34 @@ function wrapCodeBlocks(html: string): string {
       .replace(/&quot;/g, '"')
       .trim();
 
-    const lang = (cls || "").includes("bash") ? "Bash" : (cls || "").includes("sql") ? "SQL" : "Bash";
+    const clsLower = (cls || "").toLowerCase();
+    const lang = clsLower.includes("bash") || clsLower.includes("sh") ? "Bash" :
+                 clsLower.includes("sql") ? "SQL" :
+                 clsLower.includes("toml") ? "TOML" :
+                 clsLower.includes("html") ? "HTML" :
+                 clsLower.includes("javascript") || clsLower.includes("js") ? "JavaScript" :
+                 "Bash";
 
-    return `<div class="clickable-code-block group relative my-4 overflow-hidden rounded-2xl border border-zinc-800 bg-[#141417] text-zinc-100 shadow-md cursor-pointer" data-code="${encodeURIComponent(rawText)}" title="ক্লিক করে কমান্ড কপি করুন">
+    const defaultFilename = clsLower.includes("sql") ? "schema.sql" :
+                            clsLower.includes("toml") ? "wrangler.toml" :
+                            clsLower.includes("html") ? "index.html" :
+                            clsLower.includes("javascript") || clsLower.includes("js") ? "messages.js" :
+                            "command.sh";
+
+    return `<div class="clickable-code-block group relative my-4 overflow-hidden rounded-2xl border border-zinc-800 bg-[#141417] text-zinc-100 shadow-md" data-code="${encodeURIComponent(rawText)}">
   <div class="flex items-center justify-between border-b border-zinc-800/80 bg-[#1c1c22] px-4 py-2 text-xs">
     <span class="font-semibold text-zinc-300 font-sans">${lang}</span>
     <div class="flex items-center gap-1.5">
-      <button type="button" class="code-download-btn flex size-7 items-center justify-center rounded text-zinc-400 hover:bg-zinc-800 hover:text-white" data-code="${encodeURIComponent(rawText)}" data-filename="command.sh" title="ডাউনলোড করুন">
+      <button type="button" class="code-download-btn flex size-7 items-center justify-center rounded text-zinc-400 hover:bg-zinc-800 hover:text-white" data-code="${encodeURIComponent(rawText)}" data-filename="${defaultFilename}" title="ডাউনলোড করুন">
         <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
       </button>
-      <button type="button" class="code-copy-btn flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white" data-code="${encodeURIComponent(rawText)}" title="কপি করুন">
+      <button type="button" class="code-copy-btn flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white bg-zinc-800/60 transition-colors" data-code="${encodeURIComponent(rawText)}" title="কপি করুন">
         <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
         <span>কপি</span>
       </button>
     </div>
   </div>
-  <pre class="p-4 text-xs sm:text-sm font-mono overflow-x-auto text-zinc-100 selection:bg-primary/30"><code class="${cls || ""}">${innerCode}</code></pre>
+  <pre class="p-4 text-xs sm:text-sm font-mono overflow-x-auto text-zinc-100 selection:bg-primary/40 select-text cursor-text"><code class="${cls || ""} select-text cursor-text">${innerCode}</code></pre>
 </div>`;
   });
 }

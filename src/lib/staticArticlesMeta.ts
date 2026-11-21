@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "e8b1a2c3-4d5e-4f67-8901-23456789abcd",
+    "slug": "free-website-hosting",
+    "title_bn": "সম্পূর্ণ ফ্রি ওয়েবসাইট হোষ্টিং",
+    "title_en": "Completely Free Dynamic Website Hosting: GitHub, Cloudflare D1 & Workers",
+    "excerpt_bn": "GitHub, Cloudflare D1 (SQLite) এবং Cloudflare Workers & Pages ব্যবহার করে সম্পূর্ণ ফ্রিতে একটি হাই-স্পিড ডায়নামিক ওয়েবসাইট তৈরি এবং ডেপ্লয় করার পূর্ণাঙ্গ গাইডলাইন।",
+    "excerpt_en": "A complete step-by-step guide to building and deploying high-speed dynamic full-stack websites 100% free using GitHub, Cloudflare D1 SQLite database, and Cloudflare Workers & Pages.",
+    "cover_image_url": null,
+    "published_at": "2026-11-21T11:42:00.000Z"
+  },
+  {
     "id": "c7e2b109-8d4e-4f76-bc3a-592f8931ae6b",
     "slug": "rupantor",
     "title_bn": "রূপান্তর",
