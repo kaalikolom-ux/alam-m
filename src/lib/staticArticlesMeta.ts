@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "e3d4c5b6-a789-4012-9abc-def012345678",
+    "slug": "apni-ki-diye-bhat-kheyechhen",
+    "title_bn": "আপনি কি দিয়ে ভাত খেয়েছেন?",
+    "title_en": "What Did You Have Rice With?",
+    "excerpt_bn": "এনালগ টেলিফোনের সোনালী যুগের এক মধুর স্মৃতিকথা—সচিবালয়ের ল্যান্ডফোনে আসা এক রং নাম্বার থেকে শুরু হওয়া বন্ধুত্ব এবং বন্ধুর সেই কালজয়ী অবিস্মরণীয় প্রথম ডায়ালগ।",
+    "excerpt_en": "A nostalgic and humorous memoir from the analog telephone era—how a wrong call to the Secretariat blossomed into friendship, and my friend's unforgettable romantic icebreaker.",
+    "cover_image_url": null,
+    "published_at": "2026-11-22T16:34:00.000Z"
+  },
+  {
     "id": "f7e8d9c0-b1a2-4354-9586-123456789abc",
     "slug": "antigravity-cloudflare-dynamic-website-master-guide",
     "title_bn": "কোডিং ছাড়াই Google Antigravity, GitHub ও Cloudflare দিয়ে পূর্ণাঙ্গ ডায়নামিক ওয়েবসাইট (ব্লগ, ই-কমার্স ও পেমেন্ট গেটওয়েসহ) তৈরির মাস্টার গাইড",
