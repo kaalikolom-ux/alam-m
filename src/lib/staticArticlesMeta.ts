@@ -3,7 +3,7 @@ export const STATIC_ARTICLES_META = [
   {
     "id": "e3d4c5b6-a789-4012-9abc-def012345678",
     "slug": "apni-ki-diye-bhat-kheyechhen",
-    "title_bn": "আপনি কি দিয়ে ভাত খেয়েছেন?",
+    "title_bn": "আপনি কী দিয়ে ভাত খেয়েছেন?",
     "title_en": "What Did You Have Rice With?",
     "excerpt_bn": "এনালগ টেলিফোনের সোনালী যুগের এক মধুর স্মৃতিকথা—সচিবালয়ের ল্যান্ডফোনে আসা এক রং নাম্বার থেকে শুরু হওয়া বন্ধুত্ব এবং বন্ধুর সেই কালজয়ী অবিস্মরণীয় প্রথম ডায়ালগ।",
     "excerpt_en": "A nostalgic and humorous memoir from the analog telephone era—how a wrong call to the Secretariat blossomed into friendship, and my friend's unforgettable romantic icebreaker.",
