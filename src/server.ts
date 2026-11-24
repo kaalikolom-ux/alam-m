@@ -71,7 +71,31 @@ function escapeHtml(str: string): string {
     .replace(/>/g, "&gt;");
 }
 
-export default {
+
+const SECURITY_HEADERS: Record<string, string> = {
+  "X-Frame-Options": "SAMEORIGIN",
+  "X-Content-Type-Options": "nosniff",
+  "X-XSS-Protection": "1; mode=block",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), bluetooth=()",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+  "Content-Security-Policy": "default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.cloudflare.com https://api.coindyna.com https://res.cloudinary.com; frame-src 'self' https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self';",
+};
+
+function applySecurityHeaders(res: Response): Response {
+  const newHeaders = new Headers(res.headers);
+  for (const [key, val] of Object.entries(SECURITY_HEADERS)) {
+    newHeaders.set(key, val);
+  }
+  const body = [101, 204, 205, 304].includes(res.status) ? null : res.body;
+  return new Response(body, {
+    status: res.status,
+    statusText: res.statusText,
+    headers: newHeaders,
+  });
+}
+
+const appHandler = {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     setWorkerEnv(env, request);
     const url = new URL(request.url);
@@ -448,5 +472,13 @@ Alam M is a Bengali writer and storyteller who views words as a living canvas. W
         headers: { "content-type": "text/html; charset=utf-8" },
       });
     }
+  },
+};
+
+
+export default {
+  async fetch(request: Request, env: unknown, ctx: unknown): Promise<Response> {
+    const res = await appHandler.fetch(request, env, ctx);
+    return applySecurityHeaders(res);
   },
 };
