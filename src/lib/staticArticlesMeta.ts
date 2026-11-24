@@ -1,6 +1,16 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "d2e3f4a5-b6c7-4890-1234-56789abcdef0",
+    "slug": "ghumo-ador-chum",
+    "title_bn": "ঘুমোও, আদর চুম...",
+    "title_en": "Sleep, Tender Kiss...",
+    "excerpt_bn": "ঘুমন্ত আবেগকে জাগ্রত করতে চাই না গো, কিছু অনুভূতি ঘুমিয়েই সুন্দর থাকে। তোমার চোখে নেমে আসুক স্বপ্নের মায়া, নীরব রাত তোমাকে আগলে রাখুক আদরে...",
+    "excerpt_en": "I do not wish to awaken slumbering passions; some feelings remain most beautiful in their quiet rest. May dreams weave their enchantment over your eyes, and the still night hold you tenderly...",
+    "cover_image_url": null,
+    "published_at": "2026-11-23T19:00:00.000Z"
+  },
+  {
     "id": "e3d4c5b6-a789-4012-9abc-def012345678",
     "slug": "apni-ki-diye-bhat-kheyechhen",
     "title_bn": "আপনি কী দিয়ে ভাত খেয়েছেন?",

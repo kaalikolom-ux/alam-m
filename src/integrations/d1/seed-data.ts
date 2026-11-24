@@ -2,6 +2,23 @@
 export const INITIAL_SEED_DATA = {
   "articles": [
     {
+      "id": "d2e3f4a5-b6c7-4890-1234-56789abcdef0",
+      "slug": "ghumo-ador-chum",
+      "title_bn": "ঘুমোও, আদর চুম...",
+      "title_en": "Sleep, Tender Kiss...",
+      "excerpt_bn": "ঘুমন্ত আবেগকে জাগ্রত করতে চাই না গো, কিছু অনুভূতি ঘুমিয়েই সুন্দর থাকে। তোমার চোখে নেমে আসুক স্বপ্নের মায়া, নীরব রাত তোমাকে আগলে রাখুক আদরে...",
+      "excerpt_en": "I do not wish to awaken slumbering passions; some feelings remain most beautiful in their quiet rest. May dreams weave their enchantment over your eyes, and the still night hold you tenderly...",
+      "content_bn": "<p class=\"text-base sm:text-lg leading-relaxed font-serif\">\nঘুমন্ত আবেগকে জাগ্রত করতে চাই না গো,<br>\nকিছু অনুভূতি ঘুমিয়েই সুন্দর থাকে।<br>\nতোমার চোখে নেমে আসুক স্বপ্নের মায়া,<br>\nনীরব রাত তোমাকে আগলে রাখুক আদরে।<br>\nকোনো কথা নয়, কোনো আবদারও নয়,<br>\nশুধু দূর থেকে একটুখানি মুগ্ধতা রইল, ঘুমোও,<br>\nআদর চুম... ভালো থেকো স্বপ্নের ভেতরেও।\n</p>\n<p class=\"mt-8 font-semibold text-primary\">©আলম <span class=\"text-xs font-normal text-muted-foreground block mt-1\">২৪ নভেম্বর ২০২৬ইং, রাত ১টা</span></p>",
+      "content_en": "<p class=\"text-base sm:text-lg leading-relaxed font-serif\">\nI do not wish to awaken slumbering passions,<br>\nSome feelings remain most beautiful in their quiet rest.<br>\nMay the enchantment of gentle dreams descend upon your eyes,<br>\nMay the silent night embrace and cradle you with tenderness.<br>\nNo spoken words, no whispered longing,<br>\nOnly a quiet wonder lingering softly from afar; sleep now,<br>\nA tender kiss... remain well, even within the realm of dreams.\n</p>\n<p class=\"mt-8 font-semibold text-primary\">©Alam <span class=\"text-xs font-normal text-muted-foreground block mt-1\">24 November 2026, 1:00 AM</span></p>",
+      "cover_image_url": null,
+      "published": true,
+      "published_at": "2026-11-23T19:00:00.000Z",
+      "created_by": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "author_id": "6a308470-2d8d-4cd8-996b-a96de32efdc2",
+      "created_at": "2026-11-23T19:00:00.000Z",
+      "updated_at": "2026-11-23T19:00:00.000Z"
+    },
+    {
       "id": "e3d4c5b6-a789-4012-9abc-def012345678",
       "slug": "apni-ki-diye-bhat-kheyechhen",
       "title_bn": "আপনি কী দিয়ে ভাত খেয়েছেন?",
@@ -599,6 +616,10 @@ export const INITIAL_SEED_DATA = {
   ],
   "verse_translations": [],
   "article_categories": [
+    {
+      "article_id": "d2e3f4a5-b6c7-4890-1234-56789abcdef0",
+      "category_id": "fa17b7b2-a53b-4d67-b2bb-3828971b72ba"
+    },
     {
       "article_id": "e3d4c5b6-a789-4012-9abc-def012345678",
       "category_id": "555b556e-d5be-46be-bd97-16aa41828db8"
