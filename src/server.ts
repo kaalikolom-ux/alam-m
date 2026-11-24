@@ -85,7 +85,9 @@ const SECURITY_HEADERS: Record<string, string> = {
 function applySecurityHeaders(res: Response): Response {
   const newHeaders = new Headers(res.headers);
   for (const [key, val] of Object.entries(SECURITY_HEADERS)) {
-    newHeaders.set(key, val);
+    if (!newHeaders.has(key)) {
+      newHeaders.set(key, val);
+    }
   }
   const body = [101, 204, 205, 304].includes(res.status) ? null : res.body;
   return new Response(body, {
@@ -420,13 +422,19 @@ Alam M is a Bengali writer and storyteller who views words as a living canvas. W
         return normalized;
       }
 
+      const nonce = (
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID().replace(/-/g, "")
+          : Math.random().toString(36).slice(2) + Date.now().toString(36)
+      ).slice(0, 24);
+
+      let html = await normalized.text();
+
       const articleMatch = url.pathname.match(/^\/articles\/([^/]+)/);
       if (articleMatch) {
         const rawSlug = articleMatch[1];
         const decodedSlug = decodeURIComponent(rawSlug);
         const meta = STATIC_META_MAP.get(decodedSlug) || STATIC_META_MAP.get(rawSlug);
-
-        let html = await normalized.text();
 
         const canonicalUrl = `${url.origin}/articles/${rawSlug}`;
         const ogImage = `${url.origin}/og/articles/${rawSlug}.png`;
@@ -452,19 +460,26 @@ Alam M is a Bengali writer and storyteller who views words as a living canvas. W
         } else if (html.includes("<head>")) {
           html = html.replace("<head>", `<head>${injection}`);
         }
+      }
 
-        const newHeaders = new Headers(normalized.headers);
+      // Inject nonce into all <script> tags so CSP executes them without needing 'unsafe-inline'
+      html = html.replace(/<script\b(?![^>]*\bnonce=)([^>]*)>/gi, `<script nonce="${nonce}"$1>`);
+
+      const newHeaders = new Headers(normalized.headers);
+      if (articleMatch) {
+        const canonicalUrl = `${url.origin}/articles/${articleMatch[1]}`;
         newHeaders.set("Link", `<${canonicalUrl}>; rel="canonical"`);
         newHeaders.set("Cache-Control", "public, max-age=0, must-revalidate");
         newHeaders.set("Cloudflare-CDN-Cache-Control", "no-cache");
-
-        return new Response(html, {
-          status: normalized.status,
-          headers: newHeaders,
-        });
       }
 
-      return normalized;
+      const csp = `default-src 'self'; script-src 'self' 'nonce-${nonce}' https://challenges.cloudflare.com https://static.cloudflareinsights.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.cloudflare.com https://api.coindyna.com https://res.cloudinary.com; frame-src 'self' https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self';`;
+      newHeaders.set("Content-Security-Policy", csp);
+
+      return new Response(html, {
+        status: normalized.status,
+        headers: newHeaders,
+      });
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {
