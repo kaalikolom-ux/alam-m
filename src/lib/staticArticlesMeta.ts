@@ -1,6 +1,23 @@
 // Auto-generated static metadata for articles (UTF-8 without BOM)
 export const STATIC_ARTICLES_META = [
   {
+    "id": "a1b2c3d4-e5f6-4789-0123-abcdef012345",
+    "slug": "ami-meyer-baba-hote-perechhi",
+    "title_bn": "আমি মেয়ের বাবা হতে পেরেছি",
+    "title_en": "I Became a Father to a Daughter",
+    "excerpt_bn": "কুমিল্লা রেল স্টেশনে ট্রেনের সেই ইঞ্জিনিয়ারিং, উত্তরায় খাবার পৌঁছানো এবং এক গভীর মমতার সূচনা—যেখানে একটি ফুটফুটে মেয়ে খুঁজে পেয়েছিল তার বাবাকে, আর আমি পেয়েছিলাম এক রাজকন্যাকে।",
+    "excerpt_en": "A heartwarming memoir of how a journey to Comilla and a simple act of care blossomed into an unconditional bond—where a little girl found her father, and I found my daughter.",
+    "cover_image_url": null,
+    "published": 1,
+    "published_at": "2026-11-25T13:58:00.000Z",
+    "created_at": "2026-11-25T13:58:00.000Z",
+    "author_name_bn": "আলম",
+    "author_name_en": "Alam",
+    "category_name_bn": "স্মৃতিকথা",
+    "category_name_en": "Memoir",
+    "category_slug": "smritikotha"
+  },
+  {
     "id": "d2e3f4a5-b6c7-4890-1234-56789abcdef0",
     "slug": "ghumo-ador-chum",
     "title_bn": "ঘুমোও, আদর চুম...",
